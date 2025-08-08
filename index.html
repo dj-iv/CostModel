@@ -53,7 +53,7 @@
             display: flex;
             gap: 10px;
         }
-        #reset-overrides, #settings-btn, #toggle-zero-qty-btn, #generate-link-btn {
+        #reset-overrides, #settings-btn, #toggle-zero-qty-btn, #generate-link-btn, #generate-proposal-btn {
             padding: 8px 12px;
             border: 1px solid #004696;
             background-color: #f0f8ff;
@@ -63,10 +63,11 @@
             font-weight: 600;
             font-size: 13px;
         }
-        #reset-overrides:hover, #settings-btn:hover, #toggle-zero-qty-btn:hover, #generate-link-btn:hover {
+        #reset-overrides:hover, #settings-btn:hover, #toggle-zero-qty-btn:hover, #generate-link-btn:hover, #generate-proposal-btn:hover {
             background-color: #e0eefc;
         }
         #generate-link-btn { background-color: #d1ecf1; border-color: #bee5eb;}
+        #generate-proposal-btn { background-color: #d4edda; border-color: #28a745;}
 
         /* Financial Summary Box */
         .financial-summary {
@@ -152,7 +153,7 @@
         }
         .item-qty { cursor: pointer; position: relative; }
 
-        /* Support Section Styles (inside modal) */
+        /* Support Section Styles */
         .support-table { width: 100%; margin-top: 15px; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
         .support-table th, .support-table td { text-align: center; padding: 8px; border: 1px solid #ddd; vertical-align: middle; }
         .support-table th:nth-child(1), .support-table td:nth-child(1) { text-align: left; width: 18%; }
@@ -195,13 +196,14 @@
         .screenshot-mode {
             display: grid;
             grid-template-columns: 400px 1fr;
-            grid-template-rows: auto auto auto; 
+            grid-template-rows: auto auto auto 1fr; /* 4 rows for left column */
             gap: 25px;
             max-width: 1800px;
         }
         .screenshot-mode > h1 {
             display: none;
         }
+        .screenshot-mode #proposal-details-section,
         .screenshot-mode #antenna-section,
         .screenshot-mode #config-section,
         .screenshot-mode #support-section,
@@ -210,10 +212,11 @@
             padding-bottom: 0;
             border-bottom: none;
         }
-        .screenshot-mode #antenna-section { grid-area: 1 / 1 / 2 / 2; }
-        .screenshot-mode #config-section { grid-area: 2 / 1 / 3 / 2; }
-        .screenshot-mode #support-section { grid-area: 3 / 1 / 4 / 2; }
-        .screenshot-mode #results-section { grid-area: 1 / 2 / 4 / 2; }
+        .screenshot-mode #proposal-details-section { grid-area: 1 / 1 / 2 / 2; }
+        .screenshot-mode #antenna-section { grid-area: 2 / 1 / 3 / 2; }
+        .screenshot-mode #config-section { grid-area: 3 / 1 / 4 / 2; }
+        .screenshot-mode #support-section { grid-area: 4 / 1 / 5 / 2; }
+        .screenshot-mode #results-section { grid-area: 1 / 2 / 5 / 2; } /* Spans all 4 rows */
         
         /* Main page support buttons */
         .support-presets-main {
@@ -235,6 +238,18 @@
         }
         .support-presets-main button:hover { background-color: #e0eefc; }
         .support-presets-main button.active-preset { background-color: #004696; color: white; }
+        .support-prices-display {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+            padding: 8px;
+            background-color: #f8fafd;
+            border-radius: 4px;
+        }
+        .support-price-item {
+            font-size: 14px;
+            color: #555;
+        }
 
         /* Modal Tabs */
         .modal-tabs {
@@ -264,6 +279,20 @@
 
     <div class="calculator-container" id="main-container">
         <h1>Universal System Calculator</h1>
+
+        <div class="section" id="proposal-details-section">
+            <h2>Proposal Details</h2>
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="customer-name">Customer Name</label>
+                    <input type="text" id="customer-name" placeholder="e.g., One Globe Square">
+                </div>
+                <div class="input-group">
+                    <label for="survey-price">Survey Price (£)</label>
+                    <input type="number" id="survey-price" value="1200" step="100">
+                </div>
+            </div>
+        </div>
 
         <div class="section" id="antenna-section">
             <h2>Antenna Calculator</h2>
@@ -368,6 +397,11 @@
                 <button id="support-preset-gold">Gold</button>
                 <button id="support-preset-none">None</button>
             </div>
+            <div class="support-prices-display">
+                <span class="support-price-item">B: <strong id="bronze-price-display">£0.00</strong></span>
+                <span class="support-price-item">S: <strong id="silver-price-display">£0.00</strong></span>
+                <span class="support-price-item">G: <strong id="gold-price-display">£0.00</strong></span>
+            </div>
         </div>
 
         <div class="section" id="results-section">
@@ -393,6 +427,7 @@
             </div>
             <div class="results-header">
                 <div class="header-buttons">
+                    <button id="generate-proposal-btn">Generate Proposal 🚀</button>
                     <button id="generate-link-btn">Generate Link 🔗</button>
                     <button id="toggle-zero-qty-btn">Show All Items</button>
                     <button id="settings-btn">Settings ⚙️</button>
