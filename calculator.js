@@ -246,7 +246,7 @@ tabLinks.forEach(link => {
             priceData['support_package'].cost = supportCost;
             
             if (supportCost > 0) {
-                const activeButton = document.querySelector('.support-presets button.active-preset');
+                const activeButton = document.querySelector('.support-presets-main button.active-preset');
                 if (activeButton && activeButton.id !== 'support-preset-none') {
                     const tier = activeButton.id.replace('support-preset-', '');
                     const tierName = tier.charAt(0).toUpperCase() + tier.slice(1);
