@@ -43,7 +43,7 @@
             gap: 10px;
         }
         h2.table-header { margin: 0; padding: 0; border-bottom: none; }
-        #reset-overrides, #settings-btn, #toggle-zero-qty-btn, #screenshot-btn, #return-btn {
+        #reset-overrides, #settings-btn, #toggle-zero-qty-btn, #screenshot-btn, #return-btn, #generate-link-btn {
             padding: 8px 12px;
             border: 1px solid #004696;
             background-color: #f0f8ff;
@@ -53,11 +53,13 @@
             font-weight: 600;
             font-size: 13px;
         }
-        #reset-overrides:hover, #settings-btn:hover, #toggle-zero-qty-btn:hover, #screenshot-btn:hover, #return-btn:hover {
+        #reset-overrides:hover, #settings-btn:hover, #toggle-zero-qty-btn:hover, #screenshot-btn:hover, #return-btn:hover, #generate-link-btn:hover {
             background-color: #e0eefc;
         }
         #screenshot-btn { background-color: #d4edda; border-color: #28a745;}
         #return-btn { background-color: #f8d7da; border-color: #dc3545;}
+        #generate-link-btn { background-color: #d1ecf1; border-color: #bee5eb;}
+
 
         /* Financial Summary Box */
         .financial-summary {
@@ -143,13 +145,10 @@
         }
         .item-qty { cursor: pointer; position: relative; }
 
-        /* Support Section Styles */
+        /* Support Section Styles (inside modal) */
         .support-section details { border: 1px solid #004696; border-radius: 8px; padding: 10px; background-color: #f8fafd; }
         .support-section summary { font-weight: 600; color: #004696; cursor: pointer; font-size: 18px; }
-        .support-controls { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid #e0e6ec; }
-        .support-presets button { padding: 6px 10px; border: 1px solid #004696; background-color: white; color: #004696; border-radius: 5px; cursor: pointer; font-weight: 600; }
-        .support-presets button:hover { background-color: #e0eefc; }
-        .support-presets button.active-preset { background-color: #004696; color: white; }
+        .support-controls { display: flex; justify-content: flex-end; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid #e0e6ec; }
         .support-table { width: 100%; margin-top: 15px; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
         .support-table th, .support-table td { text-align: center; padding: 8px; border: 1px solid #ddd; vertical-align: middle; }
         .support-table th:nth-child(1), .support-table td:nth-child(1) { text-align: left; width: 18%; }
@@ -200,7 +199,8 @@
         }
         .screenshot-mode #antenna-section,
         .screenshot-mode #config-section,
-        .screenshot-mode #results-section {
+        .screenshot-mode #results-section,
+        .screenshot-mode #support-section {
             margin-bottom: 0;
             padding-bottom: 0;
             border-bottom: none;
@@ -214,12 +214,55 @@
         .screenshot-mode #settings-btn,
         .screenshot-mode #reset-overrides,
         .screenshot-mode #toggle-zero-qty-btn,
-        .screenshot-mode #screenshot-btn {
+        .screenshot-mode #screenshot-btn,
+        .screenshot-mode #generate-link-btn {
             display: none !important;
         }
         .screenshot-mode #return-btn {
             display: inline-block !important;
         }
+
+        /* Main page support buttons */
+        .support-presets-main {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .support-presets-main button {
+            padding: 10px 25px;
+            border: 1px solid #004696;
+            background-color: white;
+            color: #004696;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+        }
+        .support-presets-main button:hover { background-color: #e0eefc; }
+        .support-presets-main button.active-preset { background-color: #004696; color: white; }
+
+        /* Modal Tabs */
+        .modal-tabs {
+            display: flex;
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 15px;
+        }
+        .tab-link {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background-color: transparent;
+            border-bottom: 3px solid transparent;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        .tab-link.active {
+            color: #004696;
+            border-bottom: 3px solid #004696;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
 </head>
 <body>
@@ -322,25 +365,14 @@
             </div>
         </div>
 
-        <div class="section support-section" id="support-section">
-            <details>
-                <summary>Support Package</summary>
-                <div class="support-controls">
-                    <div class="support-presets">
-                        <span>Presets:</span>
-                        <button id="support-preset-bronze">Bronze</button>
-                        <button id="support-preset-silver">Silver</button>
-                        <button id="support-preset-gold">Gold</button>
-                        <button id="support-preset-none">None</button>
-                    </div>
-                    <div class="support-maintenance-input">
-                        <label for="maintenance-percent">Maintenance (% of Hardware):</label>
-                        <input type="number" id="maintenance-percent" value="5" min="0" step="0.5">
-                    </div>
-                </div>
-                <table id="support-table" class="support-table">
-                    </table>
-            </details>
+        <div class="section" id="support-section">
+            <h2>Support Package</h2>
+            <div class="support-presets-main">
+                <button id="support-preset-bronze">Bronze</button>
+                <button id="support-preset-silver">Silver</button>
+                <button id="support-preset-gold">Gold</button>
+                <button id="support-preset-none">None</button>
+            </div>
         </div>
 
         <div class="section" id="results-section">
@@ -367,13 +399,13 @@
             <div class="results-header">
                 <h2 class="table-header">System Components & Analysis</h2>
                 <div class="header-buttons">
-    <button id="generate-link-btn">Generate Link 🔗</button> 
-    <button id="screenshot-btn">Prepare for Screenshot 📸</button>
-    <button id="return-btn" class="hidden">Return to Calculator 🧮</button>
-    <button id="toggle-zero-qty-btn">Show All Items</button>
-    <button id="settings-btn">Settings ⚙️</button>
-    <button id="reset-overrides">Reset Overrides</button>
-</div>
+                    <button id="generate-link-btn">Generate Link 🔗</button>
+                    <button id="screenshot-btn">Prepare for Screenshot 📸</button>
+                    <button id="return-btn" class="hidden">Return to Calculator 🧮</button>
+                    <button id="toggle-zero-qty-btn">Show All Items</button>
+                    <button id="settings-btn">Settings ⚙️</button>
+                    <button id="reset-overrides">Reset Overrides</button>
+                </div>
             </div>
             
             <table class="results-table">
@@ -390,8 +422,29 @@
                 <span class="close-btn">&times;</span>
             </div>
             <div class="modal-body">
-                <div id="settings-form-container">
-                    </div>
+                <div class="modal-tabs">
+                    <button class="tab-link active" data-tab="pricing">Pricing</button>
+                    <button class="tab-link" data-tab="support">Support</button>
+                </div>
+        
+                <div id="pricing" class="tab-content active">
+                    <div id="settings-form-container">
+                        </div>
+                </div>
+        
+                <div id="support" class="tab-content">
+                    <details open>
+                        <summary>Detailed Support Configuration</summary>
+                        <div class="support-controls">
+                             <div class="support-maintenance-input">
+                                <label for="maintenance-percent">Maintenance (% of Hardware):</label>
+                                <input type="number" id="maintenance-percent" value="5" min="0" step="0.5">
+                            </div>
+                        </div>
+                        <table id="support-table" class="support-table">
+                            </table>
+                    </details>
+                </div>
             </div>
             <div class="modal-footer">
                 <button id="modal-cancel">Cancel</button>
@@ -399,8 +452,8 @@
             </div>
         </div>
     </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
-<script type="module" src="./calculator.js"></script>
-<script type="module" src="./calculator.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+    <script type="module" src="./calculator.js"></script>
 </body>
 </html>
