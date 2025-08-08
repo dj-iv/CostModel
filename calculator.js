@@ -444,17 +444,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     initialize();
-});
-
-function updateSellPriceDisplay(key) {
-    const costInput = document.getElementById(`cost-${key}`);
-    const marginInput = document.getElementById(`margin-${key}`);
-    const sellDisplay = document.getElementById(`sell-${key}`);
-    const cost = parseFloat(costInput.value) || 0;
-    const margin = parseFloat(marginInput.value) || 0;
-    const sellPrice = cost * (1 + margin / 100);
-    sellDisplay.textContent = `£${sellPrice.toFixed(2)}`;
-}
 // --- Shareable Link Logic ---
 
 function generateShareLink() {
@@ -510,6 +499,18 @@ function generateShareLink() {
     url.hash = encoded;
     prompt("Copy this link to share the quote:", url.href);
 }
+});
+
+function updateSellPriceDisplay(key) {
+    const costInput = document.getElementById(`cost-${key}`);
+    const marginInput = document.getElementById(`margin-${key}`);
+    const sellDisplay = document.getElementById(`sell-${key}`);
+    const cost = parseFloat(costInput.value) || 0;
+    const margin = parseFloat(marginInput.value) || 0;
+    const sellPrice = cost * (1 + margin / 100);
+    sellDisplay.textContent = `£${sellPrice.toFixed(2)}`;
+}
+
 
 function loadStateFromURL() {
     if (!window.location.hash) return false;
