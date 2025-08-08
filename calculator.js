@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let priceData = {};
     let currentResults = {};
     let showZeroQuantityItems = false;
-    let subTotalsForProposal = {}; // To store subtotals for the proposal
+    let subTotalsForProposal = {};
 
     function updateSellPriceDisplay(key) {
         const costInput = document.getElementById(`cost-${key}`);
@@ -149,6 +149,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         runFullCalculation();
     }
+    
+    // START of RE-ADDED FUNCTION
+    function updateSupportTableSummaries(totalHardwareUnits) {
+        const dailyInstallRate = priceData.install_internal.cost * (1 + priceData.install_internal.margin);
+        const tierPerSystemDPY = { bronze: 0, silver: 0, gold: 0 };
+        const tierFixedAnnualDPY = { bronze: 0, silver: 0, gold: 0 };
+        
+        for (const tier of ['bronze', 'silver', 'gold']) {
+            document.querySelectorAll(`.support-checkbox[data-tier="${tier}"]:checked`).forEach(box => {
+                const key = box.dataset.key;
+                const dpmInput = document.querySelector(`.dpm-input[data-key="${key}"]`);
+                if (dpmInput) {
+                    const dpyValue = (parseFloat(dpmInput.value) || 0) * 12;
+                    if (supportData[key].type === 'per_system') {
+                        tierPerSystemDPY[tier] += dpyValue;
+                    } else {
+                        tierFixedAnnualDPY[tier] += dpyValue;
+                    }
+                }
+            });
+        }
+
+        for (const tier of ['bronze', 'silver', 'gold']) {
+            const sysSummaryCell = document.getElementById(`${tier}-sys-summary`);
+            const yearSummaryCell = document.getElementById(`${tier}-year-summary`);
+            
+            if(sysSummaryCell) sysSummaryCell.textContent = `£${(tierPerSystemDPY[tier] * dailyInstallRate).toFixed(2)}`;
+            
+            const fixedServicesCost = tierFixedAnnualDPY[tier] * dailyInstallRate;
+            if(yearSummaryCell) yearSummaryCell.textContent = `£${fixedServicesCost.toFixed(2)}`;
+        }
+    }
+    // END of RE-ADDED FUNCTION
 
     function getSpecificSupportCost(tier, totalHardwareUnits, totalHardwareSellPrice) {
         let totalPerSystemDPY = 0, totalFixedAnnualDPY = 0;
@@ -162,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        const dailyInstallRate = priceData.install_internal.cost * (1 + priceData.install_internal.margin);
+        const dailyInstallRate = (priceData.install_internal?.cost * (1 + priceData.install_internal?.margin)) || 0;
         const perSystemCost = totalPerSystemDPY * dailyInstallRate * totalHardwareUnits;
         const fixedAnnualCost = totalFixedAnnualDPY * dailyInstallRate;
         const maintenanceCost = totalHardwareSellPrice * (maintenancePercent / 100);
@@ -208,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        const dailyInstallRate = priceData.install_internal.cost * (1 + priceData.install_internal.margin);
+        const dailyInstallRate = (priceData.install_internal?.cost * (1 + priceData.install_internal?.margin)) || 0;
         const perSystemCost = totalPerSystemDPY * dailyInstallRate * totalHardwareUnits;
         const fixedAnnualCost = totalFixedAnnualDPY * dailyInstallRate;
         const maintenanceCost = totalHardwareSellPrice * (maintenancePercent / 100);
@@ -277,7 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             updateDOM();
-            updateAllSupportTierPrices(); // Update the display for B, S, G prices
+            updateAllSupportTierPrices();
         } catch (error) {
             console.error("A critical error occurred during calculation:", error);
             const resultsBody = document.getElementById('results-tbody');
@@ -486,7 +519,6 @@ document.addEventListener('DOMContentLoaded', () => {
         button.disabled = true;
 
         try {
-            // 1. Gather hardware totals for support calcs
             let totalHardwareSellPrice = 0, totalHardwareUnits = 0;
             const hardwareKeys = ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB', 'extender_cat6', 'extender_fibre_cu', 'extender_fibre_nu'];
             for (const key of hardwareKeys) {
@@ -500,84 +532,67 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             
-            // 2. Calculate all support tiers
             const bronzeCost = getSpecificSupportCost('bronze', totalHardwareUnits, totalHardwareSellPrice);
             const silverCost = getSpecificSupportCost('silver', totalHardwareUnits, totalHardwareSellPrice);
             const goldCost = getSpecificSupportCost('gold', totalHardwareUnits, totalHardwareSellPrice);
             
-            // 3. Get totals
-            const totalSell = subTotalsForProposal.hardware.sell + subTotalsForProposal.consumables.sell + subTotalsForProposal.services.sell;
-            const totalMargin = subTotalsForProposal.hardware.margin + subTotalsForProposal.consumables.margin + subTotalsForProposal.services.margin;
+            const totalSell = (subTotalsForProposal.hardware?.sell || 0) + (subTotalsForProposal.consumables?.sell || 0) + (subTotalsForProposal.services?.sell || 0);
+            const totalMargin = (subTotalsForProposal.hardware?.margin || 0) + (subTotalsForProposal.consumables?.margin || 0) + (subTotalsForProposal.services?.margin || 0);
 
-            // 4. Format the date
             const now = new Date();
             const dateString = `${String(now.getDate()).padStart(2, '0')}${now.toLocaleString('default', { month: 'short' })}${now.getFullYear()}_${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
             
-            // 5. Assemble the final data structure
             const proposalData = {
                 variables: [
                     { name: "Account", value: document.getElementById('customer-name').value },
                     { name: "NumberOfNetworks", value: document.getElementById('number-of-networks').value },
-                    
                     { name: "SubName1", value: "CEL-FI Hardware" },
                     { name: "SubQty1", value: "1" },
                     { name: "SubPrice1", value: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
                     { name: "SubTotal1", value: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
-
                     { name: "SubName2", value: "Antennas, cables and connectors" },
                     { name: "SubQty2", value: "1" },
                     { name: "SubPrice2", value: `£${(subTotalsForProposal.consumables?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
                     { name: "SubTotal2", value: `£${(subTotalsForProposal.consumables?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
-
                     { name: "SubName3", value: "Professional Services" },
                     { name: "SubQty3", value: "1" },
                     { name: "SubPrice3", value: `£${(subTotalsForProposal.services?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
                     { name: "SubTotal3", value: `£${(subTotalsForProposal.services?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
-                    
                     { name: "SubName4", value: "" }, { name: "SubQty4", value: "" }, { name: "SubPrice4", value: "" }, { name: "SubTotal4", value: "" },
-
                     { name: "TotalPrice", value: `£${totalSell.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
-                    
                     { name: "SupportName1", value: "Bronze" },
                     { name: "SupportQty1", value: "1" },
                     { name: "SupportPrice1", value: `£${bronzeCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
                     { name: "SupportTotal1", value: `£${bronzeCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
-                    
                     { name: "SupportName2", value: "Silver" },
                     { name: "SupportQty2", value: "1" },
                     { name: "SupportPrice2", value: `£${silverCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
                     { name: "SupportTotal2", value: `£${silverCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
-                    
                     { name: "SupportName3", value: "Gold" },
                     { name: "SupportQty3", value: "1" },
                     { name: "SupportPrice3", value: `£${goldCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
                     { name: "SupportTotal3", value: `£${goldCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
-                    
                     { name: "SurveyPrice", value: `£${(parseFloat(document.getElementById('survey-price').value) || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
                     { name: "MarginTotal", value: totalMargin.toFixed(2) },
                     { name: "CurrentDate", value: dateString }
                 ]
             };
 
-            // 6. Send the data to the webhook
             const response = await fetch(MAKE_WEBHOOK_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(proposalData)
             });
-
             if (response.ok) {
                 button.innerHTML = 'Proposal Sent! ✅';
             } else {
                 throw new Error(`Webhook failed: ${response.statusText}`);
             }
-
         } catch (error) {
             console.error('Failed to send proposal data:', error);
             alert('Error: Could not send proposal to Make.com. Please check the console for details.');
             button.innerHTML = 'Failed! ❌';
         } finally {
-            // Re-enable the button after a delay
             setTimeout(() => {
                 button.innerHTML = originalText;
                 button.disabled = false;
@@ -585,7 +600,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Shareable Link Logic ---
     async function generateShareLink() {
         const stateToSave = {
             version: 1,
@@ -656,6 +670,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const savedState = JSON.parse(jsonString);
             if(savedState.version !== 1) return false;
             const { inputs, overrides, pricing, supportSelections } = savedState;
+            document.getElementById('customer-name').value = inputs.customerName || '';
+            document.getElementById('survey-price').value = inputs.surveyPrice || 1200;
             document.getElementById('system-type').value = inputs.systemType;
             document.getElementById('floor-area').value = inputs.floorArea;
             document.getElementById('number-of-floors').value = inputs.numberOfFloors;
