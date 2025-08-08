@@ -540,14 +540,21 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // 3. Get totals
         const totalMargin = (subTotalsForProposal.hardware?.margin || 0) + (subTotalsForProposal.consumables?.margin || 0) + (subTotalsForProposal.services?.margin || 0);
-        const systemTypeSelect = document.getElementById('system-type');
-        const solutionName = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
+const systemTypeSelect = document.getElementById('system-type');
+const selectedValue = systemTypeSelect.value;
+const selectedText = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
 
-        // 4. Assemble the final flat data structure
-        const proposalData = {
-            CustomerName: document.getElementById('customer-name').value,
-            Solution: solutionName,
-            NumberOfNetworks: document.getElementById('number-of-networks').value,
+// This map will translate the system value to the desired text for the proposal
+const solutionNameMap = {
+    'G41': 'GO G41',
+    'G43': 'GO G43' 
+};
+const solutionNameToSend = solutionNameMap[selectedValue] || selectedText;
+
+const proposalData = {
+    CustomerName: document.getElementById('customer-name').value,
+    Solution: solutionNameToSend,
+    NumberOfNetworks: document.getElementById('number-of-networks').value,
             SurveyPrice: (parseFloat(document.getElementById('survey-price').value) || 0).toFixed(2),
 
             Description1: "CEL-FI Hardware",
