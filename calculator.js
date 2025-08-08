@@ -73,7 +73,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function setupSettingsModal() { const modal = document.getElementById('settings-modal'), btn = document.getElementById('settings-btn'), closeBtn = modal.querySelector('.close-btn'), cancelBtn = document.getElementById('modal-cancel'), saveBtn = document.getElementById('modal-save'); btn.onclick = () => { populateSettingsModal(); modal.style.display = "block"; }; const closeModal = () => modal.style.display = "none"; closeBtn.onclick = closeModal; cancelBtn.onclick = closeModal; window.onclick = (event) => { if (event.target == modal) closeModal(); }; saveBtn.onclick = () => { const newPriceData = JSON.parse(JSON.stringify(priceData)); let allValid = true; for(const key in newPriceData) { const newCost = parseFloat(document.getElementById(`cost-${key}`).value), newMargin = parseFloat(document.getElementById(`margin-${key}`).value) / 100; if (!isNaN(newCost) && !isNaN(newMargin)) { newPriceData[key].cost = newCost; newPriceData[key].margin = newMargin; } else { allValid = false; } } if(allValid) { savePrices(newPriceData); closeModal(); } else { alert("Please ensure all values are valid numbers."); } }; }
+    function setupSettingsModal() { const modal = document.getElementById('settings-modal'), btn = document.getElementById('settings-btn'), closeBtn = modal.querySelector('.close-btn'), cancelBtn = document.getElementById('modal-cancel'), saveBtn = document.getElementById('modal-save'); btn.onclick = () => { populateSettingsModal(); modal.style.display = "block"; }; const closeModal = () => modal.style.display = "none"; closeBtn.onclick = closeModal; cancelBtn.onclick = closeModal; window.onclick = (event) => { if (event.target == modal) closeModal(); }; saveBtn.onclick = () => { const newPriceData = JSON.parse(JSON.stringify(priceData)); let allValid = true; for(const key in newPriceData) { const newCost = parseFloat(document.getElementById(`cost-${key}`).value), newMargin = parseFloat(document.getElementById(`margin-${key}`).value) / 100; if (!isNaN(newCost) && !isNaN(newMargin)) { newPriceData[key].cost = newCost; newPriceData[key].margin = newMargin; } else { allValid = false; } } if(allValid) { savePrices(newPriceData); closeModal(); } else { alert("Please ensure all values are valid numbers."); } }; 
+                                  // Add logic for modal tabs
+const tabLinks = modal.querySelectorAll('.tab-link');
+const tabContents = modal.querySelectorAll('.tab-content');
+
+tabLinks.forEach(link => {
+    link.addEventListener('click', () => {
+        const tabId = link.dataset.tab;
+
+        tabLinks.forEach(item => item.classList.remove('active'));
+        tabContents.forEach(item => item.classList.remove('active'));
+
+        link.classList.add('active');
+        modal.querySelector(`#${tabId}`).classList.add('active');
+    });
+});
+                                  }
     
     function populateSupportTable() {
         const table = document.getElementById('support-table');
