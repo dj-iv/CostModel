@@ -44,8 +44,27 @@ document.addEventListener('DOMContentLoaded', () => {
     function loadPrices() { try { const savedPrices = localStorage.getItem('universalCalculatorPrices'); if (savedPrices) { priceData = JSON.parse(savedPrices); for(const key in defaultPriceData) if(!priceData[key]) priceData[key] = defaultPriceData[key]; } else { priceData = JSON.parse(JSON.stringify(defaultPriceData)); } } catch (e) { console.error("Could not load prices", e); priceData = JSON.parse(JSON.stringify(defaultPriceData)); } }
     function savePrices(newPriceData) { try { localStorage.setItem('universalCalculatorPrices', JSON.stringify(newPriceData)); priceData = newPriceData; runFullCalculation(); alert('Prices saved successfully!'); } catch (e) { console.error("Could not save prices.", e); alert('Error: Could not save prices.'); } }
     function setupSettingsModal() { const modal = document.getElementById('settings-modal'), btn = document.getElementById('settings-btn'), closeBtn = modal.querySelector('.close-btn'), cancelBtn = document.getElementById('modal-cancel'), saveBtn = document.getElementById('modal-save'); btn.onclick = () => { populateSettingsModal(); modal.style.display = "block"; }; const closeModal = () => modal.style.display = "none"; closeBtn.onclick = closeModal; cancelBtn.onclick = closeModal; window.onclick = (event) => { if (event.target == modal) closeModal(); }; saveBtn.onclick = () => { const newPriceData = JSON.parse(JSON.stringify(priceData)); let allValid = true; for(const key in newPriceData) { const newCost = parseFloat(document.getElementById(`cost-${key}`).value), newMargin = parseFloat(document.getElementById(`margin-${key}`).value) / 100; if (!isNaN(newCost) && !isNaN(newMargin)) { newPriceData[key].cost = newCost; newPriceData[key].margin = newMargin; } else { allValid = false; } } if(allValid) { savePrices(newPriceData); closeModal(); } else { alert("Please ensure all values are valid numbers."); } }; }
-    function populateSettingsModal() { const container = document.getElementById('settings-form-container'); let html = `<div class="setting-item setting-header"><span>Component</span><span>Cost (£)</span><span>Margin (%)</span><span>Sell (£)</span></div>`; const sortedKeys = Object.keys(priceData).sort((a, b) => priceData[a].label.localeCompare(priceData[b].label)); for(const key of sortedKeys) { const item = priceData[key]; const sellPrice = item.cost * (1 + item.margin); html += `<div class="setting-item"><label for="cost-${key}">${item.label}</label><input type="number" step="0.01" id="cost-${key}" value="${item.cost.toFixed(2)}" oninput="updateSellPriceDisplay('${key}')"><input type="number" step="0.01" id="margin-${key}" value="${(item.margin * 100).toFixed(2)}" oninput="updateSellPriceDisplay('${key}')"><span id="sell-${key}" class="sell-price-display">£${sellPrice.toFixed(2)}</span></div>`; } container.innerHTML = html; }
-    
+  function populateSettingsModal() {
+    const container = document.getElementById('settings-form-container');
+    let html = `<div class="setting-item setting-header"><span>Component</span><span>Cost (£)</span><span>Margin (%)</span><span>Sell (£)</span></div>`;
+    const sortedKeys = Object.keys(priceData).sort((a, b) => priceData[a].label.localeCompare(priceData[b].label));
+    for(const key of sortedKeys) {
+        const item = priceData[key];
+        const sellPrice = item.cost * (1 + item.margin);
+        // REMOVED oninput="..." from the next line
+        html += `<div class="setting-item"><label for="cost-${key}">${item.label}</label><input type="number" step="0.01" id="cost-${key}" value="${item.cost.toFixed(2)}"><input type="number" step="0.01" id="margin-${key}" value="${(item.margin * 100).toFixed(2)}"><span id="sell-${key}" class="sell-price-display">£${sellPrice.toFixed(2)}</span></div>`;
+    }
+    container.innerHTML = html;
+
+    // Attach event listeners programmatically
+    for(const key of sortedKeys) {
+        const costInput = document.getElementById(`cost-${key}`);
+        const marginInput = document.getElementById(`margin-${key}`);
+        const handler = () => updateSellPriceDisplay(key);
+        if(costInput) costInput.addEventListener('input', handler);
+        if(marginInput) marginInput.addEventListener('input', handler);
+    }
+}
     function populateSupportTable() {
         const table = document.getElementById('support-table');
         if (!table) return;
