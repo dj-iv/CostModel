@@ -449,7 +449,16 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function initialize() {
         const stateLoaded = loadStateFromURL();
+        const mainContainer = document.getElementById('main-container');
+        const viewToggleButton = document.getElementById('view-toggle-btn');
 
+        // View toggle logic
+        viewToggleButton.addEventListener('click', () => {
+            const isDashboard = mainContainer.classList.toggle('screenshot-mode');
+            viewToggleButton.textContent = isDashboard ? 'Switch to Simple View' : 'Switch to Dashboard View';
+        });
+
+        // Other event listeners
         document.getElementById('generate-link-btn').addEventListener('click', generateShareLink);
         document.getElementById('support-preset-none').addEventListener('click', () => setSupportPreset('none'));
         document.getElementById('support-preset-bronze').addEventListener('click', () => setSupportPreset('bronze'));
@@ -485,6 +494,7 @@ document.addEventListener('DOMContentLoaded', () => {
             runFullCalculation(); 
         });
 
+        // Initial setup calls
         loadPrices();
         setupSettingsModal();
         populateSupportTable();
@@ -496,6 +506,10 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             runFullCalculation();
         }
+
+        // Set default view to dashboard
+        mainContainer.classList.add('screenshot-mode');
+        viewToggleButton.textContent = 'Switch to Simple View';
     }
 
     // --- Shareable Link Logic ---
