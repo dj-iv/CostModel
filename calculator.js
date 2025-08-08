@@ -542,10 +542,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const now = new Date();
             const dateString = `${String(now.getDate()).padStart(2, '0')}${now.toLocaleString('default', { month: 'short' })}${now.getFullYear()}_${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
             
-            const proposalData = {
-                variables: [
-                    { name: "Account", value: document.getElementById('customer-name').value },
-                    { name: "NumberOfNetworks", value: document.getElementById('number-of-networks').value },
+            const systemTypeSelect = document.getElementById('system-type');
+const solutionName = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
+
+const proposalData = {
+    variables: [
+        { name: "Account", value: document.getElementById('customer-name').value },
+        { name: "Solution", value: solutionName }, // This line was added
+        { name: "NumberOfNetworks", value: document.getElementById('number-of-networks').value },
                     { name: "SubName1", value: "CEL-FI Hardware" },
                     { name: "SubQty1", value: "1" },
                     { name: "SubPrice1", value: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
