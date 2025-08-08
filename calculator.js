@@ -252,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const networksInput = document.getElementById('number-of-networks');
             if (systemType.includes('EVO') && parseInt(networksInput.value) > 2) { networksInput.value = '2'; }
             const params = { B_SA: parseInt(document.getElementById('total-service-antennas').value) || 0, C_Net: parseInt(networksInput.value) || 0, E_Max: parseInt(document.getElementById('max-antennas').value) || 0, };
-            params.D_DA = params.C_Net;
+            params.D_DA = params.C_Net > 1 ? 2 : params.C_Net;
             const calculatedValues = systemCalculators[systemType](params);
             for (const key in calculatedValues) { if (currentResults[key]) currentResults[key].calculated = calculatedValues[key]; else currentResults[key] = { calculated: calculatedValues[key], override: null, decimals: 0, unit: { coax_half: ' (m)', coax_lmr400: ' (m)', cable_cat: ' (m)', install_internal: ' (Days)', install_external: ' (Days)' }[key] || '' };}
             if(!currentResults['service_antennas']) currentResults['service_antennas'] = { calculated: 0, override: null, decimals: 0, unit: '' };
