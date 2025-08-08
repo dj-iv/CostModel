@@ -31,9 +31,8 @@
         }
         .results-header {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end; /* Changed */
             align-items: center;
-            margin-top: 25px;
             margin-bottom: 15px;
             padding-bottom: 10px;
             border-bottom: 2px solid #004696;
@@ -42,8 +41,7 @@
             display: flex;
             gap: 10px;
         }
-        h2.table-header { margin: 0; padding: 0; border-bottom: none; }
-        #reset-overrides, #settings-btn, #toggle-zero-qty-btn, #screenshot-btn, #return-btn, #generate-link-btn {
+        #reset-overrides, #settings-btn, #toggle-zero-qty-btn, #generate-link-btn {
             padding: 8px 12px;
             border: 1px solid #004696;
             background-color: #f0f8ff;
@@ -53,13 +51,10 @@
             font-weight: 600;
             font-size: 13px;
         }
-        #reset-overrides:hover, #settings-btn:hover, #toggle-zero-qty-btn:hover, #screenshot-btn:hover, #return-btn:hover, #generate-link-btn:hover {
+        #reset-overrides:hover, #settings-btn:hover, #toggle-zero-qty-btn:hover, #generate-link-btn:hover {
             background-color: #e0eefc;
         }
-        #screenshot-btn { background-color: #d4edda; border-color: #28a745;}
-        #return-btn { background-color: #f8d7da; border-color: #dc3545;}
         #generate-link-btn { background-color: #d1ecf1; border-color: #bee5eb;}
-
 
         /* Financial Summary Box */
         .financial-summary {
@@ -146,9 +141,6 @@
         .item-qty { cursor: pointer; position: relative; }
 
         /* Support Section Styles (inside modal) */
-        .support-section details { border: 1px solid #004696; border-radius: 8px; padding: 10px; background-color: #f8fafd; }
-        .support-section summary { font-weight: 600; color: #004696; cursor: pointer; font-size: 18px; }
-        .support-controls { display: flex; justify-content: flex-end; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid #e0e6ec; }
         .support-table { width: 100%; margin-top: 15px; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
         .support-table th, .support-table td { text-align: center; padding: 8px; border: 1px solid #ddd; vertical-align: middle; }
         .support-table th:nth-child(1), .support-table td:nth-child(1) { text-align: left; width: 18%; }
@@ -187,41 +179,27 @@
         #settings-form-container .setting-item input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
         #settings-form-container .setting-item .sell-price-display { font-weight: bold; text-align: right; padding-right: 10px; }
 
-        /* --- Screenshot Mode Styles --- */
-        .screenshot-mode {
+        /* --- Main Dashboard View Styles --- */
+        .dashboard-view {
             display: grid !important;
             grid-template-columns: 400px 1fr;
-            grid-template-rows: auto 1fr;
+            grid-template-rows: auto auto auto; /* 3 rows for left column */
             gap: 25px;
-            max-width: 1800px;
-            padding: 20px;
-            border: 2px dashed #004696;
+            max-width: 1800px; /* Wider view */
         }
-        .screenshot-mode #antenna-section,
-        .screenshot-mode #config-section,
-        .screenshot-mode #results-section,
-        .screenshot-mode #support-section {
+        .dashboard-view #antenna-section,
+        .dashboard-view #config-section,
+        .dashboard-view #support-section,
+        .dashboard-view #results-section {
             margin-bottom: 0;
             padding-bottom: 0;
             border-bottom: none;
         }
-        .screenshot-mode #antenna-section { grid-area: 1 / 1 / 2 / 2; }
-        .screenshot-mode #config-section { grid-area: 2 / 1 / 3 / 2; }
-        .screenshot-mode #results-section { grid-area: 1 / 2 / 3 / 3; }
+        .dashboard-view #antenna-section { grid-area: 1 / 1 / 2 / 2; }
+        .dashboard-view #config-section { grid-area: 2 / 1 / 3 / 2; }
+        .dashboard-view #support-section { grid-area: 3 / 1 / 4 / 2; }
+        .dashboard-view #results-section { grid-area: 1 / 2 / 4 / 2; } /* Spans all 3 rows */
         
-        .screenshot-mode > h1,
-        .screenshot-mode #support-section,
-        .screenshot-mode #settings-btn,
-        .screenshot-mode #reset-overrides,
-        .screenshot-mode #toggle-zero-qty-btn,
-        .screenshot-mode #screenshot-btn,
-        .screenshot-mode #generate-link-btn {
-            display: none !important;
-        }
-        .screenshot-mode #return-btn {
-            display: inline-block !important;
-        }
-
         /* Main page support buttons */
         .support-presets-main {
             display: flex;
@@ -238,6 +216,7 @@
             cursor: pointer;
             font-weight: 600;
             font-size: 15px;
+            flex-grow: 1;
         }
         .support-presets-main button:hover { background-color: #e0eefc; }
         .support-presets-main button.active-preset { background-color: #004696; color: white; }
@@ -267,7 +246,7 @@
 </head>
 <body>
 
-    <div class="calculator-container" id="main-container">
+    <div class="calculator-container dashboard-view" id="main-container">
         <h1>Universal System Calculator</h1>
 
         <div class="section" id="antenna-section">
@@ -358,7 +337,7 @@
                 <div class="input-group" style="justify-content: center; min-width: 300px;">
                     <div class="checkbox-group">
                         <input type="checkbox" id="no-hardware-checkbox">
-                        <label for="no-hardware-checkbox">Exclude Hardware Costs (Hardware Supplied by Client)</label>
+                        <label for="no-hardware-checkbox">Exclude Hardware Costs</label>
                     </div>
                 </div>
                 <input type="hidden" id="total-service-antennas" value="12">
@@ -397,11 +376,8 @@
                 </div>
             </div>
             <div class="results-header">
-                <h2 class="table-header">System Components & Analysis</h2>
                 <div class="header-buttons">
                     <button id="generate-link-btn">Generate Link 🔗</button>
-                    <button id="screenshot-btn">Prepare for Screenshot 📸</button>
-                    <button id="return-btn" class="hidden">Return to Calculator 🧮</button>
                     <button id="toggle-zero-qty-btn">Show All Items</button>
                     <button id="settings-btn">Settings ⚙️</button>
                     <button id="reset-overrides">Reset Overrides</button>
@@ -418,7 +394,7 @@
     <div id="settings-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Component Pricing Settings</h2>
+                <h2>Component Settings</h2>
                 <span class="close-btn">&times;</span>
             </div>
             <div class="modal-body">
