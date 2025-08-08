@@ -497,7 +497,75 @@ function generateShareLink() {
     // 3. Create the URL and show it to the user
     const url = new URL(window.location);
     url.hash = encoded;
-    prompt("Copy this link to share the quote:", url.href);
+    async function generateShareLink() {
+    // 1. Gather all the data needed to recreate the state (this part is unchanged)
+    const stateToSave = {
+        version: 1,
+        inputs: {
+            systemType: document.getElementById('system-type').value,
+            floorArea: document.getElementById('floor-area').value,
+            numberOfFloors: document.getElementById('number-of-floors').value,
+            unit: document.querySelector('input[name="unit-switch"]:checked').value,
+            band: document.querySelector('input[name="band-switch"]:checked').value,
+            percentOpen: document.getElementById('percent-open').value,
+            percentCubical: document.getElementById('percent-cubical').value,
+            percentHollow: document.getElementById('percent-hollow').value,
+            percentSolid: document.getElementById('percent-solid').value,
+            isHighCeiling: document.getElementById('high-ceiling-warehouse').checked,
+            numberOfNetworks: document.getElementById('number-of-networks').value,
+            maxAntennas: document.getElementById('max-antennas').value,
+            excludeHardware: document.getElementById('no-hardware-checkbox').checked,
+            referralFeePercent: document.getElementById('referral-fee-percent').value,
+            maintenancePercent: document.getElementById('maintenance-percent').value,
+        },
+        overrides: {},
+        pricing: priceData,
+        supportSelections: {}
+    };
+    for (const key in currentResults) {
+        if (currentResults[key].override !== null) {
+            stateToSave.overrides[key] = currentResults[key].override;
+        }
+    }
+    document.querySelectorAll('.support-checkbox').forEach(box => {
+        if(!stateToSave.supportSelections[box.dataset.key]) stateToSave.supportSelections[box.dataset.key] = {};
+        stateToSave.supportSelections[box.dataset.key][box.dataset.tier] = box.checked;
+    });
+     document.querySelectorAll('.dpm-input').forEach(input => {
+         if(!stateToSave.supportSelections[input.dataset.key]) stateToSave.supportSelections[input.dataset.key] = {};
+        stateToSave.supportSelections[input.dataset.key].dpm = input.value;
+    });
+
+    // 2. Convert to JSON, compress, and encode (this part is unchanged)
+    const jsonString = JSON.stringify(stateToSave);
+    const compressed = pako.deflate(jsonString, { to: 'string' });
+    const encoded = btoa(compressed);
+
+    // 3. Create the URL
+    const url = new URL(window.location);
+    url.hash = encoded;
+
+    // 4. NEW: Copy to clipboard and provide user feedback
+    try {
+        await navigator.clipboard.writeText(url.href);
+
+        // Give feedback to the user
+        const button = document.getElementById('generate-link-btn');
+        const originalText = button.innerHTML;
+        button.innerHTML = 'Copied! ✅';
+        button.disabled = true; // Briefly disable button
+
+        // Change the text back after 2 seconds
+        setTimeout(() => {
+            button.innerHTML = originalText;
+            button.disabled = false;
+        }, 2000);
+
+    } catch (err) {
+        console.error('Failed to copy link automatically: ', err);
+        // If it fails, fall back to the old pop-up method
+        prompt("Could not copy automatically. Please copy this link:", url.href);
+    }
 }
 });
 
