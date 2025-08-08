@@ -512,97 +512,106 @@ document.addEventListener('DOMContentLoaded', () => {
         viewToggleButton.textContent = 'Switch to Simple View';
     }
 
-    async function sendProposalData() {
-        const button = document.getElementById('generate-proposal-btn');
-        const originalText = button.innerHTML;
-        button.innerHTML = 'Generating...';
-        button.disabled = true;
+   async function sendProposalData() {
+    const button = document.getElementById('generate-proposal-btn');
+    const originalText = button.innerHTML;
+    button.innerHTML = 'Generating...';
+    button.disabled = true;
 
-        try {
-            let totalHardwareSellPrice = 0, totalHardwareUnits = 0;
-            const hardwareKeys = ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB', 'extender_cat6', 'extender_fibre_cu', 'extender_fibre_nu'];
-            for (const key of hardwareKeys) {
-                if (currentResults[key]) {
-                    const quantity = currentResults[key].override ?? currentResults[key].calculated;
-                    if (quantity > 0) {
-                        totalHardwareUnits += quantity;
-                        const priceInfo = priceData[key];
-                        totalHardwareSellPrice += quantity * priceInfo.cost * (1 + priceInfo.margin);
-                    }
+    try {
+        // 1. Gather hardware totals for support calcs
+        let totalHardwareSellPrice = 0, totalHardwareUnits = 0;
+        const hardwareKeys = ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB', 'extender_cat6', 'extender_fibre_cu', 'extender_fibre_nu'];
+        for (const key of hardwareKeys) {
+            if (currentResults[key]) {
+                const quantity = currentResults[key].override ?? currentResults[key].calculated;
+                if (quantity > 0) {
+                    totalHardwareUnits += quantity;
+                    const priceInfo = priceData[key];
+                    totalHardwareSellPrice += quantity * priceInfo.cost * (1 + priceInfo.margin);
                 }
             }
-            
-            const bronzeCost = getSpecificSupportCost('bronze', totalHardwareUnits, totalHardwareSellPrice);
-            const silverCost = getSpecificSupportCost('silver', totalHardwareUnits, totalHardwareSellPrice);
-            const goldCost = getSpecificSupportCost('gold', totalHardwareUnits, totalHardwareSellPrice);
-            
-            const totalSell = (subTotalsForProposal.hardware?.sell || 0) + (subTotalsForProposal.consumables?.sell || 0) + (subTotalsForProposal.services?.sell || 0);
-            const totalMargin = (subTotalsForProposal.hardware?.margin || 0) + (subTotalsForProposal.consumables?.margin || 0) + (subTotalsForProposal.services?.margin || 0);
-
-            const now = new Date();
-            const dateString = `${String(now.getDate()).padStart(2, '0')}${now.toLocaleString('default', { month: 'short' })}${now.getFullYear()}_${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-            
-            const systemTypeSelect = document.getElementById('system-type');
-const solutionName = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
-
-const proposalData = {
-    variables: [
-        { name: "Account", value: document.getElementById('customer-name').value },
-        { name: "Solution", value: solutionName }, // This line was added
-        { name: "NumberOfNetworks", value: document.getElementById('number-of-networks').value },
-                    { name: "SubName1", value: "CEL-FI Hardware" },
-                    { name: "SubQty1", value: "1" },
-                    { name: "SubPrice1", value: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
-                    { name: "SubTotal1", value: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
-                    { name: "SubName2", value: "Antennas, cables and connectors" },
-                    { name: "SubQty2", value: "1" },
-                    { name: "SubPrice2", value: `£${(subTotalsForProposal.consumables?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
-                    { name: "SubTotal2", value: `£${(subTotalsForProposal.consumables?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
-                    { name: "SubName3", value: "Professional Services" },
-                    { name: "SubQty3", value: "1" },
-                    { name: "SubPrice3", value: `£${(subTotalsForProposal.services?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
-                    { name: "SubTotal3", value: `£${(subTotalsForProposal.services?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
-                    { name: "SubName4", value: "" }, { name: "SubQty4", value: "" }, { name: "SubPrice4", value: "" }, { name: "SubTotal4", value: "" },
-                    { name: "TotalPrice", value: `£${totalSell.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
-                    { name: "SupportName1", value: "Bronze" },
-                    { name: "SupportQty1", value: "1" },
-                    { name: "SupportPrice1", value: `£${bronzeCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
-                    { name: "SupportTotal1", value: `£${bronzeCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
-                    { name: "SupportName2", value: "Silver" },
-                    { name: "SupportQty2", value: "1" },
-                    { name: "SupportPrice2", value: `£${silverCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
-                    { name: "SupportTotal2", value: `£${silverCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
-                    { name: "SupportName3", value: "Gold" },
-                    { name: "SupportQty3", value: "1" },
-                    { name: "SupportPrice3", value: `£${goldCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
-                    { name: "SupportTotal3", value: `£${goldCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
-                    { name: "SurveyPrice", value: `£${(parseFloat(document.getElementById('survey-price').value) || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
-                    { name: "MarginTotal", value: totalMargin.toFixed(2) },
-                    { name: "CurrentDate", value: dateString }
-                ]
-            };
-
-            const response = await fetch(MAKE_WEBHOOK_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(proposalData)
-            });
-            if (response.ok) {
-                button.innerHTML = 'Proposal Sent! ✅';
-            } else {
-                throw new Error(`Webhook failed: ${response.statusText}`);
-            }
-        } catch (error) {
-            console.error('Failed to send proposal data:', error);
-            alert('Error: Could not send proposal to Make.com. Please check the console for details.');
-            button.innerHTML = 'Failed! ❌';
-        } finally {
-            setTimeout(() => {
-                button.innerHTML = originalText;
-                button.disabled = false;
-            }, 3000);
         }
+        
+        // 2. Calculate all support tiers
+        const bronzeCost = getSpecificSupportCost('bronze', totalHardwareUnits, totalHardwareSellPrice);
+        const silverCost = getSpecificSupportCost('silver', totalHardwareUnits, totalHardwareSellPrice);
+        const goldCost = getSpecificSupportCost('gold', totalHardwareUnits, totalHardwareSellPrice);
+        
+        // 3. Get totals
+        const totalMargin = (subTotalsForProposal.hardware?.margin || 0) + (subTotalsForProposal.consumables?.margin || 0) + (subTotalsForProposal.services?.margin || 0);
+        const systemTypeSelect = document.getElementById('system-type');
+        const solutionName = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
+
+        // 4. Assemble the final flat data structure
+        const proposalData = {
+            CustomerName: document.getElementById('customer-name').value,
+            Solution: solutionName,
+            NumberOfNetworks: document.getElementById('number-of-networks').value,
+            SurveyPrice: (parseFloat(document.getElementById('survey-price').value) || 0).toFixed(2),
+
+            Description1: "CEL-FI Hardware",
+            Qty1: "1",
+            UnitPrice1: (subTotalsForProposal.hardware?.sell || 0).toFixed(2),
+            TotalPrice1: (subTotalsForProposal.hardware?.sell || 0).toFixed(2),
+
+            Description2: "Antennas, cables and connectors",
+            Qty2: "1",
+            UnitPrice2: (subTotalsForProposal.consumables?.sell || 0).toFixed(2),
+            TotalPrice2: (subTotalsForProposal.consumables?.sell || 0).toFixed(2),
+            
+            Description3: "Professional Services",
+            Qty3: "1",
+            UnitPrice3: (subTotalsForProposal.services?.sell || 0).toFixed(2),
+            TotalPrice3: (subTotalsForProposal.services?.sell || 0).toFixed(2),
+
+            Description4: "", Qty4: "", UnitPrice4: "", TotalPrice4: "",
+
+            Support1: "Bronze",
+            SupportQty1: "1",
+            SupportUnitPrice1: bronzeCost.toFixed(2),
+            SupportTotalPrice1: bronzeCost.toFixed(2),
+            
+            Support2: "Silver",
+            SupportQty2: "1",
+            SupportUnitPrice2: silverCost.toFixed(2),
+            SupportTotalPrice2: silverCost.toFixed(2),
+            
+            Support3: "Gold",
+            SupportQty3: "1",
+            SupportUnitPrice3: goldCost.toFixed(2),
+            SupportTotalPrice3: goldCost.toFixed(2),
+            
+            MarginTotal: totalMargin.toFixed(2),
+            TotalMargin: totalMargin.toFixed(2),
+            QuoteNumber: ""
+        };
+
+        // 5. Send the data to the webhook (wrapped in an array to match Google Sheets output)
+        const response = await fetch(MAKE_WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify([proposalData]) // Send data as an array with one object
+        });
+
+        if (response.ok) {
+            button.innerHTML = 'Proposal Sent! ✅';
+        } else {
+            throw new Error(`Webhook failed: ${response.statusText}`);
+        }
+
+    } catch (error) {
+        console.error('Failed to send proposal data:', error);
+        alert('Error: Could not send proposal to Make.com. Please check the console for details.');
+        button.innerHTML = 'Failed! ❌';
+    } finally {
+        // Re-enable the button after a delay
+        setTimeout(() => {
+            button.innerHTML = originalText;
+            button.disabled = false;
+        }, 3000);
     }
+}
 
     async function generateShareLink() {
         const stateToSave = {
