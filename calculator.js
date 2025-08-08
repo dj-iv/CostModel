@@ -546,8 +546,8 @@ const selectedText = systemTypeSelect.options[systemTypeSelect.selectedIndex].te
 
 // This map will translate the system value to the desired text for the proposal
 const solutionNameMap = {
-    'G41': 'GO G41',
-    'G43': 'GO G43' 
+    'G41': 'GO G41 DAS',
+    'G43': 'GO G43 DAS' 
 };
 const solutionNameToSend = solutionNameMap[selectedValue] || selectedText;
 
