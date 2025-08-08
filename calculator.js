@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- MAKE.COM WEBHOOK ---
+    const MAKE_WEBHOOK_URL = 'https://hook.eu1.make.com/chemsqrmifjs5lwbrquhh1bha0vo96k2';
+
     // --- DATA ---
     const coverageData = {
         go: {
@@ -39,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let priceData = {};
     let currentResults = {};
     let showZeroQuantityItems = false;
+    let subTotalsForProposal = {}; // To store subtotals for the proposal
 
     function updateSellPriceDisplay(key) {
         const costInput = document.getElementById(`cost-${key}`);
@@ -74,49 +78,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function setupSettingsModal() { 
-        const modal = document.getElementById('settings-modal'), 
-              btn = document.getElementById('settings-btn'), 
-              closeBtn = modal.querySelector('.close-btn'), 
-              cancelBtn = document.getElementById('modal-cancel'), 
-              saveBtn = document.getElementById('modal-save'); 
-        
+        const modal = document.getElementById('settings-modal'), btn = document.getElementById('settings-btn'), closeBtn = modal.querySelector('.close-btn'), cancelBtn = document.getElementById('modal-cancel'), saveBtn = document.getElementById('modal-save'); 
         btn.onclick = () => { populateSettingsModal(); modal.style.display = "block"; }; 
         const closeModal = () => modal.style.display = "none"; 
-        closeBtn.onclick = closeModal; 
-        cancelBtn.onclick = closeModal; 
+        closeBtn.onclick = closeModal; cancelBtn.onclick = closeModal; 
         window.onclick = (event) => { if (event.target == modal) closeModal(); }; 
-        
-        saveBtn.onclick = () => { 
-            const newPriceData = JSON.parse(JSON.stringify(priceData)); 
-            let allValid = true; 
-            for(const key in newPriceData) { 
-                const newCost = parseFloat(document.getElementById(`cost-${key}`).value), 
-                      newMargin = parseFloat(document.getElementById(`margin-${key}`).value) / 100; 
-                if (!isNaN(newCost) && !isNaN(newMargin)) { 
-                    newPriceData[key].cost = newCost; 
-                    newPriceData[key].margin = newMargin; 
-                } else { 
-                    allValid = false; 
-                } 
-            } 
-            if(allValid) { 
-                savePrices(newPriceData); 
-                closeModal(); 
-            } else { 
-                alert("Please ensure all values are valid numbers."); 
-            } 
-        };
-
+        saveBtn.onclick = () => { const newPriceData = JSON.parse(JSON.stringify(priceData)); let allValid = true; for(const key in newPriceData) { const newCost = parseFloat(document.getElementById(`cost-${key}`).value), newMargin = parseFloat(document.getElementById(`margin-${key}`).value) / 100; if (!isNaN(newCost) && !isNaN(newMargin)) { newPriceData[key].cost = newCost; newPriceData[key].margin = newMargin; } else { allValid = false; } } if(allValid) { savePrices(newPriceData); closeModal(); } else { alert("Please ensure all values are valid numbers."); } };
         const tabLinks = modal.querySelectorAll('.tab-link');
         const tabContents = modal.querySelectorAll('.tab-content');
-
         tabLinks.forEach(link => {
             link.addEventListener('click', () => {
                 const tabId = link.dataset.tab;
-
                 tabLinks.forEach(item => item.classList.remove('active'));
                 tabContents.forEach(item => item.classList.remove('active'));
-
                 link.classList.add('active');
                 modal.querySelector(`#${tabId}`).classList.add('active');
             });
@@ -142,7 +116,6 @@ document.addEventListener('DOMContentLoaded', () => {
             <tr class="summary-row"><td colspan="2" style="text-align:right;">Summary per year (£)</td><td id="bronze-year-summary">£0.00</td><td id="silver-year-summary">£0.00</td><td id="gold-year-summary">£0.00</td><td colspan="2"></td></tr>
         </tfoot>`;
         table.innerHTML = html;
-
         document.querySelectorAll('.support-checkbox').forEach(box => box.addEventListener('change', () => {
             document.querySelectorAll('.support-presets-main button').forEach(b => b.classList.remove('active-preset'));
             runFullCalculation();
@@ -177,35 +150,46 @@ document.addEventListener('DOMContentLoaded', () => {
         runFullCalculation();
     }
 
-    function updateSupportTableSummaries(totalHardwareUnits) {
-        const dailyInstallRate = priceData.install_internal.cost * (1 + priceData.install_internal.margin);
-        const tierPerSystemDPY = { bronze: 0, silver: 0, gold: 0 };
-        const tierFixedAnnualDPY = { bronze: 0, silver: 0, gold: 0 };
+    function getSpecificSupportCost(tier, totalHardwareUnits, totalHardwareSellPrice) {
+        let totalPerSystemDPY = 0, totalFixedAnnualDPY = 0;
+        const maintenancePercent = (tier === 'none') ? 0 : 5;
+
+        for (const key in supportData) {
+            if (supportData[key].tiers.includes(tier)) {
+                const dpyValue = (supportData[key].dpm || 0) * 12;
+                if (supportData[key].type === 'per_system') totalPerSystemDPY += dpyValue;
+                else totalFixedAnnualDPY += dpyValue;
+            }
+        }
         
-        for (const tier of ['bronze', 'silver', 'gold']) {
-            document.querySelectorAll(`.support-checkbox[data-tier="${tier}"]:checked`).forEach(box => {
-                const key = box.dataset.key;
-                const dpmInput = document.querySelector(`.dpm-input[data-key="${key}"]`);
-                if (dpmInput) {
-                    const dpyValue = (parseFloat(dpmInput.value) || 0) * 12;
-                    if (supportData[key].type === 'per_system') {
-                        tierPerSystemDPY[tier] += dpyValue;
-                    } else {
-                        tierFixedAnnualDPY[tier] += dpyValue;
-                    }
+        const dailyInstallRate = priceData.install_internal.cost * (1 + priceData.install_internal.margin);
+        const perSystemCost = totalPerSystemDPY * dailyInstallRate * totalHardwareUnits;
+        const fixedAnnualCost = totalFixedAnnualDPY * dailyInstallRate;
+        const maintenanceCost = totalHardwareSellPrice * (maintenancePercent / 100);
+        return perSystemCost + fixedAnnualCost + maintenanceCost;
+    }
+
+    function updateAllSupportTierPrices() {
+        let totalHardwareSellPrice = 0, totalHardwareUnits = 0;
+        const hardwareKeys = ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB', 'extender_cat6', 'extender_fibre_cu', 'extender_fibre_nu'];
+        for (const key of hardwareKeys) {
+            if (currentResults[key]) {
+                const quantity = currentResults[key].override ?? currentResults[key].calculated;
+                if (quantity > 0) {
+                    totalHardwareUnits += quantity;
+                    const priceInfo = priceData[key];
+                    totalHardwareSellPrice += quantity * priceInfo.cost * (1 + priceInfo.margin);
                 }
-            });
+            }
         }
 
-        for (const tier of ['bronze', 'silver', 'gold']) {
-            const sysSummaryCell = document.getElementById(`${tier}-sys-summary`);
-            const yearSummaryCell = document.getElementById(`${tier}-year-summary`);
-            
-            if(sysSummaryCell) sysSummaryCell.textContent = `£${(tierPerSystemDPY[tier] * dailyInstallRate).toFixed(2)}`;
-            
-            const fixedServicesCost = tierFixedAnnualDPY[tier] * dailyInstallRate;
-            if(yearSummaryCell) yearSummaryCell.textContent = `£${fixedServicesCost.toFixed(2)}`;
-        }
+        const bronzeCost = getSpecificSupportCost('bronze', totalHardwareUnits, totalHardwareSellPrice);
+        const silverCost = getSpecificSupportCost('silver', totalHardwareUnits, totalHardwareSellPrice);
+        const goldCost = getSpecificSupportCost('gold', totalHardwareUnits, totalHardwareSellPrice);
+
+        document.getElementById('bronze-price-display').textContent = `£${bronzeCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        document.getElementById('silver-price-display').textContent = `£${silverCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        document.getElementById('gold-price-display').textContent = `£${goldCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
     }
 
     function calculateSupportCost(totalHardwareUnits, totalHardwareSellPrice) {
@@ -293,6 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             updateDOM();
+            updateAllSupportTierPrices(); // Update the display for B, S, G prices
         } catch (error) {
             console.error("A critical error occurred during calculation:", error);
             const resultsBody = document.getElementById('results-tbody');
@@ -364,12 +349,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
             if (itemsInGroupDisplayed > 0) {
-                resultsBody.innerHTML += `<tr class="group-header"><td colspan="5">${groupName.charAt(0).toUpperCase() + groupName.slice(1)}</td></tr>`;
+                const groupLabel = groupName.charAt(0).toUpperCase() + groupName.slice(1);
+                resultsBody.innerHTML += `<tr class="group-header"><td colspan="5">${groupLabel}</td></tr>`;
                 resultsBody.innerHTML += groupHTML;
                 const finalGroupSell = (groupName === 'hardware' && excludeHardware) ? 0 : groupSubTotalSell;
                 const finalGroupMargin = (groupName === 'hardware' && excludeHardware) ? 0 : groupSubTotalMargin;
-                resultsBody.innerHTML += `<tr class="summary-row"><td colspan="3" style="text-align: right;">${groupName.charAt(0).toUpperCase() + groupName.slice(1)} Sub-Total:</td><td style="text-align: right;">£${finalGroupSell.toFixed(2)}</td><td style="text-align: right;">£${finalGroupMargin.toFixed(2)}</td></tr>`;
-                subTotals[groupName] = { cost: (groupName === 'hardware' && excludeHardware) ? 0 : groupSubTotalCost, sell: finalGroupSell, margin: finalGroupMargin };
+                resultsBody.innerHTML += `<tr class="summary-row"><td colspan="3" style="text-align: right;">${groupLabel} Sub-Total:</td><td style="text-align: right;">£${finalGroupSell.toFixed(2)}</td><td style="text-align: right;">£${finalGroupMargin.toFixed(2)}</td></tr>`;
+                subTotals[groupName] = { label: groupLabel, cost: (groupName === 'hardware' && excludeHardware) ? 0 : groupSubTotalCost, sell: finalGroupSell, margin: finalGroupMargin };
             }
         }
         
@@ -377,6 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         updateSupportTableSummaries(totalHardwareUnits);
         calculateAndDisplayGrandTotals(subTotals);
+        subTotalsForProposal = subTotals;
     }
 
     function calculateAndDisplayGrandTotals(subTotals) {
@@ -397,7 +384,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const isNonDasQuatra = systemType === 'QUATRA' || systemType === 'QUATRA_EVO';
         const floorsGroup = document.getElementById('number-of-floors-group');
         const areaLabel = document.getElementById('floor-area-label');
-
         if (isNonDasQuatra) {
             floorsGroup.style.display = 'flex';
             areaLabel.textContent = 'Area per Floor';
@@ -412,7 +398,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const sum = pOpen + pCubical + pHollow + pSolid;
         const sumSpan = document.getElementById('percentage-sum');
         sumSpan.textContent = `${sum.toFixed(0)}%`; sumSpan.style.color = (sum.toFixed(0) === "100") ? 'green' : 'red';
-        
         const systemType=document.getElementById('system-type').value;
         const floorArea=parseFloat(document.getElementById('floor-area').value)||0;
         const unit=document.querySelector('input[name="unit-switch"]:checked').value;
@@ -421,7 +406,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const isHighCeiling = document.getElementById('high-ceiling-warehouse').checked;
         const dataSource = isQuatra ? coverageData.quatra : coverageData.go;
         const coverage = dataSource[band]?.[unit];
-        
         let antennasForArea = 0;
         if (floorArea > 0 && coverage) {
             if (isQuatra && isHighCeiling) {
@@ -431,10 +415,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 antennasForArea = ((floorArea*(percentages.open/100))/coverage.open) + ((floorArea*(percentages.cubical/100))/coverage.cubical) + ((floorArea*(percentages.hollow/100))/coverage.hollow) + ((floorArea*(percentages.solid/100))/coverage.solid);
             }
         }
-
         let totalRequiredAntennas;
         const isNonDasQuatra = systemType === 'QUATRA' || systemType === 'QUATRA_EVO';
-
         if (isNonDasQuatra) {
             const numberOfFloors = parseInt(document.getElementById('number-of-floors').value) || 1;
             const roundedUpAntennasPerFloor = Math.ceil(antennasForArea);
@@ -442,7 +424,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             totalRequiredAntennas = Math.ceil(antennasForArea);
         }
-
         document.getElementById('total-service-antennas').value = totalRequiredAntennas;
         runFullCalculation();
     }
@@ -452,20 +433,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const mainContainer = document.getElementById('main-container');
         const viewToggleButton = document.getElementById('view-toggle-btn');
 
-        // View toggle logic
         viewToggleButton.addEventListener('click', () => {
             const isDashboard = mainContainer.classList.toggle('screenshot-mode');
             viewToggleButton.textContent = isDashboard ? 'Switch to Simple View' : 'Switch to Dashboard View';
         });
 
-        // Other event listeners
+        document.getElementById('generate-proposal-btn').addEventListener('click', sendProposalData);
         document.getElementById('generate-link-btn').addEventListener('click', generateShareLink);
         document.getElementById('support-preset-none').addEventListener('click', () => setSupportPreset('none'));
         document.getElementById('support-preset-bronze').addEventListener('click', () => setSupportPreset('bronze'));
         document.getElementById('support-preset-silver').addEventListener('click', () => setSupportPreset('silver'));
         document.getElementById('support-preset-gold').addEventListener('click', () => setSupportPreset('gold'));
 
-        document.querySelectorAll('#floor-area, input[name="unit-switch"], input[name="band-switch"], .wall-percent, #high-ceiling-warehouse, #number-of-floors').forEach(input => {
+        document.querySelectorAll('#floor-area, input[name="unit-switch"], input[name="band-switch"], .wall-percent, #high-ceiling-warehouse, #number-of-floors, #customer-name, #survey-price').forEach(input => {
             input.addEventListener('input', calculateAntennas);
             input.addEventListener('change', calculateAntennas);
         });
@@ -480,21 +460,9 @@ document.addEventListener('DOMContentLoaded', () => {
             input.addEventListener('change', runFullCalculation);
         });
 
-        document.getElementById('reset-overrides').addEventListener('click', () => { 
-            for (const key in currentResults) { 
-                if (currentResults[key].hasOwnProperty('override')) currentResults[key].override = null; 
-            } 
-            setSupportPreset('none'); 
-            runFullCalculation(); 
-        });
-        
-        document.getElementById('toggle-zero-qty-btn').addEventListener('click', (e) => { 
-            showZeroQuantityItems = !showZeroQuantityItems; 
-            e.target.textContent = showZeroQuantityItems ? 'Hide Zero Qty Items' : 'Show All Items'; 
-            runFullCalculation(); 
-        });
+        document.getElementById('reset-overrides').addEventListener('click', () => { for (const key in currentResults) { if (currentResults[key].hasOwnProperty('override')) currentResults[key].override = null; } setSupportPreset('none'); runFullCalculation(); });
+        document.getElementById('toggle-zero-qty-btn').addEventListener('click', (e) => { showZeroQuantityItems = !showZeroQuantityItems; e.target.textContent = showZeroQuantityItems ? 'Hide Zero Qty Items' : 'Show All Items'; runFullCalculation(); });
 
-        // Initial setup calls
         loadPrices();
         setupSettingsModal();
         populateSupportTable();
@@ -507,9 +475,114 @@ document.addEventListener('DOMContentLoaded', () => {
             runFullCalculation();
         }
 
-        // Set default view to dashboard
         mainContainer.classList.add('screenshot-mode');
         viewToggleButton.textContent = 'Switch to Simple View';
+    }
+
+    async function sendProposalData() {
+        const button = document.getElementById('generate-proposal-btn');
+        const originalText = button.innerHTML;
+        button.innerHTML = 'Generating...';
+        button.disabled = true;
+
+        try {
+            // 1. Gather hardware totals for support calcs
+            let totalHardwareSellPrice = 0, totalHardwareUnits = 0;
+            const hardwareKeys = ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB', 'extender_cat6', 'extender_fibre_cu', 'extender_fibre_nu'];
+            for (const key of hardwareKeys) {
+                if (currentResults[key]) {
+                    const quantity = currentResults[key].override ?? currentResults[key].calculated;
+                    if (quantity > 0) {
+                        totalHardwareUnits += quantity;
+                        const priceInfo = priceData[key];
+                        totalHardwareSellPrice += quantity * priceInfo.cost * (1 + priceInfo.margin);
+                    }
+                }
+            }
+            
+            // 2. Calculate all support tiers
+            const bronzeCost = getSpecificSupportCost('bronze', totalHardwareUnits, totalHardwareSellPrice);
+            const silverCost = getSpecificSupportCost('silver', totalHardwareUnits, totalHardwareSellPrice);
+            const goldCost = getSpecificSupportCost('gold', totalHardwareUnits, totalHardwareSellPrice);
+            
+            // 3. Get totals
+            const totalSell = subTotalsForProposal.hardware.sell + subTotalsForProposal.consumables.sell + subTotalsForProposal.services.sell;
+            const totalMargin = subTotalsForProposal.hardware.margin + subTotalsForProposal.consumables.margin + subTotalsForProposal.services.margin;
+
+            // 4. Format the date
+            const now = new Date();
+            const dateString = `${String(now.getDate()).padStart(2, '0')}${now.toLocaleString('default', { month: 'short' })}${now.getFullYear()}_${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            
+            // 5. Assemble the final data structure
+            const proposalData = {
+                variables: [
+                    { name: "Account", value: document.getElementById('customer-name').value },
+                    { name: "NumberOfNetworks", value: document.getElementById('number-of-networks').value },
+                    
+                    { name: "SubName1", value: "CEL-FI Hardware" },
+                    { name: "SubQty1", value: "1" },
+                    { name: "SubPrice1", value: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
+                    { name: "SubTotal1", value: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
+
+                    { name: "SubName2", value: "Antennas, cables and connectors" },
+                    { name: "SubQty2", value: "1" },
+                    { name: "SubPrice2", value: `£${(subTotalsForProposal.consumables?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
+                    { name: "SubTotal2", value: `£${(subTotalsForProposal.consumables?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
+
+                    { name: "SubName3", value: "Professional Services" },
+                    { name: "SubQty3", value: "1" },
+                    { name: "SubPrice3", value: `£${(subTotalsForProposal.services?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
+                    { name: "SubTotal3", value: `£${(subTotalsForProposal.services?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
+                    
+                    { name: "SubName4", value: "" }, { name: "SubQty4", value: "" }, { name: "SubPrice4", value: "" }, { name: "SubTotal4", value: "" },
+
+                    { name: "TotalPrice", value: `£${totalSell.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
+                    
+                    { name: "SupportName1", value: "Bronze" },
+                    { name: "SupportQty1", value: "1" },
+                    { name: "SupportPrice1", value: `£${bronzeCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
+                    { name: "SupportTotal1", value: `£${bronzeCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
+                    
+                    { name: "SupportName2", value: "Silver" },
+                    { name: "SupportQty2", value: "1" },
+                    { name: "SupportPrice2", value: `£${silverCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
+                    { name: "SupportTotal2", value: `£${silverCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
+                    
+                    { name: "SupportName3", value: "Gold" },
+                    { name: "SupportQty3", value: "1" },
+                    { name: "SupportPrice3", value: `£${goldCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
+                    { name: "SupportTotal3", value: `£${goldCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
+                    
+                    { name: "SurveyPrice", value: `£${(parseFloat(document.getElementById('survey-price').value) || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` },
+                    { name: "MarginTotal", value: totalMargin.toFixed(2) },
+                    { name: "CurrentDate", value: dateString }
+                ]
+            };
+
+            // 6. Send the data to the webhook
+            const response = await fetch(MAKE_WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(proposalData)
+            });
+
+            if (response.ok) {
+                button.innerHTML = 'Proposal Sent! ✅';
+            } else {
+                throw new Error(`Webhook failed: ${response.statusText}`);
+            }
+
+        } catch (error) {
+            console.error('Failed to send proposal data:', error);
+            alert('Error: Could not send proposal to Make.com. Please check the console for details.');
+            button.innerHTML = 'Failed! ❌';
+        } finally {
+            // Re-enable the button after a delay
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }, 3000);
+        }
     }
 
     // --- Shareable Link Logic ---
@@ -560,17 +633,14 @@ document.addEventListener('DOMContentLoaded', () => {
     
         try {
             await navigator.clipboard.writeText(url.href);
-            
             const button = document.getElementById('generate-link-btn');
             const originalText = button.innerHTML;
             button.innerHTML = 'Copied! ✅';
             button.disabled = true;
-    
             setTimeout(() => {
                 button.innerHTML = originalText;
                 button.disabled = false;
             }, 2000);
-    
         } catch (err) {
             console.error('Failed to copy link automatically: ', err);
             prompt("Could not copy automatically. Please copy this link:", url.href);
@@ -579,15 +649,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function loadStateFromURL() {
         if (!window.location.hash) return false;
-    
         try {
             const encoded = window.location.hash.substring(1);
             const compressed = atob(encoded);
             const jsonString = pako.inflate(compressed, { to: 'string' });
             const savedState = JSON.parse(jsonString);
-    
             if(savedState.version !== 1) return false;
-    
             const { inputs, overrides, pricing, supportSelections } = savedState;
             document.getElementById('system-type').value = inputs.systemType;
             document.getElementById('floor-area').value = inputs.floorArea;
@@ -604,13 +671,11 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('no-hardware-checkbox').checked = inputs.excludeHardware;
             document.getElementById('referral-fee-percent').value = inputs.referralFeePercent;
             document.getElementById('maintenance-percent').value = inputs.maintenancePercent;
-    
             priceData = pricing;
             for (const key in overrides) {
                 if(!currentResults[key]) currentResults[key] = { calculated: 0, override: null };
                 currentResults[key].override = overrides[key];
             }
-            
             if(supportSelections){
                  document.querySelectorAll('.support-checkbox').forEach(box => {
                     box.checked = supportSelections[box.dataset.key]?.[box.dataset.tier] || false;
@@ -619,10 +684,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     input.value = supportSelections[input.dataset.key]?.dpm || supportData[input.dataset.key].dpm.toFixed(4);
                 });
             }
-    
             window.location.hash = '';
             return true;
-    
         } catch (e) {
             console.error("Could not load state from URL:", e);
             window.location.hash = '';
