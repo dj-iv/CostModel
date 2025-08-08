@@ -125,13 +125,9 @@ tabLinks.forEach(link => {
             el.addEventListener('change', runFullCalculation);
         });
 
-        document.getElementById('support-preset-none').addEventListener('click', () => setSupportPreset('none'));
-        document.getElementById('support-preset-bronze').addEventListener('click', () => setSupportPreset('bronze'));
-        document.getElementById('support-preset-silver').addEventListener('click', () => setSupportPreset('silver'));
-        document.getElementById('support-preset-gold').addEventListener('click', () => setSupportPreset('gold'));
     }
     function setSupportPreset(tier) {
-        document.querySelectorAll('.support-presets button').forEach(b => b.classList.remove('active-preset'));
+        document.querySelectorAll('.support-presets-main button').forEach(b => b.classList.remove('active-preset'));
         const presetBtn = document.getElementById(`support-preset-${tier}`);
         if(presetBtn) presetBtn.classList.add('active-preset');
         
@@ -421,6 +417,11 @@ tabLinks.forEach(link => {
         const stateLoaded = loadStateFromURL();
 
         document.getElementById('generate-link-btn').addEventListener('click', generateShareLink);
+        document.getElementById('support-preset-none').addEventListener('click', () => setSupportPreset('none'));
+document.getElementById('support-preset-bronze').addEventListener('click', () => setSupportPreset('bronze'));
+document.getElementById('support-preset-silver').addEventListener('click', () => setSupportPreset('silver'));
+document.getElementById('support-preset-gold').addEventListener('click', () => setSupportPreset('gold'));
+
 
         document.querySelectorAll('#floor-area, input[name="unit-switch"], input[name="band-switch"], .wall-percent, #high-ceiling-warehouse, #number-of-floors').forEach(input => {
             input.addEventListener('input', calculateAntennas);
