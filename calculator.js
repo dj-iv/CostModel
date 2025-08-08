@@ -548,6 +548,9 @@ const selectedText = systemTypeSelect.options[systemTypeSelect.selectedIndex].te
 const solutionNameMap = {
     'G41': 'GO G41 DAS',
     'G43': 'GO G43 DAS' 
+'QUATRA 4000e': 'QUATRA 4000e Only' 
+  'QUATRA EVO': 'QUATRA EVO Only'       
+    
 };
 const solutionNameToSend = solutionNameMap[selectedValue] || selectedText;
 
