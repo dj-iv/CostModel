@@ -73,23 +73,55 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function setupSettingsModal() { const modal = document.getElementById('settings-modal'), btn = document.getElementById('settings-btn'), closeBtn = modal.querySelector('.close-btn'), cancelBtn = document.getElementById('modal-cancel'), saveBtn = document.getElementById('modal-save'); btn.onclick = () => { populateSettingsModal(); modal.style.display = "block"; }; const closeModal = () => modal.style.display = "none"; closeBtn.onclick = closeModal; cancelBtn.onclick = closeModal; window.onclick = (event) => { if (event.target == modal) closeModal(); }; saveBtn.onclick = () => { const newPriceData = JSON.parse(JSON.stringify(priceData)); let allValid = true; for(const key in newPriceData) { const newCost = parseFloat(document.getElementById(`cost-${key}`).value), newMargin = parseFloat(document.getElementById(`margin-${key}`).value) / 100; if (!isNaN(newCost) && !isNaN(newMargin)) { newPriceData[key].cost = newCost; newPriceData[key].margin = newMargin; } else { allValid = false; } } if(allValid) { savePrices(newPriceData); closeModal(); } else { alert("Please ensure all values are valid numbers."); } }; 
-                                  // Add logic for modal tabs
-const tabLinks = modal.querySelectorAll('.tab-link');
-const tabContents = modal.querySelectorAll('.tab-content');
+    function setupSettingsModal() { 
+        const modal = document.getElementById('settings-modal'), 
+              btn = document.getElementById('settings-btn'), 
+              closeBtn = modal.querySelector('.close-btn'), 
+              cancelBtn = document.getElementById('modal-cancel'), 
+              saveBtn = document.getElementById('modal-save'); 
+        
+        btn.onclick = () => { populateSettingsModal(); modal.style.display = "block"; }; 
+        const closeModal = () => modal.style.display = "none"; 
+        closeBtn.onclick = closeModal; 
+        cancelBtn.onclick = closeModal; 
+        window.onclick = (event) => { if (event.target == modal) closeModal(); }; 
+        
+        saveBtn.onclick = () => { 
+            const newPriceData = JSON.parse(JSON.stringify(priceData)); 
+            let allValid = true; 
+            for(const key in newPriceData) { 
+                const newCost = parseFloat(document.getElementById(`cost-${key}`).value), 
+                      newMargin = parseFloat(document.getElementById(`margin-${key}`).value) / 100; 
+                if (!isNaN(newCost) && !isNaN(newMargin)) { 
+                    newPriceData[key].cost = newCost; 
+                    newPriceData[key].margin = newMargin; 
+                } else { 
+                    allValid = false; 
+                } 
+            } 
+            if(allValid) { 
+                savePrices(newPriceData); 
+                closeModal(); 
+            } else { 
+                alert("Please ensure all values are valid numbers."); 
+            } 
+        };
 
-tabLinks.forEach(link => {
-    link.addEventListener('click', () => {
-        const tabId = link.dataset.tab;
+        const tabLinks = modal.querySelectorAll('.tab-link');
+        const tabContents = modal.querySelectorAll('.tab-content');
 
-        tabLinks.forEach(item => item.classList.remove('active'));
-        tabContents.forEach(item => item.classList.remove('active'));
+        tabLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                const tabId = link.dataset.tab;
 
-        link.classList.add('active');
-        modal.querySelector(`#${tabId}`).classList.add('active');
-    });
-});
-                                  }
+                tabLinks.forEach(item => item.classList.remove('active'));
+                tabContents.forEach(item => item.classList.remove('active'));
+
+                link.classList.add('active');
+                modal.querySelector(`#${tabId}`).classList.add('active');
+            });
+        });
+    }
     
     function populateSupportTable() {
         const table = document.getElementById('support-table');
@@ -112,7 +144,7 @@ tabLinks.forEach(link => {
         table.innerHTML = html;
 
         document.querySelectorAll('.support-checkbox').forEach(box => box.addEventListener('change', () => {
-            document.querySelectorAll('.support-presets button').forEach(b => b.classList.remove('active-preset'));
+            document.querySelectorAll('.support-presets-main button').forEach(b => b.classList.remove('active-preset'));
             runFullCalculation();
         }));
         document.querySelectorAll('.dpm-input').forEach(el => {
@@ -124,8 +156,8 @@ tabLinks.forEach(link => {
             });
             el.addEventListener('change', runFullCalculation);
         });
-
     }
+
     function setSupportPreset(tier) {
         document.querySelectorAll('.support-presets-main button').forEach(b => b.classList.remove('active-preset'));
         const presetBtn = document.getElementById(`support-preset-${tier}`);
@@ -144,6 +176,7 @@ tabLinks.forEach(link => {
         }
         runFullCalculation();
     }
+
     function updateSupportTableSummaries(totalHardwareUnits) {
         const dailyInstallRate = priceData.install_internal.cost * (1 + priceData.install_internal.margin);
         const tierPerSystemDPY = { bronze: 0, silver: 0, gold: 0 };
@@ -174,6 +207,7 @@ tabLinks.forEach(link => {
             if(yearSummaryCell) yearSummaryCell.textContent = `£${fixedServicesCost.toFixed(2)}`;
         }
     }
+
     function calculateSupportCost(totalHardwareUnits, totalHardwareSellPrice) {
         let totalPerSystemDPY = 0, totalFixedAnnualDPY = 0;
         const selectedServices = document.querySelectorAll('.support-checkbox:checked');
@@ -418,10 +452,9 @@ tabLinks.forEach(link => {
 
         document.getElementById('generate-link-btn').addEventListener('click', generateShareLink);
         document.getElementById('support-preset-none').addEventListener('click', () => setSupportPreset('none'));
-document.getElementById('support-preset-bronze').addEventListener('click', () => setSupportPreset('bronze'));
-document.getElementById('support-preset-silver').addEventListener('click', () => setSupportPreset('silver'));
-document.getElementById('support-preset-gold').addEventListener('click', () => setSupportPreset('gold'));
-
+        document.getElementById('support-preset-bronze').addEventListener('click', () => setSupportPreset('bronze'));
+        document.getElementById('support-preset-silver').addEventListener('click', () => setSupportPreset('silver'));
+        document.getElementById('support-preset-gold').addEventListener('click', () => setSupportPreset('gold'));
 
         document.querySelectorAll('#floor-area, input[name="unit-switch"], input[name="band-switch"], .wall-percent, #high-ceiling-warehouse, #number-of-floors').forEach(input => {
             input.addEventListener('input', calculateAntennas);
@@ -438,12 +471,19 @@ document.getElementById('support-preset-gold').addEventListener('click', () => s
             input.addEventListener('change', runFullCalculation);
         });
 
-        document.getElementById('reset-overrides').addEventListener('click', () => { for (const key in currentResults) { if (currentResults[key].hasOwnProperty('override')) currentResults[key].override = null; } setSupportPreset('none'); runFullCalculation(); });
-        document.getElementById('toggle-zero-qty-btn').addEventListener('click', (e) => { showZeroQuantityItems = !showZeroQuantityItems; e.target.textContent = showZeroQuantityItems ? 'Hide Zero Qty Items' : 'Show All Items'; runFullCalculation(); });
-
-        const mainContainer = document.getElementById('main-container');
-        document.getElementById('screenshot-btn').addEventListener('click', () => mainContainer.classList.add('screenshot-mode'));
-        document.getElementById('return-btn').addEventListener('click', () => mainContainer.classList.remove('screenshot-mode'));
+        document.getElementById('reset-overrides').addEventListener('click', () => { 
+            for (const key in currentResults) { 
+                if (currentResults[key].hasOwnProperty('override')) currentResults[key].override = null; 
+            } 
+            setSupportPreset('none'); 
+            runFullCalculation(); 
+        });
+        
+        document.getElementById('toggle-zero-qty-btn').addEventListener('click', (e) => { 
+            showZeroQuantityItems = !showZeroQuantityItems; 
+            e.target.textContent = showZeroQuantityItems ? 'Hide Zero Qty Items' : 'Show All Items'; 
+            runFullCalculation(); 
+        });
 
         loadPrices();
         setupSettingsModal();
