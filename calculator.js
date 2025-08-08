@@ -417,7 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initialize();
 });
 
-window.updateSellPriceDisplay = (key) => {
+function updateSellPriceDisplay(key) {
     const costInput = document.getElementById(`cost-${key}`);
     const marginInput = document.getElementById(`margin-${key}`);
     const sellDisplay = document.getElementById(`sell-${key}`);
@@ -425,4 +425,4 @@ window.updateSellPriceDisplay = (key) => {
     const margin = parseFloat(marginInput.value) || 0;
     const sellPrice = cost * (1 + margin / 100);
     sellDisplay.textContent = `£${sellPrice.toFixed(2)}`;
-};
+}
