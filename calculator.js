@@ -402,7 +402,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- INITIALIZATION ---
     function initialize() {
-        document.querySelectorAll('#floor-area, input[name="unit-switch"], input[name="band-switch"], .wall-percent, #high-ceiling-warehouse, #number-of-floors').forEach(input => {
+    const stateLoaded = loadStateFromURL(); // Add this line at the top
+
+    document.getElementById('generate-link-btn').addEventListener('click', generateShareLink); // Add this line
+
+    document.querySelectorAll('#floor-area, input[name="unit-switch"], input[name="band-switch"], .wall-percent, #high-ceiling-warehouse, #number-of-floors').forEach(input => {
             input.addEventListener('input', calculateAntennas);
             input.addEventListener('change', calculateAntennas);
         });
@@ -430,7 +434,13 @@ document.addEventListener('DOMContentLoaded', () => {
         populateSupportTable();
         setSupportPreset('none');
         toggleMultiFloorUI();
-        calculateAntennas();
+       if (!stateLoaded) {
+    // If we didn't load from a link, run the default calculation
+    calculateAntennas();
+} else {
+    // If we DID load from a link, just run the full calculation to update the display
+    runFullCalculation();
+}
     }
 
     initialize();
@@ -444,4 +454,115 @@ function updateSellPriceDisplay(key) {
     const margin = parseFloat(marginInput.value) || 0;
     const sellPrice = cost * (1 + margin / 100);
     sellDisplay.textContent = `£${sellPrice.toFixed(2)}`;
+}
+// --- Shareable Link Logic ---
+
+function generateShareLink() {
+    // 1. Gather all the data needed to recreate the state
+    const stateToSave = {
+        version: 1,
+        inputs: {
+            systemType: document.getElementById('system-type').value,
+            floorArea: document.getElementById('floor-area').value,
+            numberOfFloors: document.getElementById('number-of-floors').value,
+            unit: document.querySelector('input[name="unit-switch"]:checked').value,
+            band: document.querySelector('input[name="band-switch"]:checked').value,
+            percentOpen: document.getElementById('percent-open').value,
+            percentCubical: document.getElementById('percent-cubical').value,
+            percentHollow: document.getElementById('percent-hollow').value,
+            percentSolid: document.getElementById('percent-solid').value,
+            isHighCeiling: document.getElementById('high-ceiling-warehouse').checked,
+            numberOfNetworks: document.getElementById('number-of-networks').value,
+            maxAntennas: document.getElementById('max-antennas').value,
+            excludeHardware: document.getElementById('no-hardware-checkbox').checked,
+            referralFeePercent: document.getElementById('referral-fee-percent').value,
+            maintenancePercent: document.getElementById('maintenance-percent').value,
+        },
+        overrides: {},
+        pricing: priceData, // Save the exact pricing used for the quote
+        supportSelections: {}
+    };
+
+    // Gather any overridden quantities
+    for (const key in currentResults) {
+        if (currentResults[key].override !== null) {
+            stateToSave.overrides[key] = currentResults[key].override;
+        }
+    }
+
+    // Gather support package selections
+    document.querySelectorAll('.support-checkbox').forEach(box => {
+        if(!stateToSave.supportSelections[box.dataset.key]) stateToSave.supportSelections[box.dataset.key] = {};
+        stateToSave.supportSelections[box.dataset.key][box.dataset.tier] = box.checked;
+    });
+    document.querySelectorAll('.dpm-input').forEach(input => {
+         if(!stateToSave.supportSelections[input.dataset.key]) stateToSave.supportSelections[input.dataset.key] = {};
+        stateToSave.supportSelections[input.dataset.key].dpm = input.value;
+    });
+
+    // 2. Convert to JSON, compress, and encode
+    const jsonString = JSON.stringify(stateToSave);
+    const compressed = pako.deflate(jsonString, { to: 'string' });
+    const encoded = btoa(compressed);
+
+    // 3. Create the URL and show it to the user
+    const url = new URL(window.location);
+    url.hash = encoded;
+    prompt("Copy this link to share the quote:", url.href);
+}
+
+function loadStateFromURL() {
+    if (!window.location.hash) return false;
+
+    try {
+        const encoded = window.location.hash.substring(1);
+        const compressed = atob(encoded);
+        const jsonString = pako.inflate(compressed, { to: 'string' });
+        const savedState = JSON.parse(jsonString);
+
+        if(savedState.version !== 1) return false;
+
+        // 1. Restore all inputs
+        const { inputs, overrides, pricing, supportSelections } = savedState;
+        document.getElementById('system-type').value = inputs.systemType;
+        document.getElementById('floor-area').value = inputs.floorArea;
+        document.getElementById('number-of-floors').value = inputs.numberOfFloors;
+        document.getElementById(inputs.unit === 'sqm' ? 'unit-sqm' : 'unit-sqft').checked = true;
+        document.getElementById(inputs.band === 'high_band' ? 'band-high' : 'band-low').checked = true;
+        document.getElementById('percent-open').value = inputs.percentOpen;
+        document.getElementById('percent-cubical').value = inputs.percentCubical;
+        document.getElementById('percent-hollow').value = inputs.percentHollow;
+        document.getElementById('percent-solid').value = inputs.percentSolid;
+        document.getElementById('high-ceiling-warehouse').checked = inputs.isHighCeiling;
+        document.getElementById('number-of-networks').value = inputs.numberOfNetworks;
+        document.getElementById('max-antennas').value = inputs.maxAntennas;
+        document.getElementById('no-hardware-checkbox').checked = inputs.excludeHardware;
+        document.getElementById('referral-fee-percent').value = inputs.referralFeePercent;
+        document.getElementById('maintenance-percent').value = inputs.maintenancePercent;
+
+        // 2. Restore pricing and overrides
+        priceData = pricing; // Use the exact pricing from the quote
+        for (const key in overrides) {
+            if(!currentResults[key]) currentResults[key] = { calculated: 0, override: null };
+            currentResults[key].override = overrides[key];
+        }
+
+        // 3. Restore support selections
+        if(supportSelections){
+             document.querySelectorAll('.support-checkbox').forEach(box => {
+                box.checked = supportSelections[box.dataset.key]?.[box.dataset.tier] || false;
+            });
+            document.querySelectorAll('.dpm-input').forEach(input => {
+                input.value = supportSelections[input.dataset.key]?.dpm || supportData[input.dataset.key].dpm.toFixed(4);
+            });
+        }
+
+        window.location.hash = ''; // Clear the hash to prevent re-loading
+        return true; // Indicate that state was loaded
+
+    } catch (e) {
+        console.error("Could not load state from URL:", e);
+        window.location.hash = ''; // Clear invalid hash
+        return false;
+    }
 }
