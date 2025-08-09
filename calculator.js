@@ -401,7 +401,124 @@ document.addEventListener('DOMContentLoaded', () => {
         const maintenanceCost = totalHardwareSellPrice * (maintenancePercent / 100);
         return perSystemCost + fixedAnnualCost + maintenanceCost;
     }
+async function generateDocument() {
+    const button = document.getElementById('generate-document-btn');
+    const originalText = button.innerHTML;
+    button.innerHTML = 'Generating...';
+    button.disabled = true;
 
+    if (!validateInputs(['customer-name', 'survey-price'])) {
+        button.innerHTML = originalText;
+        button.disabled = false;
+        return;
+    }
+
+    try {
+        const systemType = document.getElementById('system-type').value;
+        const templateMap = {
+            'G41': 'CEL-FI GO G41 Proposal Template.docx',
+            'G43': 'CEL-FI GO G43 Proposal Template.docx',
+            'QUATRA': 'CEL-FI QUATRA 4000e Proposal Template.docx',
+            'QUATRA_DAS': 'CEL-FI QUATRA 4000e Proposal Template.docx',
+            'QUATRA_EVO': 'CEL-FI QUATRA EVO Proposal Template.docx',
+            'QUATRA_EVO_DAS': 'CEL-FI QUATRA EVO Proposal Template.docx'
+        };
+        const templateFilename = templateMap[systemType];
+        if (!templateFilename) {
+            throw new Error(`No template found for system type: ${systemType}`);
+        }
+
+        const response = await fetch(`templates/${templateFilename}`);
+        if (!response.ok) { throw new Error(`Could not fetch template: ${response.statusText}`); }
+        const content = await response.arrayBuffer();
+
+        const zip = new PizZip(content);
+        const doc = new docxtemplater(zip, { delimiters: { start: '{{', end: '}}' } });
+
+        // Prepare data matching the placeholders in your template
+        let totalHardwareSellPrice = 0, totalHardwareUnits = 0;
+        const hardwareKeys = ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB'];
+        hardwareKeys.forEach(key => {
+            if (currentResults[key]) {
+                const quantity = currentResults[key].override ?? currentResults[key].calculated;
+                if (quantity > 0) {
+                    totalHardwareUnits += quantity;
+                    totalHardwareSellPrice += quantity * priceData[key].cost * (1 + priceData[key].margin);
+                }
+            }
+        });
+
+        let selectedSupportTier = 'none';
+        const activeButton = document.querySelector('.support-presets-main button.active-preset');
+        if (activeButton && activeButton.id !== 'support-preset-none') {
+            selectedSupportTier = activeButton.id.replace('support-preset-', '');
+        }
+        const selectedSupportCost = getSpecificSupportCost(selectedSupportTier, totalHardwareUnits, totalHardwareSellPrice);
+        const professionalServicesCost = (subTotalsForProposal.services?.sell || 0) - selectedSupportCost;
+        
+        const templateData = {
+            Account: document.getElementById('customer-name').value,
+            Solution: systemTypeSelect.options[systemTypeSelect.selectedIndex].text,
+            NumberOfNetworks: document.getElementById('number-of-networks').value,
+            SurveyPrice: `£${(parseFloat(document.getElementById('survey-price').value) || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            
+            Description1: "CEL-FI Hardware", Qty1: "1", 
+            UnitPrice1: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            TotalPrice1: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+
+            Description2: "Antennas, cables and connectors", Qty2: "1",
+            UnitPrice2: `£${(subTotalsForProposal.consumables?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            TotalPrice2: `£${(subTotalsForProposal.consumables?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            
+            Description3: "Professional Services", Qty3: "1",
+            UnitPrice3: `£${professionalServicesCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            TotalPrice3: `£${professionalServicesCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            
+            Description4: selectedSupportTier !== 'none' ? (selectedSupportTier.charAt(0).toUpperCase() + selectedSupportTier.slice(1)) : "Please see the support options below",
+            Qty4: selectedSupportTier !== 'none' ? "1" : "",
+            UnitPrice4: selectedSupportTier !== 'none' ? `£${selectedSupportCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : "",
+            TotalPrice4: selectedSupportTier !== 'none' ? `£${selectedSupportCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : "",
+
+            TotalPrice: `£${((subTotalsForProposal.hardware?.sell || 0) + (subTotalsForProposal.consumables?.sell || 0) + (subTotalsForProposal.services?.sell || 0)).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+
+            Support1: "Bronze", SupportQty1: "1",
+            SupportUnitPrice1: `£${getSpecificSupportCost('bronze', totalHardwareUnits, totalHardwareSellPrice).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            SupportTotalPrice1: `£${getSpecificSupportCost('bronze', totalHardwareUnits, totalHardwareSellPrice).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            
+            Support2: "Silver", SupportQty2: "1",
+            SupportUnitPrice2: `£${getSpecificSupportCost('silver', totalHardwareUnits, totalHardwareSellPrice).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            SupportTotalPrice2: `£${getSpecificSupportCost('silver', totalHardwareUnits, totalHardwareSellPrice).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            
+            Support3: "Gold", SupportQty3: "1",
+            SupportUnitPrice3: `£${getSpecificSupportCost('gold', totalHardwareUnits, totalHardwareSellPrice).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            SupportTotalPrice3: `£${getSpecificSupportCost('gold', totalHardwareUnits, totalHardwareSellPrice).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        };
+
+        doc.render(templateData);
+
+        const out = doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+        const customerName = document.getElementById('customer-name').value || 'Proposal';
+        const filename = `${customerName.replace(/ /g, '_')}_Proposal.docx`;
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(out);
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        button.innerHTML = 'Downloaded! ✅';
+
+    } catch (error) {
+        console.error('Error generating document:', error);
+        alert('Could not generate the document. Please check the console for errors.');
+        button.innerHTML = 'Failed! ❌';
+    } finally {
+        setTimeout(() => {
+            button.innerHTML = originalText;
+            button.disabled = false;
+        }, 3000);
+    }
+}
     // --- NEW FEATURES (Make.com, Links, Validation) ---
     function initialize() {
         const stateLoaded = loadStateFromURL();
@@ -412,7 +529,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const isDashboard = mainContainer.classList.toggle('screenshot-mode');
             viewToggleButton.textContent = isDashboard ? 'Switch to Simple View' : 'Switch to Dashboard View';
         });
-
+document.getElementById('generate-document-btn').addEventListener('click', generateDocument);
         document.getElementById('generate-proposal-btn').addEventListener('click', () => sendDataToMake('proposal'));
         document.getElementById('quote-to-monday-btn').addEventListener('click', () => sendDataToMake('quote'));
         document.getElementById('generate-link-btn').addEventListener('click', generateShareLink);
