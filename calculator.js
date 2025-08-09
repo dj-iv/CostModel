@@ -512,11 +512,11 @@ async function sendDataToMake(dataType) {
     const button = document.getElementById(buttonId);
     const originalText = button.innerHTML;
 
-    if (dataType === 'proposal') {
-        if (!validateInputs(['customer-name', 'survey-price'])) return;
-    } else if (dataType === 'quote') {
-        if (!validateInputs(['quote-number', 'customer-name', 'survey-price'])) return;
-    }
+   if (dataType === 'proposal') {
+    if (!validateInputs(['customer-name', 'survey-price'])) return;
+} else if (dataType === 'quote') {
+    if (!validateInputs(['quote-number'])) return;
+}
 
     button.innerHTML = 'Sending...';
     button.disabled = true;
