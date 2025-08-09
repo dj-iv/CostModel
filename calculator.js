@@ -530,7 +530,7 @@ async function generateDocument() {
             viewToggleButton.textContent = isDashboard ? 'Switch to Simple View' : 'Switch to Dashboard View';
         });
 document.getElementById('generate-document-btn').addEventListener('click', generateDocument);
-        document.getElementById('generate-proposal-btn').addEventListener('click', () => sendDataToMake('proposal'));
+        document.getElementById('send-to-make-btn').addEventListener('click', () => sendDataToMake('proposal'));
         document.getElementById('quote-to-monday-btn').addEventListener('click', () => sendDataToMake('quote'));
         document.getElementById('generate-link-btn').addEventListener('click', generateShareLink);
         document.getElementById('support-preset-none').addEventListener('click', () => setSupportPreset('none'));
