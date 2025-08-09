@@ -546,8 +546,8 @@ const selectedText = systemTypeSelect.options[systemTypeSelect.selectedIndex].te
 
 // This map will translate the system value to the desired text for the proposal
 const solutionNameMap = {
-    'G41': 'GO 41/3',
-    'G43': 'GO 43/3',
+    'G41': 'GO G41 DAS',
+    'G43': 'GO G43 DAS',
     'QUATRA': 'QUATRA 4000e Only',
     'QUATRA_EVO': 'QUATRA EVO Only'
 };
