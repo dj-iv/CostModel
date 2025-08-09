@@ -53,7 +53,7 @@
             display: flex;
             gap: 10px;
         }
-        #reset-overrides, #settings-btn, #toggle-zero-qty-btn, #generate-link-btn, #generate-proposal-btn {
+        #reset-overrides, #settings-btn, #toggle-zero-qty-btn, #generate-link-btn, #generate-proposal-btn, #quote-to-monday-btn {
             padding: 8px 12px;
             border: 1px solid #004696;
             background-color: #f0f8ff;
@@ -63,11 +63,13 @@
             font-weight: 600;
             font-size: 13px;
         }
-        #reset-overrides:hover, #settings-btn:hover, #toggle-zero-qty-btn:hover, #generate-link-btn:hover, #generate-proposal-btn:hover {
+        #reset-overrides:hover, #settings-btn:hover, #toggle-zero-qty-btn:hover, #generate-link-btn:hover, #generate-proposal-btn:hover, #quote-to-monday-btn:hover {
             background-color: #e0eefc;
         }
         #generate-link-btn { background-color: #d1ecf1; border-color: #bee5eb;}
         #generate-proposal-btn { background-color: #d4edda; border-color: #28a745;}
+        #quote-to-monday-btn { background-color: #d6d8db; border-color: #6c757d;}
+
 
         /* Financial Summary Box */
         .financial-summary {
@@ -106,6 +108,10 @@
             border: 1px solid #ccc;
             border-radius: 6px;
             font-size: 15px;
+        }
+        .input-error {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25);
         }
         
         /* Table Styles */
@@ -153,7 +159,7 @@
         }
         .item-qty { cursor: pointer; position: relative; }
 
-        /* Support Section Styles (inside modal) */
+        /* Support Section Styles */
         .support-table { width: 100%; margin-top: 15px; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
         .support-table th, .support-table td { text-align: center; padding: 8px; border: 1px solid #ddd; vertical-align: middle; }
         .support-table th:nth-child(1), .support-table td:nth-child(1) { text-align: left; width: 18%; }
@@ -218,13 +224,13 @@
         
         /* Main page support buttons */
         .support-presets-main {
-            display: grid; /* Changed to grid */
-            grid-template-columns: repeat(4, 1fr); /* 4 equal columns */
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
             gap: 15px;
             margin-top: 10px;
         }
         .support-presets-main button {
-            padding: 10px 0; /* Adjusted padding */
+            padding: 10px 0;
             border: 1px solid #004696;
             background-color: white;
             color: #004696;
@@ -237,8 +243,8 @@
         .support-presets-main button.active-preset { background-color: #004696; color: white; }
         
         .support-prices-display {
-            display: grid; /* Changed to grid */
-            grid-template-columns: repeat(4, 1fr); /* 4 equal columns */
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
             gap: 15px;
             margin-top: 10px;
             text-align: center;
@@ -290,6 +296,10 @@
                 <div class="input-group">
                     <label for="survey-price">Survey Price (£)</label>
                     <input type="number" id="survey-price" value="1200" step="100">
+                </div>
+                 <div class="input-group">
+                    <label for="quote-number">Quote Number</label>
+                    <input type="text" id="quote-number" placeholder="e.g., Q-12345">
                 </div>
             </div>
         </div>
@@ -358,8 +368,8 @@
                 <div class="input-group">
                     <label for="system-type">System Type</label>
                     <select id="system-type">
-                        <option value="G41">CEL-FI Go G41</option>
-                        <option value="G43">CEL-FI Go G43</option>
+                        <option value="G41">GO G41</option>
+                        <option value="G43">GO G43</option>
                         <option value="QUATRA">QUATRA 4000e</option>
                         <option value="QUATRA_DAS">QUATRA 4000e DAS</option>
                         <option value="QUATRA_EVO">QUATRA EVO</option>
@@ -401,7 +411,8 @@
                 <span class="support-price-item">B: <strong id="bronze-price-display">£0.00</strong></span>
                 <span class="support-price-item">S: <strong id="silver-price-display">£0.00</strong></span>
                 <span class="support-price-item">G: <strong id="gold-price-display">£0.00</strong></span>
-                <span class="support-price-item"></span> </div>
+                <span class="support-price-item"></span>
+            </div>
         </div>
 
         <div class="section" id="results-section">
@@ -428,6 +439,7 @@
             <div class="results-header">
                 <div class="header-buttons">
                     <button id="generate-proposal-btn">Generate Proposal 🚀</button>
+                    <button id="quote-to-monday-btn">Quote to Monday</button>
                     <button id="generate-link-btn">Generate Link 🔗</button>
                     <button id="toggle-zero-qty-btn">Show All Items</button>
                     <button id="settings-btn">Settings ⚙️</button>
