@@ -41,6 +41,79 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentResults = {};
     let showZeroQuantityItems = false;
     let subTotalsForProposal = {};
+    function populateSettingsModal() {
+        const container = document.getElementById('settings-form-container');
+        let html = `<div class="setting-item setting-header"><span>Component</span><span>Cost (£)</span><span>Margin (%)</span><span>Sell (£)</span></div>`;
+        const sortedKeys = Object.keys(priceData).sort((a, b) => priceData[a].label.localeCompare(priceData[b].label));
+        for(const key of sortedKeys) {
+            const item = priceData[key];
+            const sellPrice = item.cost * (1 + item.margin);
+            html += `<div class="setting-item"><label for="cost-${key}">${item.label}</label><input type="number" step="0.01" id="cost-${key}" value="${item.cost.toFixed(2)}"><input type="number" step="0.01" id="margin-${key}" value="${(item.margin * 100).toFixed(2)}"><span id="sell-${key}" class="sell-price-display">£${sellPrice.toFixed(2)}</span></div>`;
+        }
+        container.innerHTML = html;
+    
+        for(const key of sortedKeys) {
+            const costInput = document.getElementById(`cost-${key}`);
+            const marginInput = document.getElementById(`margin-${key}`);
+            const handler = () => window.updateSellPriceDisplay(key);
+            if(costInput) costInput.addEventListener('input', handler);
+            if(marginInput) marginInput.addEventListener('input', handler);
+        }
+    }
+
+    function setupSettingsModal() { 
+        const modal = document.getElementById('settings-modal'), btn = document.getElementById('settings-btn'), closeBtn = modal.querySelector('.close-btn'), cancelBtn = document.getElementById('modal-cancel'), saveBtn = document.getElementById('modal-save'); 
+        btn.onclick = () => { populateSettingsModal(); modal.style.display = "block"; }; 
+        const closeModal = () => modal.style.display = "none"; 
+        closeBtn.onclick = closeModal; cancelBtn.onclick = closeModal; 
+        window.onclick = (event) => { if (event.target == modal) closeModal(); }; 
+        saveBtn.onclick = () => { const newPriceData = JSON.parse(JSON.stringify(priceData)); let allValid = true; for(const key in newPriceData) { const newCost = parseFloat(document.getElementById(`cost-${key}`).value), newMargin = parseFloat(document.getElementById(`margin-${key}`).value) / 100; if (!isNaN(newCost) && !isNaN(newMargin)) { newPriceData[key].cost = newCost; newPriceData[key].margin = newMargin; } else { allValid = false; } } if(allValid) { savePrices(newPriceData); closeModal(); } else { alert("Please ensure all values are valid numbers."); } };
+        const tabLinks = modal.querySelectorAll('.tab-link');
+        const tabContents = modal.querySelectorAll('.tab-content');
+        tabLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                const tabId = link.dataset.tab;
+                tabLinks.forEach(item => item.classList.remove('active'));
+                tabContents.forEach(item => item.classList.remove('active'));
+                link.classList.add('active');
+                modal.querySelector(`#${tabId}`).classList.add('active');
+            });
+        });
+    }
+    
+    function populateSupportTable() {
+        const table = document.getElementById('support-table');
+        if (!table) return;
+        let html = `<thead><tr><th>Included Services</th><th>Description</th><th>Bronze</th><th>Silver</th><th>Gold</th><th>dpm/sys</th><th>dpy/sys</th></tr></thead><tbody>`;
+        for (const key in supportData) {
+            const item = supportData[key];
+            const dpy = item.dpm * 12;
+            html += `<tr><td>${item.label}</td><td>${item.description}</td>
+                <td><input type="checkbox" class="support-checkbox" data-key="${key}" data-tier="bronze"></td>
+                <td><input type="checkbox" class="support-checkbox" data-key="${key}" data-tier="silver"></td>
+                <td><input type="checkbox" class="support-checkbox" data-key="${key}" data-tier="gold"></td>
+                <td><input type="number" class="dpm-input" data-key="${key}" value="${item.dpm.toFixed(4)}" step="0.0001"></td>
+                <td><span id="dpy-${key}">${dpy.toFixed(4)}</span></td></tr>`;
+        }
+        html += `</tbody><tfoot>
+            <tr class="summary-row"><td colspan="2" style="text-align:right;">Summary per system per year (£)</td><td id="bronze-sys-summary">£0.00</td><td id="silver-sys-summary">£0.00</td><td id="gold-sys-summary">£0.00</td><td colspan="2"></td></tr>
+            <tr class="summary-row"><td colspan="2" style="text-align:right;">Summary per year (£)</td><td id="bronze-year-summary">£0.00</td><td id="silver-year-summary">£0.00</td><td id="gold-year-summary">£0.00</td><td colspan="2"></td></tr>
+        </tfoot>`;
+        table.innerHTML = html;
+        document.querySelectorAll('.support-checkbox').forEach(box => box.addEventListener('change', () => {
+            document.querySelectorAll('.support-presets-main button').forEach(b => b.classList.remove('active-preset'));
+            runFullCalculation();
+        }));
+        document.querySelectorAll('.dpm-input').forEach(el => {
+            el.addEventListener('input', (e) => {
+                const key = e.target.dataset.key;
+                const dpySpan = document.getElementById(`dpy-${key}`);
+                const dpmValue = parseFloat(e.target.value) || 0;
+                if (dpySpan) dpySpan.textContent = (dpmValue * 12).toFixed(4);
+            });
+            el.addEventListener('change', runFullCalculation);
+        });
+    }
 
     function loadPrices() { try { const savedPrices = localStorage.getItem('universalCalculatorPrices'); if (savedPrices) { priceData = JSON.parse(savedPrices); for(const key in defaultPriceData) if(!priceData[key]) priceData[key] = defaultPriceData[key]; } else { priceData = JSON.parse(JSON.stringify(defaultPriceData)); } } catch (e) { console.error("Could not load prices", e); priceData = JSON.parse(JSON.stringify(defaultPriceData)); } }
     function savePrices(newPriceData) { try { localStorage.setItem('universalCalculatorPrices', JSON.stringify(newPriceData)); priceData = newPriceData; runFullCalculation(); alert('Prices saved successfully!'); } catch (e) { console.error("Could not save prices.", e); alert('Error: Could not save prices.'); } }
