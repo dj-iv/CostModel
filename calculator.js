@@ -550,11 +550,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 'QUATRA': 'QUATRA 4000e Only',
                 'QUATRA_EVO': 'QUATRA EVO Only'
             };
-            const solutionNameToSend = solutionNameMap[selectedValue] || selectedText;
+const solutionNameToSend = solutionNameMap[selectedValue] || selectedText;
 
-            const dataToSend = {
-                CustomerName: document.getElementById('customer-name').value,
-                Solution: solutionNameToSend,
+// Get the name of the selected support package
+let description4Text = "Please see the support options below"; // Default text
+const activeButton = document.querySelector('.support-presets-main button.active-preset');
+if (activeButton && activeButton.id !== 'support-preset-none') {
+    const tier = activeButton.id.replace('support-preset-', '');
+    description4Text = tier.charAt(0).toUpperCase() + tier.slice(1); // "Bronze", "Silver", or "Gold"
+}
+
+const dataToSend = {
+    CustomerName: document.getElementById('customer-name').value,
+    Solution: solutionNameToSend,
                 NumberOfNetworks: document.getElementById('number-of-networks').value,
                 SurveyPrice: (parseFloat(document.getElementById('survey-price').value) || 0).toFixed(2),
                 Description1: "CEL-FI Hardware",
@@ -569,7 +577,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 Qty3: "1",
                 UnitPrice3: (subTotalsForProposal.services?.sell || 0).toFixed(2),
                 TotalPrice3: (subTotalsForProposal.services?.sell || 0).toFixed(2),
-                Description4: "", Qty4: "", UnitPrice4: "", TotalPrice4: "",
+                Description4: description4Text, Qty4: "", UnitPrice4: "", TotalPrice4: "",
                 Support1: "Bronze", SupportQty1: "1", SupportUnitPrice1: bronzeCost.toFixed(2), SupportTotalPrice1: bronzeCost.toFixed(2),
                 Support2: "Silver", SupportQty2: "1", SupportUnitPrice2: silverCost.toFixed(2), SupportTotalPrice2: silverCost.toFixed(2),
                 Support3: "Gold", SupportQty3: "1", SupportUnitPrice3: goldCost.toFixed(2), SupportTotalPrice3: goldCost.toFixed(2),
