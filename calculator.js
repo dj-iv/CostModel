@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- MAKE.COM WEBHOOK ---
     const MAKE_WEBHOOK_URL = 'https://hook.eu1.make.com/chemsqrmifjs5lwbrquhh1bha0vo96k2';
 
-    // --- DATA (Copied from your trusted file) ---
+    // --- DATA ---
     const coverageData = {
         go: {
             high_band: { sqm: { solid: 56, hollow: 94, cubical: 157, open: 250 }, sqft: { solid: 603, hollow: 1012, cubical: 1690, open: 2691 } },
@@ -15,7 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const defaultPriceData = {
-        'G41':{label:"GO G41",cost:800.19,margin:0.25},'G43':{label:"GO G43",cost:3149.37,margin:0.25},'QUATRA_NU':{label:"QUATRA 4000e NU",cost:5668.74,margin:0.25},'QUATRA_CU':{label:"QUATRA 4000e CU",cost:3400.74,margin:0.25},'QUATRA_HUB':{label:"QUATRA 4000e HUB",cost:4219.74,margin:0.25},'QUATRA_EVO_NU':{label:"QUATRA EVO NU",cost:2707.74,margin:0.25},'QUATRA_EVO_CU':{label:"QUATRA EVO CU",cost:1731.39,margin:0.25},'QUATRA_EVO_HUB':{label:"QUATRA EVO HUB",cost:2243.8,margin:0.25},'extender_cat6':{label:"Q4000 CAT6 Range Extender",cost:426.43,margin:0.25},'extender_fibre_cu':{label:"Q4000 Fibre Extender CU",cost:755.99,margin:0.25},'extender_fibre_nu':{label:"Q4000 Fibre Extender NU",cost:986.61,margin:0.25},'service_antennas':{label:"Omni Ceiling Antenna",cost:11.22,margin:7},'donor_wideband':{label:"Log-periodic Antenna",cost:20.08,margin:5},'donor_lpda':{label:"LPDA-R Antenna",cost:268.8,margin:0.62},'antenna_bracket':{label:"Antenna Bracket",cost:40,margin:0.5},
+        'G41':{label:"GO G41",cost:800.19,margin:0.25},
+        'G43':{label:"GO G43",cost:3149.37,margin:0.25},
+        'QUATRA_NU':{label:"QUATRA 4000e NU",cost:5668.74,margin:0.25},'QUATRA_CU':{label:"QUATRA 4000e CU",cost:3400.74,margin:0.25},'QUATRA_HUB':{label:"QUATRA 4000e HUB",cost:4219.74,margin:0.25},'QUATRA_EVO_NU':{label:"QUATRA EVO NU",cost:2707.74,margin:0.25},'QUATRA_EVO_CU':{label:"QUATRA EVO CU",cost:1731.39,margin:0.25},'QUATRA_EVO_HUB':{label:"QUATRA EVO HUB",cost:2243.8,margin:0.25},'extender_cat6':{label:"Q4000 CAT6 Range Extender",cost:426.43,margin:0.25},'extender_fibre_cu':{label:"Q4000 Fibre Extender CU",cost:755.99,margin:0.25},'extender_fibre_nu':{label:"Q4000 Fibre Extender NU",cost:986.61,margin:0.25},'service_antennas':{label:"Omni Ceiling Antenna",cost:11.22,margin:7},'donor_wideband':{label:"Log-periodic Antenna",cost:20.08,margin:5},'donor_lpda':{label:"LPDA-R Antenna",cost:268.8,margin:0.62},'antenna_bracket':{label:"Antenna Bracket",cost:40,margin:0.5},
         'hybrids_4x4':{label:"4x4 Hybrid Combiner",cost:183.05,margin:1.0},
         'hybrids_2x2':{label:"2x2 Hybrid Combiner",cost:30.12,margin:3.0},
         'splitters_4way':{label:"4-Way Splitter",cost:18.36,margin:3},'splitters_3way':{label:"3-Way Splitter",cost:15.36,margin:3},'splitters_2way':{label:"2-Way Splitter",cost:14.18,margin:3},'pigtails':{label:"N-Male to SMA-Male Pigtail",cost:5.02,margin:5},'coax_lmr400':{label:"LMR400/HDF400 Coax Cable",cost:1.25,margin:3},'coax_half':{label:"1/2in Coax Cable",cost:1.78,margin:3},
@@ -44,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let showZeroQuantityItems = false;
     let subTotalsForProposal = {};
     
-    // --- CORE CALCULATION ENGINE (Restored from your trusted file) ---
+    // --- FROM TRUSTED FILE: Core Calculation Engine ---
     function calculateCoverageRequirements() {
         const pOpen=parseFloat(document.getElementById('percent-open').value)||0, pCubical=parseFloat(document.getElementById('percent-cubical').value)||0, pHollow=parseFloat(document.getElementById('percent-hollow').value)||0, pSolid=parseFloat(document.getElementById('percent-solid').value)||0;
         const sum = pOpen + pCubical + pHollow + pSolid;
@@ -92,11 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             params.D_DA = params.C_Net > 1 ? 2 : params.C_Net;
             const calculatedValues = systemCalculators[systemType](params);
-            
-            for (const key in currentResults) {
-                currentResults[key].calculated = 0;
-            }
-
+            for (const key in currentResults) { currentResults[key].calculated = 0; }
             for (const key in calculatedValues) {
                 if (currentResults[key]) {
                     currentResults[key].calculated = calculatedValues[key];
@@ -104,19 +102,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     currentResults[key] = { calculated: calculatedValues[key], override: null, decimals: 0, unit: { coax_half: ' (m)', coax_lmr400: ' (m)', cable_cat: ' (m)', install_internal: ' (Days)', install_external: ' (Days)' }[key] || '' };
                 }
             }
-
-            if(!currentResults['service_antennas']) {
-                currentResults['service_antennas'] = { calculated: 0, override: null, decimals: 0, unit: '' };
-            }
+            if(!currentResults['service_antennas']) { currentResults['service_antennas'] = { calculated: 0, override: null, decimals: 0, unit: '' }; }
             currentResults['service_antennas'].calculated = params.B_SA;
-
             const internal_days = currentResults['install_internal']?.override ?? currentResults['install_internal']?.calculated ?? 0;
-            if(currentResults['travel_expenses']) {
-                currentResults['travel_expenses'].calculated = internal_days;
-            } else {
-                currentResults['travel_expenses'] = { calculated: internal_days, override: null, decimals: 0, unit: ' (Days)'};
-            }
-
+            if(currentResults['travel_expenses']) { currentResults['travel_expenses'].calculated = internal_days; } else { currentResults['travel_expenses'] = { calculated: internal_days, override: null, decimals: 0, unit: ' (Days)'}; }
             let totalHardwareSellPrice = 0, totalHardwareUnits = 0;
             const hardwareKeys = ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB', 'extender_cat6', 'extender_fibre_cu', 'extender_fibre_nu'];
             for (const key of hardwareKeys) {
@@ -129,14 +118,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             }
-
             const supportCost = calculateSupportCost(totalHardwareUnits, totalHardwareSellPrice);
-            if(!currentResults['support_package']) {
-                currentResults['support_package'] = { calculated: 0, override: null, decimals: 2, unit: ''};
-            }
+            if(!currentResults['support_package']) { currentResults['support_package'] = { calculated: 0, override: null, decimals: 2, unit: ''}; }
             currentResults['support_package'].calculated = supportCost;
             priceData['support_package'].cost = supportCost;
-            
             if (supportCost > 0) {
                 const activeButton = document.querySelector('.support-presets-main button.active-preset');
                 if (activeButton && activeButton.id !== 'support-preset-none') {
@@ -149,7 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 priceData['support_package'].label = "Annual Support Package";
             }
-            
             updateDOM();
             updateAllSupportTierPrices();
         } catch (error) {
@@ -205,18 +189,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const finalUnitSell = baseUnitSell * uplift;
                     const finalTotalSell = finalUnitSell * quantity;
                     let trueLineMargin = (baseUnitSell - priceInfo.cost) * quantity;
-                    
-                    if (key === 'support_package') {
-                        trueLineMargin = finalTotalSell;
-                        groupSubTotalSell += finalTotalSell;
-                        groupSubTotalMargin += finalTotalSell;
-                    } else {
-                        groupSubTotalSell += finalTotalSell; 
-                        groupSubTotalCost += (priceInfo.cost * quantity); 
-                        groupSubTotalMargin += trueLineMargin;
-                    }
+                    if (key === 'support_package') { trueLineMargin = finalTotalSell; groupSubTotalSell += finalTotalSell; groupSubTotalMargin += finalTotalSell; } else { groupSubTotalSell += finalTotalSell; groupSubTotalCost += (priceInfo.cost * quantity); groupSubTotalMargin += trueLineMargin; }
                     itemsInGroupDisplayed++;
-                    
                     const qtyDisplay = (key === 'support_package') ? '1' : `<span class="value-display"></span><input type="number" step="any" class="value-input hidden" />`;
                     const qtyClass = (key === 'support_package') ? '' : 'item-qty';
                     groupHTML += `<tr><td class="col-item item-name">${priceInfo.label}${itemResult.unit || ''}</td><td class="col-qty ${qtyClass}" data-key="${key}">${qtyDisplay}</td><td class="col-sell">£${finalUnitSell.toFixed(2)}</td><td class="col-total">£${finalTotalSell.toFixed(2)}</td><td class="col-margin">£${trueLineMargin.toFixed(2)}</td></tr>`;
@@ -235,9 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.querySelectorAll('.item-qty').forEach(cell => { const key = cell.dataset.key; if(key !== 'support_package') { updateCellDisplay(cell, key); cell.addEventListener('click', () => activateEditMode(cell, key)); const inputField = cell.querySelector('.value-input'); inputField.addEventListener('blur', () => deactivateEditMode(cell, key, true)); inputField.addEventListener('keydown', e => { if (e.key === 'Enter') deactivateEditMode(cell, key, true); else if (e.key === 'Escape') deactivateEditMode(cell, key, false); }); }});
         
-        if (priceData && priceData.install_internal) {
-            updateSupportTableSummaries(totalHardwareUnits);
-        }
+        updateSupportTableSummaries(totalHardwareUnits);
         calculateAndDisplayGrandTotals(subTotals);
         subTotalsForProposal = subTotals;
     }
@@ -260,16 +232,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const isNonDasQuatra = systemType === 'QUATRA' || systemType === 'QUATRA_EVO';
         const floorsGroup = document.getElementById('number-of-floors-group');
         const areaLabel = document.getElementById('floor-area-label');
-        if (isNonDasQuatra) {
-            floorsGroup.style.display = 'flex';
-            areaLabel.textContent = 'Area per Floor';
-        } else {
-            floorsGroup.style.display = 'none';
-            areaLabel.textContent = 'Floor Area';
-        }
+        if (isNonDasQuatra) { floorsGroup.style.display = 'flex'; areaLabel.textContent = 'Area per Floor'; } else { floorsGroup.style.display = 'none'; areaLabel.textContent = 'Floor Area'; }
     }
-    
-    // --- SYSTEM CALCULATORS (Copied from your trusted file) ---
+
+    // --- FROM TRUSTED FILE: System Calculators ---
     const systemCalculators = {
         'G41': params => { const { B_SA, C_Net, D_DA, E_Max } = params; let r = getBaseCalculations(params, 'G41'); const num_systems = (B_SA === 0 || E_Max === 0) ? 0 : Math.ceil(B_SA / E_Max); r.G41 = num_systems * C_Net; const G_DonorPorts = C_Net * num_systems; const SA_per_set = (num_systems === 0) ? 0 : Math.ceil(B_SA / num_systems); const is_4x4 = (C_Net === 4 && SA_per_set >= 3), is_2x2 = (C_Net === 2 && SA_per_set >= 2); let s4=0,s3=0,s2=0; if (is_4x4 || is_2x2) { const num_outputs=is_4x4?4:2,antennas_per_output=Math.ceil(SA_per_set/num_outputs),splitters=getSplitterCascade(antennas_per_output); s4=splitters.d4*num_outputs;s3=splitters.d3*num_outputs;s2=splitters.d2*num_outputs;} else { const d4=(SA_per_set<=1)?0:((SA_per_set===6)?0:((SA_per_set%4===1)?Math.max(0,Math.floor(SA_per_set/4)-1):Math.floor(SA_per_set/4))),d3=(SA_per_set<=1)?0:Math.floor((SA_per_set-4*d4)/3),d2=(SA_per_set<=1)?0:Math.ceil((SA_per_set-4*d4-3*d3)/2),nd=d4+d3+d2; s4=d4+((C_Net===4)?1:0)+((nd===4)?1:0);s3=d3+((C_Net===3)?1:0)+((nd===3)?1:0);s2=d2+((C_Net===2)?1:0)+((nd===2)?1:0);} let d4_way=0,d3_way=0,d2_way=0; if(G_DonorPorts>D_DA&&D_DA>0){ const p_ceil=Math.ceil(G_DonorPorts/D_DA),p_floor=Math.floor(G_DonorPorts/D_DA),n_ceil=(G_DonorPorts%D_DA===0)?0:(G_DonorPorts%D_DA),n_floor=D_DA-n_ceil; const s_ceil=getSplitterCascade(p_ceil),s_floor=getSplitterCascade(p_floor); d4_way=n_ceil*s_ceil.d4+n_floor*s_floor.d4;d3_way=n_ceil*s_ceil.d3+n_floor*s_floor.d3;d2_way=n_ceil*s_ceil.d2+n_floor*s_floor.d2;} r.hybrids_4x4=is_4x4?num_systems:0;r.hybrids_2x2=is_2x2?num_systems:0; r.splitters_4way=(s4*num_systems)+d4_way;r.splitters_3way=(s3*num_systems)+d3_way;r.splitters_2way=(s2*num_systems)+d2_way; r.pigtails=r.G41+G_DonorPorts; r.connectors=(B_SA+D_DA)+(r.splitters_4way*5+r.splitters_3way*4+r.splitters_2way*3)+(r.hybrids_4x4*8+r.hybrids_2x2*4); r.install_internal=Math.ceil((B_SA/3)+(D_DA/3)+(r.G41/4)+1); return r; },
         'G43': params => { const { B_SA, C_Net, D_DA, E_Max } = params; let r = getBaseCalculations(params, 'G43'); const is_4_nets=(C_Net===4),outputs_per_set=is_4_nets?6:3,max_antennas_per_set=outputs_per_set*E_Max; const num_sets=(B_SA>0&&max_antennas_per_set>0)?Math.ceil(B_SA/max_antennas_per_set):0; r.G43=is_4_nets?(num_sets*2):num_sets;r.hybrids_2x2=is_4_nets?(num_sets*3):0;r.hybrids_4x4=0; const G_DonorPorts=is_4_nets?(num_sets*6):(num_sets*3); let s4_t=0,s3_t=0,s2_t=0; if(B_SA>0&&E_Max>0){const total_outputs=num_sets*outputs_per_set,antennas_per_output=total_outputs>0?Math.ceil(B_SA/total_outputs):0; const splitters=getSplitterCascade(antennas_per_output); s4_t=splitters.d4*total_outputs;s3_t=splitters.d3*total_outputs;s2_t=splitters.d2*total_outputs;} let d4_t=0,d3_t=0,d2_t=0; if(G_DonorPorts>D_DA&&D_DA>0){const p_ceil=Math.ceil(G_DonorPorts/D_DA),p_floor=Math.floor(G_DonorPorts/D_DA),n_ceil=(G_DonorPorts%D_DA===0)?0:(G_DonorPorts%D_DA),n_floor=D_DA-n_ceil; const s_ceil=getSplitterCascade(p_ceil),s_floor=getSplitterCascade(p_floor); d4_t=n_ceil*s_ceil.d4+n_floor*s_floor.d4;d3_t=n_ceil*s_ceil.d3+n_floor*s_floor.d3;d2_t=n_ceil*s_ceil.d2+n_floor*s_floor.d2;} r.splitters_4way=s4_t+d4_t;r.splitters_3way=s3_t+d3_t;r.splitters_2way=s2_t+d2_t; r.pigtails=is_4_nets?(num_sets*6):0; r.connectors=(B_SA+D_DA)+(r.splitters_4way*5+r.splitters_3way*4+r.splitters_2way*3)+(r.hybrids_4x4*8+r.hybrids_2x2*4); r.install_internal=Math.ceil((B_SA/3)+(D_DA/3)+(r.G43/4)+1); return r; },
@@ -301,9 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const validatedFields = ['customer-name', 'survey-price', 'quote-number'];
         validatedFields.forEach(fieldId => {
             const field = document.getElementById(fieldId);
-            if(field) {
-                field.addEventListener('input', () => field.classList.remove('input-error'));
-            }
+            if(field) { field.addEventListener('input', () => field.classList.remove('input-error')); }
         });
 
         document.querySelectorAll('#floor-area, input[name="unit-switch"], input[name="band-switch"], .wall-percent, #high-ceiling-warehouse, #number-of-floors').forEach(input => {
@@ -316,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
             calculateCoverageRequirements();
         });
 
-        document.querySelectorAll('#number-of-networks, #max-antennas, #no-hardware-checkbox, #referral-fee-percent, #maintenance-percent').forEach(input => {
+        document.querySelectorAll('#number-of-networks, #max-antennas, #no-hardware-checkbox, #referral-fee-percent, #maintenance-percent, #customer-name, #survey-price, #quote-number').forEach(input => {
             input.addEventListener('input', runFullCalculation);
             input.addEventListener('change', runFullCalculation);
         });
@@ -330,10 +294,11 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleMultiFloorUI();
         
         if (!stateLoaded) {
-            setSupportPreset('none');
+            setSupportPreset('none'); // This will trigger a runFullCalculation
+            calculateCoverageRequirements(); // This will trigger another, correcting the CU/antenna count
+        } else {
+            runFullCalculation();
         }
-        
-        calculateCoverageRequirements(); // Initial calculation on page load
 
         mainContainer.classList.add('screenshot-mode');
         viewToggleButton.textContent = 'Switch to Simple View';
@@ -368,7 +333,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initialize();
 });
 
-// This must be in the global scope for the inline oninput handler in the modal
 window.updateSellPriceDisplay = (key) => {
     const costInput = document.getElementById(`cost-${key}`);
     const marginInput = document.getElementById(`margin-${key}`);
