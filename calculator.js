@@ -690,3 +690,4 @@ window.updateSellPriceDisplay = (key) => {
     const sellPrice = cost * (1 + margin / 100);
     sellDisplay.textContent = `£${sellPrice.toFixed(2)}`;
 };
+// Trigger deployment - August 7, 2025
