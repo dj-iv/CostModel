@@ -51,11 +51,9 @@
         }
         .header-buttons {
             display: flex;
-            flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
             gap: 10px;
-            justify-content: flex-end;
         }
-        #reset-overrides, #settings-btn, #toggle-zero-qty-btn, #generate-link-btn, #send-to-make-btn, #generate-document-btn, #quote-to-monday-btn {
+        #reset-overrides, #settings-btn, #toggle-zero-qty-btn, #generate-link-btn, #generate-proposal-btn, #quote-to-monday-btn {
             padding: 8px 12px;
             border: 1px solid #004696;
             background-color: #f0f8ff;
@@ -65,13 +63,13 @@
             font-weight: 600;
             font-size: 13px;
         }
-        #reset-overrides:hover, #settings-btn:hover, #toggle-zero-qty-btn:hover, #generate-link-btn:hover, #send-to-make-btn:hover, #generate-document-btn:hover, #quote-to-monday-btn:hover {
+        #reset-overrides:hover, #settings-btn:hover, #toggle-zero-qty-btn:hover, #generate-link-btn:hover, #generate-proposal-btn:hover, #quote-to-monday-btn:hover {
             background-color: #e0eefc;
         }
         #generate-link-btn { background-color: #d1ecf1; border-color: #bee5eb;}
-        #send-to-make-btn { background-color: #d4edda; border-color: #28a745;}
-        #generate-document-btn { background-color: #cce5ff; border-color: #b8daff;}
+        #generate-proposal-btn { background-color: #d4edda; border-color: #28a745;}
         #quote-to-monday-btn { background-color: #d6d8db; border-color: #6c757d;}
+
 
         /* Financial Summary Box */
         .financial-summary {
@@ -440,8 +438,7 @@
             </div>
             <div class="results-header">
                 <div class="header-buttons">
-                    <button id="generate-document-btn">Generate Document 📄</button>
-                    <button id="send-to-make-btn">Send to Make.com 🚀</button>
+                    <button id="generate-proposal-btn">Generate Proposal 🚀</button>
                     <button id="quote-to-monday-btn">Quote to Monday</button>
                     <button id="generate-link-btn">Generate Link 🔗</button>
                     <button id="toggle-zero-qty-btn">Show All Items</button>
@@ -496,8 +493,6 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pizzip/3.1.1/pizzip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.47.1/docxtemplater.js"></script>
     <script type="module" src="./calculator.js"></script>
 </body>
 </html>
