@@ -415,14 +415,14 @@ async function generateDocument() {
 
     try {
         const systemType = document.getElementById('system-type').value;
-        const templateMap = {
-            'G41': 'CEL-FI GO G41 Proposal Template.docx',
-            'G43': 'CEL-FI GO G43 Proposal Template.docx',
-            'QUATRA': 'CEL-FI QUATRA 4000e Proposal Template.docx',
-            'QUATRA_DAS': 'CEL-FI QUATRA 4000e Proposal Template.docx',
-            'QUATRA_EVO': 'CEL-FI QUATRA EVO Proposal Template.docx',
-            'QUATRA_EVO_DAS': 'CEL-FI QUATRA EVO Proposal Template.docx'
-        };
+const templateMap = {
+    'G41': 'CEL-FI-GO-G41-Proposal-Template.docx',
+    'G43': 'CEL-FI-GO-G43-Proposal-Template.docx',
+    'QUATRA': 'CEL-FI-QUATRA-4000e-Proposal-Template.docx',
+    'QUATRA_DAS': 'CEL-FI-QUATRA-4000e-Proposal-Template.docx',
+    'QUATRA_EVO': 'CEL-FI-QUATRA-EVO-Proposal-Template.docx',
+    'QUATRA_EVO_DAS': 'CEL-FI-QUATRA-EVO-Proposal-Template.docx'
+};
         const templateFilename = templateMap[systemType];
         if (!templateFilename) {
             throw new Error(`No template found for system type: ${systemType}`);
