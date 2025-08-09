@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
         for(const key of sortedKeys) {
             const costInput = document.getElementById(`cost-${key}`);
             const marginInput = document.getElementById(`margin-${key}`);
-            const handler = () => window.updateSellPriceDisplay(key); // Use window scope
+            const handler = () => window.updateSellPriceDisplay(key);
             if(costInput) costInput.addEventListener('input', handler);
             if(marginInput) marginInput.addEventListener('input', handler);
         }
@@ -256,7 +256,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function runFullCalculation() {
         try {
-            // Stage 1: Calculate base hardware quantities
             const systemType = document.getElementById('system-type').value;
             const networksInput = document.getElementById('number-of-networks');
             if (systemType.includes('EVO') && parseInt(networksInput.value) > 2) {
@@ -267,10 +266,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 C_Net: parseInt(networksInput.value) || 0,
                 E_Max: parseInt(document.getElementById('max-antennas').value) || 0,
             };
-            params.D_DA = params.C_Net;
+            params.D_DA = params.C_Net > 1 ? 2 : params.C_Net;
+
             const calculatedValues = systemCalculators[systemType](params);
             
-            // Clear all previous calculated values before applying new ones
             for (const key in currentResults) {
                 currentResults[key].calculated = 0;
             }
@@ -295,7 +294,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentResults['travel_expenses'] = { calculated: internal_days, override: null, decimals: 0, unit: ' (Days)'};
             }
 
-            // Stage 2: Calculate hardware totals for support cost calculation
             let totalHardwareSellPrice = 0, totalHardwareUnits = 0;
             const hardwareKeys = ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB', 'extender_cat6', 'extender_fibre_cu', 'extender_fibre_nu'];
             for (const key of hardwareKeys) {
@@ -309,7 +307,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // Stage 3: Calculate support cost and determine its label
             const supportCost = calculateSupportCost(totalHardwareUnits, totalHardwareSellPrice);
             if(!currentResults['support_package']) {
                 currentResults['support_package'] = { calculated: 0, override: null, decimals: 2, unit: ''};
@@ -318,23 +315,24 @@ document.addEventListener('DOMContentLoaded', () => {
             priceData['support_package'].cost = supportCost;
             
             if (supportCost > 0) {
-                const activeButton = document.querySelector('.support-presets button.active-preset');
+                const activeButton = document.querySelector('.support-presets-main button.active-preset');
                 if (activeButton && activeButton.id !== 'support-preset-none') {
-                    const tier = activeButton.id.replace('support-preset-', ''); // e.g. 'gold'
-                    const tierName = tier.charAt(0).toUpperCase() + tier.slice(1); // e.g. 'Gold'
+                    const tier = activeButton.id.replace('support-preset-', '');
+                    const tierName = tier.charAt(0).toUpperCase() + tier.slice(1);
                     priceData['support_package'].label = `Annual ${tierName} Support Package`;
                 } else {
                     priceData['support_package'].label = `Annual Custom Support Package`;
                 }
             } else {
-                priceData['support_package'].label = "Annual Support Package"; // Reset to default
+                priceData['support_package'].label = "Annual Support Package";
             }
             
             updateDOM();
+            updateAllSupportTierPrices();
         } catch (error) {
             console.error("A critical error occurred during calculation:", error);
             const resultsBody = document.getElementById('results-tbody');
-            if(resultsBody) resultsBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: red;">An error occurred. Please refresh and try again.</td></tr>`;
+            if(resultsBody) resultsBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: red;">${error.message}</td></tr>`;
         }
     }
     
@@ -344,13 +342,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const referralPercent = parseFloat(document.getElementById('referral-fee-percent').value) || 0;
         const referralDecimal = referralPercent / 100;
         const uplift = (referralDecimal > 0 && referralDecimal < 1) ? 1 / (1 - referralDecimal) : 1;
-
         document.getElementById('high-ceiling-checkbox-group').style.display = ['QUATRA', 'QUATRA_EVO'].includes(systemType) ? 'block' : 'none';
         document.getElementById('max-antennas-group').style.display = ['QUATRA', 'QUATRA_EVO', 'QUATRA_DAS', 'QUATRA_EVO_DAS'].includes(systemType) ? 'none' : 'flex';
-        
         const resultsHead = document.getElementById('results-thead'),
               resultsBody = document.getElementById('results-tbody');
-        
         resultsBody.innerHTML = '';
         resultsHead.innerHTML = `<tr><th class="col-item">Item</th><th class="col-qty">Qty</th><th class="col-sell">Unit Sell</th><th class="col-total">Total Sell</th><th class="col-margin">Margin (£)</th></tr>`;
         
@@ -374,12 +369,9 @@ document.addEventListener('DOMContentLoaded', () => {
             all: ['service_antennas', 'donor_wideband', 'donor_lpda', 'antenna_bracket', 'splitters_4way', 'splitters_3way', 'splitters_2way', 'coax_lmr400', 'coax_half', 'connectors', 'install_internal', 'install_external', 'cherry_picker', 'travel_expenses', 'support_package'],
             go: ['hybrids_4x4', 'hybrids_2x2', 'pigtails'],
             quatra: ['cable_cat', 'cable_fibre', 'connectors_rg45', 'adapters_sfp', 'adapters_n', 'extender_cat6', 'extender_fibre_cu', 'extender_fibre_nu'],
-            G41: ['G41'],
-            G43: ['G43'],
-            QUATRA: ['QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB'],
-            QUATRA_DAS: ['QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB'],
-            QUATRA_EVO: ['QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB'],
-            QUATRA_EVO_DAS: ['QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB'],
+            G41: ['G41'], G43: ['G43'],
+            QUATRA: ['QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB'], QUATRA_DAS: ['QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB'],
+            QUATRA_EVO: ['QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB'], QUATRA_EVO_DAS: ['QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB'],
         };
         
         let subTotals = { hardware: { cost: 0, sell: 0, margin: 0 }, consumables: { cost: 0, sell: 0, margin: 0 }, services: { cost: 0, sell: 0, margin: 0 } };
@@ -389,20 +381,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!currentResults[key]) currentResults[key] = { calculated: 0, override: null, decimals: 0, unit: '' };
                 const itemResult = currentResults[key],
                       priceInfo = priceData[key] || { cost: 0, margin: 0, label: 'N/A' };
-                
                 const quantity = itemResult.override !== null ? itemResult.override : (key === 'support_package' ? 1 : itemResult.calculated);
-                
                 let isRelevant = true;
-                if (groupName === 'hardware' || groupName === 'consumables') {
-                    isRelevant = false;
-                    if (componentRelevance.all.includes(key)) isRelevant = true;
-                    if (componentRelevance[systemType]?.includes(key)) isRelevant = true;
-                    if (systemType.includes('G4') && componentRelevance.go.includes(key)) isRelevant = true;
-                    if (systemType.includes('QUATRA') && componentRelevance.quatra.includes(key)) isRelevant = true;
-                }
-                if (key === 'support_package' && (itemResult.calculated <= 0 && itemResult.override === null)) {
-                    isRelevant = false;
-                }
+                if (groupName === 'hardware' || groupName === 'consumables') { isRelevant = false; if (componentRelevance.all.includes(key)) isRelevant = true; if (componentRelevance[systemType]?.includes(key)) isRelevant = true; if (systemType.includes('G4') && componentRelevance.go.includes(key)) isRelevant = true; if (systemType.includes('QUATRA') && componentRelevance.quatra.includes(key)) isRelevant = true; }
+                if (key === 'support_package' && (itemResult.calculated <= 0 && itemResult.override === null)) isRelevant = false;
 
                 if (isRelevant && (quantity > 0 || showZeroQuantityItems)) {
                     const baseUnitSell = priceInfo.cost * (1 + priceInfo.margin);
@@ -411,7 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     let trueLineMargin = (baseUnitSell - priceInfo.cost) * quantity;
                     
                     if (key === 'support_package') {
-                        trueLineMargin = finalTotalSell; // Margin on support is the full sell price
+                        trueLineMargin = finalTotalSell;
                         groupSubTotalSell += finalTotalSell;
                         groupSubTotalMargin += finalTotalSell;
                     } else {
@@ -419,7 +401,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         groupSubTotalCost += (priceInfo.cost * quantity); 
                         groupSubTotalMargin += trueLineMargin;
                     }
-
                     itemsInGroupDisplayed++;
                     
                     const qtyDisplay = (key === 'support_package') ? '1' : `<span class="value-display"></span><input type="number" step="any" class="value-input hidden" />`;
@@ -427,14 +408,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     groupHTML += `<tr><td class="col-item item-name">${priceInfo.label}${itemResult.unit || ''}</td><td class="col-qty ${qtyClass}" data-key="${key}">${qtyDisplay}</td><td class="col-sell">£${finalUnitSell.toFixed(2)}</td><td class="col-total">£${finalTotalSell.toFixed(2)}</td><td class="col-margin">£${trueLineMargin.toFixed(2)}</td></tr>`;
                 }
             });
-
             if (itemsInGroupDisplayed > 0) {
-                resultsBody.innerHTML += `<tr class="group-header"><td colspan="5">${groupName.charAt(0).toUpperCase() + groupName.slice(1)}</td></tr>`;
+                const groupLabel = groupName.charAt(0).toUpperCase() + groupName.slice(1);
+                resultsBody.innerHTML += `<tr class="group-header"><td colspan="5">${groupLabel}</td></tr>`;
                 resultsBody.innerHTML += groupHTML;
                 const finalGroupSell = (groupName === 'hardware' && excludeHardware) ? 0 : groupSubTotalSell;
                 const finalGroupMargin = (groupName === 'hardware' && excludeHardware) ? 0 : groupSubTotalMargin;
-                resultsBody.innerHTML += `<tr class="summary-row"><td colspan="3" style="text-align: right;">${groupName.charAt(0).toUpperCase() + groupName.slice(1)} Sub-Total:</td><td style="text-align: right;">£${finalGroupSell.toFixed(2)}</td><td style="text-align: right;">£${finalGroupMargin.toFixed(2)}</td></tr>`;
-                subTotals[groupName] = { cost: (groupName === 'hardware' && excludeHardware) ? 0 : groupSubTotalCost, sell: finalGroupSell, margin: finalGroupMargin };
+                resultsBody.innerHTML += `<tr class="summary-row"><td colspan="3" style="text-align: right;">${groupLabel} Sub-Total:</td><td style="text-align: right;">£${finalGroupSell.toFixed(2)}</td><td style="text-align: right;">£${finalGroupMargin.toFixed(2)}</td></tr>`;
+                subTotals[groupName] = { label: groupLabel, cost: (groupName === 'hardware' && excludeHardware) ? 0 : groupSubTotalCost, sell: finalGroupSell, margin: finalGroupMargin };
             }
         }
         
@@ -452,14 +433,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        updateSupportTableSummaries(totalHardwareUnits);
+        if (priceData && priceData.install_internal) {
+            updateSupportTableSummaries(totalHardwareUnits);
+        }
         calculateAndDisplayGrandTotals(subTotals);
+        subTotalsForProposal = subTotals;
     }
 
     function calculateAndDisplayGrandTotals(subTotals) {
-        const totalSell = subTotals.hardware.sell + subTotals.consumables.sell + subTotals.services.sell;
-        const totalCost = subTotals.hardware.cost + subTotals.consumables.cost + subTotals.services.cost;
-        const totalMargin = subTotals.hardware.margin + subTotals.consumables.margin + subTotals.services.margin;
+        const totalSell = (subTotals.hardware?.sell || 0) + (subTotals.consumables?.sell || 0) + (subTotals.services?.sell || 0);
+        const totalCost = (subTotals.hardware?.cost || 0) + (subTotals.consumables?.cost || 0) + (subTotals.services?.cost || 0);
+        const totalMargin = (subTotals.hardware?.margin || 0) + (subTotals.consumables?.margin || 0) + (subTotals.services?.margin || 0);
         const totalReferralFee = totalSell - totalCost - totalMargin;
         const marginPercent = totalCost > 0 ? (totalMargin / totalCost) * 100 : 0;
         document.getElementById('total-cost').textContent = `£${totalCost.toFixed(2)}`;
@@ -484,7 +468,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function calculateAntennas() {
+    function calculateCoverageRequirements() {
         const pOpen=parseFloat(document.getElementById('percent-open').value)||0, pCubical=parseFloat(document.getElementById('percent-cubical').value)||0, pHollow=parseFloat(document.getElementById('percent-hollow').value)||0, pSolid=parseFloat(document.getElementById('percent-solid').value)||0;
         const sum = pOpen + pCubical + pHollow + pSolid;
         const sumSpan = document.getElementById('percentage-sum');
@@ -499,41 +483,63 @@ document.addEventListener('DOMContentLoaded', () => {
         const dataSource = isQuatra ? coverageData.quatra : coverageData.go;
         const coverage = dataSource[band]?.[unit];
         
-        let antennasForArea = 0;
+        let unitsForArea = 0;
         if (floorArea > 0 && coverage) {
             if (isQuatra && isHighCeiling) {
-                antennasForArea = floorArea / coverage.open_high_ceiling;
+                unitsForArea = floorArea / coverage.open_high_ceiling;
             } else {
                 const percentages = { open: pOpen, cubical: pCubical, hollow: pHollow, solid: pSolid };
-                antennasForArea = ((floorArea*(percentages.open/100))/coverage.open) + ((floorArea*(percentages.cubical/100))/coverage.cubical) + ((floorArea*(percentages.hollow/100))/coverage.hollow) + ((floorArea*(percentages.solid/100))/coverage.solid);
+                unitsForArea = ((floorArea*(percentages.open/100))/coverage.open) + ((floorArea*(percentages.cubical/100))/coverage.cubical) + ((floorArea*(percentages.hollow/100))/coverage.hollow) + ((floorArea*(percentages.solid/100))/coverage.solid);
             }
         }
 
-        let totalRequiredAntennas;
+        let totalRequiredUnits;
         const isNonDasQuatra = systemType === 'QUATRA' || systemType === 'QUATRA_EVO';
 
         if (isNonDasQuatra) {
             const numberOfFloors = parseInt(document.getElementById('number-of-floors').value) || 1;
-            const roundedUpAntennasPerFloor = Math.ceil(antennasForArea);
-            totalRequiredAntennas = roundedUpAntennasPerFloor * numberOfFloors;
+            const roundedUpUnitsPerFloor = Math.ceil(unitsForArea);
+            totalRequiredUnits = roundedUpUnitsPerFloor * numberOfFloors;
         } else {
-            totalRequiredAntennas = Math.ceil(antennasForArea);
+            totalRequiredUnits = Math.ceil(unitsForArea);
         }
-
-        document.getElementById('total-service-antennas').value = totalRequiredAntennas;
-        runFullCalculation();
+        document.getElementById('total-service-antennas').value = totalRequiredUnits;
     }
     
-    // --- INITIALIZATION ---
     function initialize() {
-        document.querySelectorAll('#floor-area, input[name="unit-switch"], input[name="band-switch"], .wall-percent, #high-ceiling-warehouse, #number-of-floors').forEach(input => {
-            input.addEventListener('input', calculateAntennas);
-            input.addEventListener('change', calculateAntennas);
+        const stateLoaded = loadStateFromURL();
+        const mainContainer = document.getElementById('main-container');
+        const viewToggleButton = document.getElementById('view-toggle-btn');
+
+        viewToggleButton.addEventListener('click', () => {
+            const isDashboard = mainContainer.classList.toggle('screenshot-mode');
+            viewToggleButton.textContent = isDashboard ? 'Switch to Simple View' : 'Switch to Dashboard View';
+        });
+
+        document.getElementById('generate-proposal-btn').addEventListener('click', () => sendDataToMake('proposal'));
+        document.getElementById('quote-to-monday-btn').addEventListener('click', () => sendDataToMake('quote'));
+        document.getElementById('generate-link-btn').addEventListener('click', generateShareLink);
+        document.getElementById('support-preset-none').addEventListener('click', () => setSupportPreset('none'));
+        document.getElementById('support-preset-bronze').addEventListener('click', () => setSupportPreset('bronze'));
+        document.getElementById('support-preset-silver').addEventListener('click', () => setSupportPreset('silver'));
+        document.getElementById('support-preset-gold').addEventListener('click', () => setSupportPreset('gold'));
+
+        const validatedFields = ['customer-name', 'survey-price', 'quote-number'];
+        validatedFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if(field) {
+                field.addEventListener('input', () => field.classList.remove('input-error'));
+            }
+        });
+
+        document.querySelectorAll('#floor-area, input[name="unit-switch"], input[name="band-switch"], .wall-percent, #high-ceiling-warehouse, #number-of-floors, #customer-name, #survey-price').forEach(input => {
+            input.addEventListener('input', runFullCalculation);
+            input.addEventListener('change', runFullCalculation);
         });
         
         document.getElementById('system-type').addEventListener('change', () => {
             toggleMultiFloorUI();
-            calculateAntennas();
+            runFullCalculation();
         });
 
         document.querySelectorAll('#number-of-networks, #max-antennas, #no-hardware-checkbox, #referral-fee-percent, #maintenance-percent').forEach(input => {
@@ -547,11 +553,45 @@ document.addEventListener('DOMContentLoaded', () => {
         loadPrices();
         setupSettingsModal();
         populateSupportTable();
-        setSupportPreset('none');
         toggleMultiFloorUI();
-        calculateAntennas();
+        
+        if (!stateLoaded) {
+            calculateCoverageRequirements();
+            setSupportPreset('none');
+        } 
+        
+        runFullCalculation();
+
+        mainContainer.classList.add('screenshot-mode');
+        viewToggleButton.textContent = 'Switch to Simple View';
     }
 
+    function validateInputs(fieldIds) {
+        let isValid = true;
+        fieldIds.forEach(id => {
+            const field = document.getElementById(id);
+            if (!field.value.trim()) {
+                field.classList.add('input-error');
+                isValid = false;
+            } else {
+                field.classList.remove('input-error');
+            }
+        });
+        return isValid;
+    }
+
+    async function sendDataToMake(dataType) {
+        // ... (function body from previous step)
+    }
+
+    async function generateShareLink() {
+        // ... (function body from previous step)
+    }
+    
+    function loadStateFromURL() {
+        // ... (function body from previous step)
+    }
+    
     initialize();
 });
 
