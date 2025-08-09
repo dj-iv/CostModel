@@ -507,107 +507,125 @@ document.addEventListener('DOMContentLoaded', () => {
         return isValid;
     }
 
-    async function sendDataToMake(dataType) {
-        const buttonId = dataType === 'proposal' ? 'generate-proposal-btn' : 'quote-to-monday-btn';
-        const button = document.getElementById(buttonId);
-        const originalText = button.innerHTML;
+async function sendDataToMake(dataType) {
+    const buttonId = dataType === 'proposal' ? 'generate-proposal-btn' : 'quote-to-monday-btn';
+    const button = document.getElementById(buttonId);
+    const originalText = button.innerHTML;
 
-        if (dataType === 'proposal') {
-            if (!validateInputs(['customer-name', 'survey-price'])) return;
-        } else if (dataType === 'quote') {
-            if (!validateInputs(['quote-number', 'customer-name', 'survey-price'])) return;
-        }
+    if (dataType === 'proposal') {
+        if (!validateInputs(['customer-name', 'survey-price'])) return;
+    } else if (dataType === 'quote') {
+        if (!validateInputs(['quote-number', 'customer-name', 'survey-price'])) return;
+    }
 
-        button.innerHTML = 'Sending...';
-        button.disabled = true;
+    button.innerHTML = 'Sending...';
+    button.disabled = true;
 
-        try {
-            let totalHardwareSellPrice = 0, totalHardwareUnits = 0;
-            const hardwareKeys = ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB', 'extender_cat6', 'extender_fibre_cu', 'extender_fibre_nu'];
-            for (const key of hardwareKeys) {
-                if (currentResults[key]) {
-                    const quantity = currentResults[key].override ?? currentResults[key].calculated;
-                    if (quantity > 0) {
-                        totalHardwareUnits += quantity;
-                        const priceInfo = priceData[key];
-                        totalHardwareSellPrice += quantity * priceInfo.cost * (1 + priceInfo.margin);
-                    }
+    try {
+        // 1. Gather hardware totals for support calcs
+        let totalHardwareSellPrice = 0, totalHardwareUnits = 0;
+        const hardwareKeys = ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB', 'extender_cat6', 'extender_fibre_cu', 'extender_fibre_nu'];
+        for (const key of hardwareKeys) {
+            if (currentResults[key]) {
+                const quantity = currentResults[key].override ?? currentResults[key].calculated;
+                if (quantity > 0) {
+                    totalHardwareUnits += quantity;
+                    const priceInfo = priceData[key];
+                    totalHardwareSellPrice += quantity * priceInfo.cost * (1 + priceInfo.margin);
                 }
             }
-            
-            const bronzeCost = getSpecificSupportCost('bronze', totalHardwareUnits, totalHardwareSellPrice);
-            const silverCost = getSpecificSupportCost('silver', totalHardwareUnits, totalHardwareSellPrice);
-            const goldCost = getSpecificSupportCost('gold', totalHardwareUnits, totalHardwareSellPrice);
-            
-            const totalMargin = (subTotalsForProposal.hardware?.margin || 0) + (subTotalsForProposal.consumables?.margin || 0) + (subTotalsForProposal.services?.margin || 0);
-            const systemTypeSelect = document.getElementById('system-type');
-            const selectedValue = systemTypeSelect.value;
-            const selectedText = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
-            
-            const solutionNameMap = {
-                'G41': 'GO G41 DAS',
-                'G43': 'GO G43 DAS',
-                'QUATRA': 'QUATRA 4000e Only',
-                'QUATRA_EVO': 'QUATRA EVO Only'
-            };
-const solutionNameToSend = solutionNameMap[selectedValue] || selectedText;
-
-// Get the name of the selected support package
-let description4Text = "Please see the support options below"; // Default text
-const activeButton = document.querySelector('.support-presets-main button.active-preset');
-if (activeButton && activeButton.id !== 'support-preset-none') {
-    const tier = activeButton.id.replace('support-preset-', '');
-    description4Text = tier.charAt(0).toUpperCase() + tier.slice(1); // "Bronze", "Silver", or "Gold"
-}
-
-const dataToSend = {
-    CustomerName: document.getElementById('customer-name').value,
-    Solution: solutionNameToSend,
-                NumberOfNetworks: document.getElementById('number-of-networks').value,
-                SurveyPrice: (parseFloat(document.getElementById('survey-price').value) || 0).toFixed(2),
-                Description1: "CEL-FI Hardware",
-                Qty1: "1",
-                UnitPrice1: (subTotalsForProposal.hardware?.sell || 0).toFixed(2),
-                TotalPrice1: (subTotalsForProposal.hardware?.sell || 0).toFixed(2),
-                Description2: "Antennas, cables and connectors",
-                Qty2: "1",
-                UnitPrice2: (subTotalsForProposal.consumables?.sell || 0).toFixed(2),
-                TotalPrice2: (subTotalsForProposal.consumables?.sell || 0).toFixed(2),
-                Description3: "Professional Services",
-                Qty3: "1",
-                UnitPrice3: (subTotalsForProposal.services?.sell || 0).toFixed(2),
-                TotalPrice3: (subTotalsForProposal.services?.sell || 0).toFixed(2),
-                Description4: description4Text, Qty4: "", UnitPrice4: "", TotalPrice4: "",
-                Support1: "Bronze", SupportQty1: "1", SupportUnitPrice1: bronzeCost.toFixed(2), SupportTotalPrice1: bronzeCost.toFixed(2),
-                Support2: "Silver", SupportQty2: "1", SupportUnitPrice2: silverCost.toFixed(2), SupportTotalPrice2: silverCost.toFixed(2),
-                Support3: "Gold", SupportQty3: "1", SupportUnitPrice3: goldCost.toFixed(2), SupportTotalPrice3: goldCost.toFixed(2),
-                MarginTotal: totalMargin.toFixed(2),
-                TotalMargin: totalMargin.toFixed(2),
-                QuoteNumber: dataType === 'quote' ? document.getElementById('quote-number').value : "",
-            };
-
-            const response = await fetch(MAKE_WEBHOOK_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify([dataToSend])
-            });
-
-            if (response.ok) {
-                button.innerHTML = 'Sent! ✅';
-            } else {
-                throw new Error(`Webhook failed: ${response.statusText}`);
-            }
-        } catch (error) {
-            console.error(`Failed to send ${dataType}:`, error);
-            alert(`Error: Could not send ${dataType} to Make.com.`);
-            button.innerHTML = 'Failed! ❌';
-        } finally {
-            setTimeout(() => {
-                button.innerHTML = originalText;
-                button.disabled = false;
-            }, 3000);
         }
+        
+        // 2. Determine selected support tier and its cost
+        let selectedSupportTier = 'none';
+        let selectedSupportName = "Please see the support options below";
+        let selectedSupportCost = 0;
+        const activeButton = document.querySelector('.support-presets-main button.active-preset');
+        if (activeButton && activeButton.id !== 'support-preset-none') {
+            selectedSupportTier = activeButton.id.replace('support-preset-', '');
+            selectedSupportName = selectedSupportTier.charAt(0).toUpperCase() + selectedSupportTier.slice(1);
+        }
+        selectedSupportCost = getSpecificSupportCost(selectedSupportTier, totalHardwareUnits, totalHardwareSellPrice);
+
+        // 3. Calculate all three support tiers for the separate table
+        const bronzeCost = getSpecificSupportCost('bronze', totalHardwareUnits, totalHardwareSellPrice);
+        const silverCost = getSpecificSupportCost('silver', totalHardwareUnits, totalHardwareSellPrice);
+        const goldCost = getSpecificSupportCost('gold', totalHardwareUnits, totalHardwareSellPrice);
+        
+        // 4. Calculate final totals and adjust services subtotal
+        const professionalServicesCost = (subTotalsForProposal.services?.sell || 0) - selectedSupportCost;
+        const totalSell = (subTotalsForProposal.hardware?.sell || 0) + (subTotalsForProposal.consumables?.sell || 0) + (subTotalsForProposal.services?.sell || 0);
+        const totalMargin = (subTotalsForProposal.hardware?.margin || 0) + (subTotalsForProposal.consumables?.margin || 0) + (subTotalsForProposal.services?.margin || 0);
+        
+        // 5. Get other details
+        const systemTypeSelect = document.getElementById('system-type');
+        const selectedValue = systemTypeSelect.value;
+        const selectedText = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
+        const solutionNameMap = {
+            'G41': 'GO G41 DAS', 'G43': 'GO G43 DAS',
+            'QUATRA': 'QUATRA 4000e Only', 'QUATRA_EVO': 'QUATRA EVO Only'
+        };
+        const solutionNameToSend = solutionNameMap[selectedValue] || selectedText;
+
+        // 6. Assemble the final flat data structure
+        const dataToSend = {
+            CustomerName: document.getElementById('customer-name').value,
+            Solution: solutionNameToSend,
+            NumberOfNetworks: document.getElementById('number-of-networks').value,
+            SurveyPrice: (parseFloat(document.getElementById('survey-price').value) || 0).toFixed(2),
+
+            Description1: "CEL-FI Hardware",
+            Qty1: "1",
+            UnitPrice1: (subTotalsForProposal.hardware?.sell || 0).toFixed(2),
+            TotalPrice1: (subTotalsForProposal.hardware?.sell || 0).toFixed(2),
+
+            Description2: "Antennas, cables and connectors",
+            Qty2: "1",
+            UnitPrice2: (subTotalsForProposal.consumables?.sell || 0).toFixed(2),
+            TotalPrice2: (subTotalsForProposal.consumables?.sell || 0).toFixed(2),
+            
+            Description3: "Professional Services",
+            Qty3: "1",
+            UnitPrice3: professionalServicesCost.toFixed(2),
+            TotalPrice3: professionalServicesCost.toFixed(2),
+
+            Description4: selectedSupportTier !== 'none' ? selectedSupportName : "Please see the support options below",
+            Qty4: selectedSupportTier !== 'none' ? "1" : "",
+            UnitPrice4: selectedSupportTier !== 'none' ? selectedSupportCost.toFixed(2) : "",
+            TotalPrice4: selectedSupportTier !== 'none' ? selectedSupportCost.toFixed(2) : "",
+
+            Support1: "Bronze", SupportQty1: "1", SupportUnitPrice1: bronzeCost.toFixed(2), SupportTotalPrice1: bronzeCost.toFixed(2),
+            Support2: "Silver", SupportQty2: "1", SupportUnitPrice2: silverCost.toFixed(2), SupportTotalPrice2: silverCost.toFixed(2),
+            Support3: "Gold", SupportQty3: "1", SupportUnitPrice3: goldCost.toFixed(2), SupportTotalPrice3: goldCost.toFixed(2),
+            
+            MarginTotal: totalMargin.toFixed(2),
+            TotalMargin: totalMargin.toFixed(2),
+            QuoteNumber: dataType === 'quote' ? document.getElementById('quote-number').value : "",
+        };
+
+        // 7. Send the data
+        const response = await fetch(MAKE_WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify([dataToSend])
+        });
+
+        if (response.ok) {
+            button.innerHTML = 'Sent! ✅';
+        } else {
+            throw new Error(`Webhook failed: ${response.statusText}`);
+        }
+    } catch (error) {
+        console.error(`Failed to send ${dataType}:`, error);
+        alert(`Error: Could not send ${dataType} to Make.com.`);
+        button.innerHTML = 'Failed! ❌';
+    } finally {
+        setTimeout(() => {
+            button.innerHTML = originalText;
+            button.disabled = false;
+        }, 3000);
     }
+}
 
     async function generateShareLink() {
         // This function body was copied from a previous complete version
