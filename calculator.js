@@ -510,7 +510,44 @@ const doc = new docxtemplater(zip);
             SupportTotalPrice3: `£${goldCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
         };
 
-        const templateData = getTemplateData();
+        const templateData = {
+    Account: document.getElementById('customer-name').value,
+    Solution: solutionNameToSend,
+    NumberOfNetworks: document.getElementById('number-of-networks').value,
+    SurveyPrice: `£${(parseFloat(document.getElementById('survey-price').value) || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+
+    Description1: "CEL-FI Hardware", Qty1: "1",
+    UnitPrice1: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+    TotalPrice1: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+
+    Description2: "Antennas, cables and connectors", Qty2: "1",
+    UnitPrice2: `£${(subTotalsForProposal.consumables?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+    TotalPrice2: `£${(subTotalsForProposal.consumables?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+
+    Description3: "Professional Services", Qty3: "1",
+    UnitPrice3: `£${professionalServicesCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+    TotalPrice3: `£${professionalServicesCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+
+    Description4: selectedSupportTier !== 'none' ? selectedSupportName : "Please see the support options below",
+    Qty4: selectedSupportTier !== 'none' ? "1" : "",
+    UnitPrice4: selectedSupportTier !== 'none' ? `£${selectedSupportCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : "",
+    TotalPrice4: selectedSupportTier !== 'none' ? `£${selectedSupportCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : "",
+
+    TotalPrice: `£${((subTotalsForProposal.hardware?.sell || 0) + (subTotalsForProposal.consumables?.sell || 0) + (subTotalsForProposal.services?.sell || 0)).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+
+    Support1: "Bronze", SupportQty1: "1",
+    SupportUnitPrice1: `£${bronzeCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+    SupportTotalPrice1: `£${bronzeCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+
+    Support2: "Silver", SupportQty2: "1",
+    SupportUnitPrice2: `£${silverCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+    SupportTotalPrice2: `£${silverCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+
+    Support3: "Gold", SupportQty3: "1",
+    SupportUnitPrice3: `£${goldCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+    SupportTotalPrice3: `£${goldCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+};
+
 doc.render(templateData);
 
         const out = doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
@@ -699,142 +736,7 @@ async function generatePdf() {
     alert("Generate PDF button test successful!");
 }
 
-function getTemplateData() {
-    // --- This is the data gathering logic from your generateDocument function ---
-    let totalHardwareSellPrice = 0, totalHardwareUnits = 0;
-    const hardwareKeys = ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB'];
-    hardwareKeys.forEach(key => {
-        if (currentResults[key]) {
-            const quantity = currentResults[key].override ?? currentResults[key].calculated;
-            if (quantity > 0) {
-                totalHardwareUnits += quantity;
-                totalHardwareSellPrice += quantity * priceData[key].cost * (1 + priceData[key].margin);
-            }
-        }
-    });
 
-    let selectedSupportTier = 'none';
-    let selectedSupportName = "Please see the support options below";
-    const activeButton = document.querySelector('.support-presets-main button.active-preset');
-    if (activeButton && activeButton.id !== 'support-preset-none') {
-        selectedSupportTier = activeButton.id.replace('support-preset-', '');
-        selectedSupportName = selectedSupportTier.charAt(0).toUpperCase() + selectedSupportTier.slice(1);
-    }
-    const selectedSupportCost = getSpecificSupportCost(selectedSupportTier, totalHardwareUnits, totalHardwareSellPrice);
-    const professionalServicesCost = (subTotalsForProposal.services?.sell || 0) - selectedSupportCost;
-    
-    const bronzeCost = getSpecificSupportCost('bronze', totalHardwareUnits, totalHardwareSellPrice);
-    const silverCost = getSpecificSupportCost('silver', totalHardwareUnits, totalHardwareSellPrice);
-    const goldCost = getSpecificSupportCost('gold', totalHardwareUnits, totalHardwareSellPrice);
-
-    const systemTypeSelect = document.getElementById('system-type');
-    const selectedValue = systemTypeSelect.value;
-    const selectedText = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
-    const solutionNameMap = {
-        'G41': 'GO G41 DAS', 'G43': 'GO G43 DAS',
-        'QUATRA': 'QUATRA 4000e Only', 'QUATRA_EVO': 'QUATRA EVO Only'
-    };
-    const solutionNameToSend = solutionNameMap[selectedValue] || selectedText;
-
-    return {
-        Account: document.getElementById('customer-name').value,
-        Solution: solutionNameToSend,
-        NumberOfNetworks: document.getElementById('number-of-networks').value,
-        SurveyPrice: `£${(parseFloat(document.getElementById('survey-price').value) || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        Description1: "CEL-FI Hardware", Qty1: "1",
-        UnitPrice1: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        TotalPrice1: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        Description2: "Antennas, cables and connectors", Qty2: "1",
-        UnitPrice2: `£${(subTotalsForProposal.consumables?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        TotalPrice2: `£${(subTotalsForProposal.consumables?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        Description3: "Professional Services", Qty3: "1",
-        UnitPrice3: `£${professionalServicesCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        TotalPrice3: `£${professionalServicesCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        Description4: selectedSupportTier !== 'none' ? selectedSupportName : "Please see the support options below",
-        Qty4: selectedSupportTier !== 'none' ? "1" : "",
-        UnitPrice4: selectedSupportTier !== 'none' ? `£${selectedSupportCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : "",
-        TotalPrice4: selectedSupportTier !== 'none' ? `£${selectedSupportCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : "",
-        TotalPrice: `£${((subTotalsForProposal.hardware?.sell || 0) + (subTotalsForProposal.consumables?.sell || 0) + (subTotalsForProposal.services?.sell || 0)).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        Support1: "Bronze", SupportQty1: "1",
-        SupportUnitPrice1: `£${bronzeCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        SupportTotalPrice1: `£${bronzeCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        Support2: "Silver", SupportQty2: "1",
-        SupportUnitPrice2: `£${silverCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        SupportTotalPrice2: `£${silverCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        Support3: "Gold", SupportQty3: "1",
-        SupportUnitPrice3: `£${goldCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        SupportTotalPrice3: `£${goldCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-    };
-}
-
-// Create this new helper function in calculator.js to avoid repeating code
-function getTemplateData() {
-    // --- This is the data gathering logic from your generateDocument function ---
-    let totalHardwareSellPrice = 0, totalHardwareUnits = 0;
-    const hardwareKeys = ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB'];
-    hardwareKeys.forEach(key => {
-        if (currentResults[key]) {
-            const quantity = currentResults[key].override ?? currentResults[key].calculated;
-            if (quantity > 0) {
-                totalHardwareUnits += quantity;
-                totalHardwareSellPrice += quantity * priceData[key].cost * (1 + priceData[key].margin);
-            }
-        }
-    });
-
-    let selectedSupportTier = 'none';
-    let selectedSupportName = "Please see the support options below";
-    const activeButton = document.querySelector('.support-presets-main button.active-preset');
-    if (activeButton && activeButton.id !== 'support-preset-none') {
-        selectedSupportTier = activeButton.id.replace('support-preset-', '');
-        selectedSupportName = selectedSupportTier.charAt(0).toUpperCase() + selectedSupportTier.slice(1);
-    }
-    const selectedSupportCost = getSpecificSupportCost(selectedSupportTier, totalHardwareUnits, totalHardwareSellPrice);
-    const professionalServicesCost = (subTotalsForProposal.services?.sell || 0) - selectedSupportCost;
-    
-    const bronzeCost = getSpecificSupportCost('bronze', totalHardwareUnits, totalHardwareSellPrice);
-    const silverCost = getSpecificSupportCost('silver', totalHardwareUnits, totalHardwareSellPrice);
-    const goldCost = getSpecificSupportCost('gold', totalHardwareUnits, totalHardwareSellPrice);
-
-    const systemTypeSelect = document.getElementById('system-type');
-    const selectedValue = systemTypeSelect.value;
-    const selectedText = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
-    const solutionNameMap = {
-        'G41': 'GO G41 DAS', 'G43': 'GO G43 DAS',
-        'QUATRA': 'QUATRA 4000e Only', 'QUATRA_EVO': 'QUATRA EVO Only'
-    };
-    const solutionNameToSend = solutionNameMap[selectedValue] || selectedText;
-
-    return {
-        Account: document.getElementById('customer-name').value,
-        Solution: solutionNameToSend,
-        NumberOfNetworks: document.getElementById('number-of-networks').value,
-        SurveyPrice: `£${(parseFloat(document.getElementById('survey-price').value) || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        Description1: "CEL-FI Hardware", Qty1: "1",
-        UnitPrice1: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        TotalPrice1: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        Description2: "Antennas, cables and connectors", Qty2: "1",
-        UnitPrice2: `£${(subTotalsForProposal.consumables?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        TotalPrice2: `£${(subTotalsForProposal.consumables?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        Description3: "Professional Services", Qty3: "1",
-        UnitPrice3: `£${professionalServicesCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        TotalPrice3: `£${professionalServicesCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        Description4: selectedSupportTier !== 'none' ? selectedSupportName : "Please see the support options below",
-        Qty4: selectedSupportTier !== 'none' ? "1" : "",
-        UnitPrice4: selectedSupportTier !== 'none' ? `£${selectedSupportCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : "",
-        TotalPrice4: selectedSupportTier !== 'none' ? `£${selectedSupportCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : "",
-        TotalPrice: `£${((subTotalsForProposal.hardware?.sell || 0) + (subTotalsForProposal.consumables?.sell || 0) + (subTotalsForProposal.services?.sell || 0)).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        Support1: "Bronze", SupportQty1: "1",
-        SupportUnitPrice1: `£${bronzeCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        SupportTotalPrice1: `£${bronzeCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        Support2: "Silver", SupportQty2: "1",
-        SupportUnitPrice2: `£${silverCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        SupportTotalPrice2: `£${silverCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        Support3: "Gold", SupportQty3: "1",
-        SupportUnitPrice3: `£${goldCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        SupportTotalPrice3: `£${goldCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-    };
-}
 
 
     async function generateShareLink() {
