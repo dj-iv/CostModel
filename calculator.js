@@ -696,64 +696,28 @@ async function generatePdf() {
     button.disabled = true;
 
     try {
-        const response = await fetch('templates/proposal_template.html');
-        if (!response.ok) throw new Error('Could not fetch the HTML template.');
+        const systemType = document.getElementById('system-type').value;
+        const htmlTemplateMap = {
+            'G41': 'CEL-FI-GO-G41-Proposal-Template.html',
+            'G43': 'CEL-FI-GO-G43-Proposal-Template.html',
+            'QUATRA': 'CEL-FI-QUATRA-4000e-Proposal-Template.html',
+            'QUATRA_DAS': 'CEL-FI-QUATRA-4000e-Proposal-Template.html',
+            'QUATRA_EVO': 'CEL-FI-QUATRA-EVO-Proposal-Template.html',
+            'QUATRA_EVO_DAS': 'CEL-FI-QUATRA-EVO-Proposal-Template.html'
+        };
+
+        const templateFilename = htmlTemplateMap[systemType];
+        if (!templateFilename) {
+            throw new Error(`No HTML template found for system type: ${systemType}`);
+        }
+
+        const response = await fetch(`templates/${templateFilename}`);
+        if (!response.ok) {
+            throw new Error(`Could not fetch the HTML template: ${templateFilename}`);
+        }
         let templateHtml = await response.text();
 
-        // --- Gather data for the template ---
-        let totalHardwareSellPrice = 0, totalHardwareUnits = 0;
-        const hardwareKeys = ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB'];
-        hardwareKeys.forEach(key => {
-            if (currentResults[key]) {
-                const quantity = currentResults[key].override ?? currentResults[key].calculated;
-                if (quantity > 0) {
-                    totalHardwareUnits += quantity;
-                    totalHardwareSellPrice += quantity * priceData[key].cost * (1 + priceData[key].margin);
-                }
-            }
-        });
-
-        let selectedSupportTier = 'none';
-        let selectedSupportName = "Please see the support options below";
-        const activeButton = document.querySelector('.support-presets-main button.active-preset');
-        if (activeButton && activeButton.id !== 'support-preset-none') {
-            selectedSupportTier = activeButton.id.replace('support-preset-', '');
-            selectedSupportName = selectedSupportTier.charAt(0).toUpperCase() + selectedSupportTier.slice(1);
-        }
-        const selectedSupportCost = getSpecificSupportCost(selectedSupportTier, totalHardwareUnits, totalHardwareSellPrice);
-        const professionalServicesCost = (subTotalsForProposal.services?.sell || 0) - selectedSupportCost;
-        const systemTypeSelect = document.getElementById('system-type');
-        const solutionName = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
-        
-        const data = {
-            Account: document.getElementById('customer-name').value,
-            Solution: solutionName,
-            NumberOfNetworks: document.getElementById('number-of-networks').value,
-            SurveyPrice: `£${(parseFloat(document.getElementById('survey-price').value) || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-            Description1: "CEL-FI Hardware", Qty1: "1",
-            UnitPrice1: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-            TotalPrice1: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-            Description2: "Antennas, cables and connectors", Qty2: "1",
-            UnitPrice2: `£${(subTotalsForProposal.consumables?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-            TotalPrice2: `£${(subTotalsForProposal.consumables?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-            Description3: "Professional Services", Qty3: "1",
-            UnitPrice3: `£${professionalServicesCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-            TotalPrice3: `£${professionalServicesCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-            Description4: selectedSupportName,
-            Qty4: selectedSupportTier !== 'none' ? "1" : "",
-            UnitPrice4: selectedSupportTier !== 'none' ? `£${selectedSupportCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : "",
-            TotalPrice4: selectedSupportTier !== 'none' ? `£${selectedSupportCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : "",
-            TotalPrice: `£${((subTotalsForProposal.hardware?.sell || 0) + (subTotalsForProposal.consumables?.sell || 0) + (subTotalsForProposal.services?.sell || 0)).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-            Support1: "Bronze", SupportQty1: "1",
-            SupportUnitPrice1: `£${getSpecificSupportCost('bronze', totalHardwareUnits, totalHardwareSellPrice).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-            SupportTotalPrice1: `£${getSpecificSupportCost('bronze', totalHardwareUnits, totalHardwareSellPrice).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-            Support2: "Silver", SupportQty2: "1",
-            SupportUnitPrice2: `£${getSpecificSupportCost('silver', totalHardwareUnits, totalHardwareSellPrice).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-            SupportTotalPrice2: `£${getSpecificSupportCost('silver', totalHardwareUnits, totalHardwareSellPrice).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-            Support3: "Gold", SupportQty3: "1",
-            SupportUnitPrice3: `£${getSpecificSupportCost('gold', totalHardwareUnits, totalHardwareSellPrice).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-            SupportTotalPrice3: `£${getSpecificSupportCost('gold', totalHardwareUnits, totalHardwareSellPrice).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        };
+        const data = getTemplateData();
         
         // Replace placeholders in the HTML
         for (const key in data) {
