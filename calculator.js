@@ -434,8 +434,7 @@ async function generateDocument() {
         const content = await response.arrayBuffer();
 
         const zip = new PizZip(content);
-        // Use the {{ }} delimiters that your template uses
-        const doc = new docxtemplater(zip, { delimiters: { start: '{{', end: '}}' } });
+const doc = new docxtemplater(zip);
 
         // --- Prepare Data for the Template ---
         let totalHardwareSellPrice = 0, totalHardwareUnits = 0;
