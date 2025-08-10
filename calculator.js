@@ -692,99 +692,36 @@ doc.render(templateData);
 // This is not strictly necessary as it's loaded in index.html, but it's good practice to know what you're using.
 // Note: docx-preview.js is not needed, html2pdf.js handles the PDF creation.
 
+
+
 async function generatePdf() {
     const button = document.getElementById('generate-pdf-btn');
     const originalText = button.innerHTML;
-
-    // 1. Validate inputs (same as your generateDocument function)
-    if (!validateInputs(['customer-name', 'survey-price'])) {
-        return;
-    }
-
+    if (!validateInputs(['customer-name', 'survey-price'])) return;
+    
     button.innerHTML = 'Generating...';
     button.disabled = true;
 
     try {
-        // --- This section is copied and adapted from your generateDocument function ---
-        const systemType = document.getElementById('system-type').value;
-        const templateMap = {
-            'G41': 'CEL-FI-GO-G41-Proposal-Template.docx',
-            'G43': 'CEL-FI-GO-G43-Proposal-Template.docx',
-            'QUATRA': 'CEL-FI-QUATRA-4000e-Proposal-Template.docx',
-            'QUATRA_DAS': 'CEL-FI-QUATRA-4000e-Proposal-Template.docx',
-            'QUATRA_EVO': 'CEL-FI-QUATRA-EVO-Proposal-Template.docx',
-            'QUATRA_EVO_DAS': 'CEL-FI-QUATRA-EVO-Proposal-Template.docx'
-        };
-        const templateFilename = templateMap[systemType];
-        if (!templateFilename) {
-            throw new Error(`No template found for system type: ${systemType}`);
-        }
+        // You will need to create an HTML template that mirrors your DOCX template's content and style.
+        const response = await fetch('templates/proposal_template.html');
+        if (!response.ok) throw new Error('Could not fetch the HTML template.');
+        let templateHtml = await response.text();
 
-        const response = await fetch(`templates/${templateFilename}`);
-        if (!response.ok) {
-            throw new Error(`Could not fetch template: ${response.statusText}`);
-        }
-        const content = await response.arrayBuffer();
+        const data = getTemplateData(); // Uses the new helper function
         
-        // Use Docxtemplater to create the filled DOCX file in memory (as a blob)
-        // This reuses the exact same logic and data as your DOCX generation.
-        const zip = new PizZip(content);
-        const doc = new docxtemplater(zip, {
-            paragraphLoop: true,
-            linebreaks: true,
-        });
-
-        // The data gathering logic can be extracted into a separate function to avoid repetition
-        const templateData = getTemplateData(); // We will create this helper function
-        doc.render(templateData);
-
-        const out = doc.getZip().generate({
-            type: "blob",
-            mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        });
-        // --- End of adapted section ---
-
-        // 2. Render the generated DOCX to the hidden container
-        // Note: For client-side rendering, we need a library like docx-preview. 
-        // A simpler alternative is using an API, but let's try a pure client-side method first.
-        // The most direct way without another library is to use an external API or the server-side method.
-
-        // Given the complexity of direct browser DOCX-to-HTML rendering, let's pivot slightly.
-        // We will send the generated blob to an API that converts it and returns a PDF.
-        // A library like PDFTron WebViewer can do this purely client-side but is a paid product.
-        
-        // Let's reconsider the simplest path. The html2pdf.js library you added is for HTML -> PDF.
-        // Your old generatePdf function was on the right track by using an HTML template.
-        // Let's create an HTML version of your proposal and use that.
-        
-        // Since you already have the DOCX generation, the most consistent UX
-        // is to let the user download the DOCX and instruct them to "Save as PDF".
-        // A true DOCX -> PDF in-browser converter without a server or paid library is complex.
-
-        // **Revised Recommendation:**
-        // The simplest, most reliable solution without adding a server is to
-        // make the 'Generate PDF' button simply a 'Generate Document' button
-        // and instruct users to save it as a PDF themselves.
-        
-        // However, if you really want the PDF button to work directly, let's complete the
-        // HTML template approach from your original code.
-        
-        const htmlTemplateResponse = await fetch('templates/proposal_template.html'); // You need to create this HTML template
-        if (!htmlTemplateResponse.ok) throw new Error('Could not fetch the HTML template.');
-        let templateHtml = await htmlTemplateResponse.text();
-        
-        const data = getTemplateData();
+        // Replace placeholders in the HTML
         for (const key in data) {
             const regex = new RegExp(`{${key}}`, 'g');
-            templateHtml = templateHtml.replace(regex, data[key] || ''); // Ensure undefined values don't break it
+            templateHtml = templateHtml.replace(regex, data[key] || '');
         }
-
+        
         const element = document.createElement('div');
         element.innerHTML = templateHtml;
 
         const customerName = document.getElementById('customer-name').value || 'Proposal';
         const filename = `${customerName.replace(/ /g, '_')}_Proposal.pdf`;
-
+        
         const opt = {
           margin:       0.5,
           filename:     filename,
@@ -793,11 +730,9 @@ async function generatePdf() {
           jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
         };
 
-        // Use html2pdf to generate the PDF from the filled HTML template
         await html2pdf().from(element).set(opt).save();
         
         button.innerHTML = 'PDF Downloaded! ✅';
-
 
     } catch (error) {
         console.error('Error generating PDF:', error);
@@ -807,8 +742,76 @@ async function generatePdf() {
         setTimeout(() => {
             button.innerHTML = originalText;
             button.disabled = false;
-        }, 3000);
+        }, 1000);
     }
+}
+
+function getTemplateData() {
+    // --- This is the data gathering logic from your generateDocument function ---
+    let totalHardwareSellPrice = 0, totalHardwareUnits = 0;
+    const hardwareKeys = ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB'];
+    hardwareKeys.forEach(key => {
+        if (currentResults[key]) {
+            const quantity = currentResults[key].override ?? currentResults[key].calculated;
+            if (quantity > 0) {
+                totalHardwareUnits += quantity;
+                totalHardwareSellPrice += quantity * priceData[key].cost * (1 + priceData[key].margin);
+            }
+        }
+    });
+
+    let selectedSupportTier = 'none';
+    let selectedSupportName = "Please see the support options below";
+    const activeButton = document.querySelector('.support-presets-main button.active-preset');
+    if (activeButton && activeButton.id !== 'support-preset-none') {
+        selectedSupportTier = activeButton.id.replace('support-preset-', '');
+        selectedSupportName = selectedSupportTier.charAt(0).toUpperCase() + selectedSupportTier.slice(1);
+    }
+    const selectedSupportCost = getSpecificSupportCost(selectedSupportTier, totalHardwareUnits, totalHardwareSellPrice);
+    const professionalServicesCost = (subTotalsForProposal.services?.sell || 0) - selectedSupportCost;
+    
+    const bronzeCost = getSpecificSupportCost('bronze', totalHardwareUnits, totalHardwareSellPrice);
+    const silverCost = getSpecificSupportCost('silver', totalHardwareUnits, totalHardwareSellPrice);
+    const goldCost = getSpecificSupportCost('gold', totalHardwareUnits, totalHardwareSellPrice);
+
+    const systemTypeSelect = document.getElementById('system-type');
+    const selectedValue = systemTypeSelect.value;
+    const selectedText = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
+    const solutionNameMap = {
+        'G41': 'GO G41 DAS', 'G43': 'GO G43 DAS',
+        'QUATRA': 'QUATRA 4000e Only', 'QUATRA_EVO': 'QUATRA EVO Only'
+    };
+    const solutionNameToSend = solutionNameMap[selectedValue] || selectedText;
+
+    return {
+        Account: document.getElementById('customer-name').value,
+        Solution: solutionNameToSend,
+        NumberOfNetworks: document.getElementById('number-of-networks').value,
+        SurveyPrice: `£${(parseFloat(document.getElementById('survey-price').value) || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        Description1: "CEL-FI Hardware", Qty1: "1",
+        UnitPrice1: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        TotalPrice1: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        Description2: "Antennas, cables and connectors", Qty2: "1",
+        UnitPrice2: `£${(subTotalsForProposal.consumables?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        TotalPrice2: `£${(subTotalsForProposal.consumables?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        Description3: "Professional Services", Qty3: "1",
+        UnitPrice3: `£${professionalServicesCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        TotalPrice3: `£${professionalServicesCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        Description4: selectedSupportTier !== 'none' ? selectedSupportName : "Please see the support options below",
+        Qty4: selectedSupportTier !== 'none' ? "1" : "",
+        UnitPrice4: selectedSupportTier !== 'none' ? `£${selectedSupportCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : "",
+        TotalPrice4: selectedSupportTier !== 'none' ? `£${selectedSupportCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : "",
+        TotalPrice: `£${((subTotalsForProposal.hardware?.sell || 0) + (subTotalsForProposal.consumables?.sell || 0) + (subTotalsForProposal.services?.sell || 0)).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        Support1: "Bronze", SupportQty1: "1",
+        SupportUnitPrice1: `£${bronzeCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        SupportTotalPrice1: `£${bronzeCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        Support2: "Silver", SupportQty2: "1",
+        SupportUnitPrice2: `£${silverCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        SupportTotalPrice2: `£${silverCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        Support3: "Gold", SupportQty3: "1",
+        SupportUnitPrice3: `£${goldCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        SupportTotalPrice3: `£${goldCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+    };
 }
 
 // Create this new helper function in calculator.js to avoid repeating code
