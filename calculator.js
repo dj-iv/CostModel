@@ -401,179 +401,108 @@ document.addEventListener('DOMContentLoaded', () => {
         const maintenanceCost = totalHardwareSellPrice * (maintenancePercent / 100);
         return perSystemCost + fixedAnnualCost + maintenanceCost;
     }
-async function generateDocument() {
-    const button = document.getElementById('generate-document-btn');
-    const originalText = button.innerHTML;
-    
-    if (!validateInputs(['customer-name', 'survey-price'])) {
-        return; // Stop if validation fails
-    }
 
-    button.innerHTML = 'Generating...';
-    button.disabled = true;
-
-    try {
-        const systemType = document.getElementById('system-type').value;
-        const templateMap = {
-            'G41': 'CEL-FI-GO-G41-Proposal-Template.docx',
-            'G43': 'CEL-FI-GO-G43-Proposal-Template.docx',
-            'QUATRA': 'CEL-FI-QUATRA-4000e-Proposal-Template.docx',
-            'QUATRA_DAS': 'CEL-FI-QUATRA-4000e-Proposal-Template.docx',
-            'QUATRA_EVO': 'CEL-FI-QUATRA-EVO-Proposal-Template.docx',
-            'QUATRA_EVO_DAS': 'CEL-FI-QUATRA-EVO-Proposal-Template.docx'
-        };
-        const templateFilename = templateMap[systemType];
-        if (!templateFilename) {
-            throw new Error(`No template found for system type: ${systemType}`);
+    async function generateDocument() {
+        const button = document.getElementById('generate-document-btn');
+        const originalText = button.innerHTML;
+        
+        if (!validateInputs(['customer-name', 'survey-price'])) {
+            return; // Stop if validation fails
         }
 
-        const response = await fetch(`templates/${templateFilename}`);
-        if (!response.ok) {
-            throw new Error(`Could not fetch template: ${response.statusText}`);
-        }
-        const content = await response.arrayBuffer();
+        button.innerHTML = 'Generating...';
+        button.disabled = true;
 
-        const zip = new PizZip(content);
-const doc = new docxtemplater(zip);
-
-        // --- Prepare Data for the Template ---
-        let totalHardwareSellPrice = 0, totalHardwareUnits = 0;
-        const hardwareKeys = ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB'];
-        hardwareKeys.forEach(key => {
-            if (currentResults[key]) {
-                const quantity = currentResults[key].override ?? currentResults[key].calculated;
-                if (quantity > 0) {
-                    totalHardwareUnits += quantity;
-                    totalHardwareSellPrice += quantity * priceData[key].cost * (1 + priceData[key].margin);
-                }
+        try {
+            const systemType = document.getElementById('system-type').value;
+            const templateMap = {
+                'G41': 'CEL-FI-GO-G41-Proposal-Template.docx',
+                'G43': 'CEL-FI-GO-G43-Proposal-Template.docx',
+                'QUATRA': 'CEL-FI-QUATRA-4000e-Proposal-Template.docx',
+                'QUATRA_DAS': 'CEL-FI-QUATRA-4000e-Proposal-Template.docx',
+                'QUATRA_EVO': 'CEL-FI-QUATRA-EVO-Proposal-Template.docx',
+                'QUATRA_EVO_DAS': 'CEL-FI-QUATRA-EVO-Proposal-Template.docx'
+            };
+            const templateFilename = templateMap[systemType];
+            if (!templateFilename) {
+                throw new Error(`No template found for system type: ${systemType}`);
             }
-        });
 
-        let selectedSupportTier = 'none';
-        let selectedSupportName = "Please see the support options below";
-        const activeButton = document.querySelector('.support-presets-main button.active-preset');
-        if (activeButton && activeButton.id !== 'support-preset-none') {
-            selectedSupportTier = activeButton.id.replace('support-preset-', '');
-            selectedSupportName = selectedSupportTier.charAt(0).toUpperCase() + selectedSupportTier.slice(1);
+            const response = await fetch(`templates/${templateFilename}`);
+            if (!response.ok) {
+                throw new Error(`Could not fetch template: ${response.statusText}`);
+            }
+            const content = await response.arrayBuffer();
+
+            const zip = new PizZip(content);
+            const doc = new docxtemplater(zip);
+
+            // This is the original, working code block for the data
+            const templateData = {
+                Account: document.getElementById('customer-name').value,
+                Solution: solutionNameToSend,
+                NumberOfNetworks: document.getElementById('number-of-networks').value,
+                SurveyPrice: `£${(parseFloat(document.getElementById('survey-price').value) || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+                
+                Description1: "CEL-FI Hardware", Qty1: "1",
+                UnitPrice1: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+                TotalPrice1: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+
+                Description2: "Antennas, cables and connectors", Qty2: "1",
+                UnitPrice2: `£${(subTotalsForProposal.consumables?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+                TotalPrice2: `£${(subTotalsForProposal.consumables?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+                
+                Description3: "Professional Services", Qty3: "1",
+                UnitPrice3: `£${professionalServicesCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+                TotalPrice3: `£${professionalServicesCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+                
+                Description4: selectedSupportTier !== 'none' ? selectedSupportName : "Please see the support options below",
+                Qty4: selectedSupportTier !== 'none' ? "1" : "",
+                UnitPrice4: selectedSupportTier !== 'none' ? `£${selectedSupportCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : "",
+                TotalPrice4: selectedSupportTier !== 'none' ? `£${selectedSupportCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : "",
+
+                TotalPrice: `£${((subTotalsForProposal.hardware?.sell || 0) + (subTotalsForProposal.consumables?.sell || 0) + (subTotalsForProposal.services?.sell || 0)).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+
+                Support1: "Bronze", SupportQty1: "1",
+                SupportUnitPrice1: `£${bronzeCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+                SupportTotalPrice1: `£${bronzeCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+                
+                Support2: "Silver", SupportQty2: "1",
+                SupportUnitPrice2: `£${silverCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+                SupportTotalPrice2: `£${silverCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+                
+                Support3: "Gold", SupportQty3: "1",
+                SupportUnitPrice3: `£${goldCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+                SupportTotalPrice3: `£${goldCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            };
+
+            doc.render(templateData);
+
+            const out = doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+            
+            const customerName = document.getElementById('customer-name').value || 'Proposal';
+            const filename = `${customerName.replace(/ /g, '_')}_Proposal.docx`;
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(out);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            button.innerHTML = 'Downloaded! ✅';
+
+        } catch (error) {
+            console.error('Error generating document:', error);
+            alert('Could not generate the document. Please check the console for errors.');
+            button.innerHTML = 'Failed! ❌';
+        } finally {
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }, 3000);
         }
-        const selectedSupportCost = getSpecificSupportCost(selectedSupportTier, totalHardwareUnits, totalHardwareSellPrice);
-        const professionalServicesCost = (subTotalsForProposal.services?.sell || 0) - selectedSupportCost;
-        
-        const bronzeCost = getSpecificSupportCost('bronze', totalHardwareUnits, totalHardwareSellPrice);
-        const silverCost = getSpecificSupportCost('silver', totalHardwareUnits, totalHardwareSellPrice);
-        const goldCost = getSpecificSupportCost('gold', totalHardwareUnits, totalHardwareSellPrice);
-
-        const systemTypeSelect = document.getElementById('system-type');
-        const selectedValue = systemTypeSelect.value;
-        const selectedText = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
-        const solutionNameMap = {
-            'G41': 'GO G41 DAS', 'G43': 'GO G43 DAS',
-            'QUATRA': 'QUATRA 4000e Only', 'QUATRA_EVO': 'QUATRA EVO Only'
-        };
-        const solutionNameToSend = solutionNameMap[selectedValue] || selectedText;
-
-        const templateData = {
-            Account: document.getElementById('customer-name').value,
-            Solution: solutionNameToSend,
-            NumberOfNetworks: document.getElementById('number-of-networks').value,
-            SurveyPrice: `£${(parseFloat(document.getElementById('survey-price').value) || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-            
-            Description1: "CEL-FI Hardware", Qty1: "1",
-            UnitPrice1: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-            TotalPrice1: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-
-            Description2: "Antennas, cables and connectors", Qty2: "1",
-            UnitPrice2: `£${(subTotalsForProposal.consumables?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-            TotalPrice2: `£${(subTotalsForProposal.consumables?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-            
-            Description3: "Professional Services", Qty3: "1",
-            UnitPrice3: `£${professionalServicesCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-            TotalPrice3: `£${professionalServicesCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-            
-            Description4: selectedSupportTier !== 'none' ? selectedSupportName : "Please see the support options below",
-            Qty4: selectedSupportTier !== 'none' ? "1" : "",
-            UnitPrice4: selectedSupportTier !== 'none' ? `£${selectedSupportCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : "",
-            TotalPrice4: selectedSupportTier !== 'none' ? `£${selectedSupportCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : "",
-
-            TotalPrice: `£${((subTotalsForProposal.hardware?.sell || 0) + (subTotalsForProposal.consumables?.sell || 0) + (subTotalsForProposal.services?.sell || 0)).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-
-            Support1: "Bronze", SupportQty1: "1",
-            SupportUnitPrice1: `£${bronzeCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-            SupportTotalPrice1: `£${bronzeCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-            
-            Support2: "Silver", SupportQty2: "1",
-            SupportUnitPrice2: `£${silverCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-            SupportTotalPrice2: `£${silverCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-            
-            Support3: "Gold", SupportQty3: "1",
-            SupportUnitPrice3: `£${goldCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-            SupportTotalPrice3: `£${goldCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-        };
-
-        const templateData = {
-    Account: document.getElementById('customer-name').value,
-    Solution: solutionNameToSend,
-    NumberOfNetworks: document.getElementById('number-of-networks').value,
-    SurveyPrice: `£${(parseFloat(document.getElementById('survey-price').value) || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-
-    Description1: "CEL-FI Hardware", Qty1: "1",
-    UnitPrice1: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-    TotalPrice1: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-
-    Description2: "Antennas, cables and connectors", Qty2: "1",
-    UnitPrice2: `£${(subTotalsForProposal.consumables?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-    TotalPrice2: `£${(subTotalsForProposal.consumables?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-
-    Description3: "Professional Services", Qty3: "1",
-    UnitPrice3: `£${professionalServicesCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-    TotalPrice3: `£${professionalServicesCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-
-    Description4: selectedSupportTier !== 'none' ? selectedSupportName : "Please see the support options below",
-    Qty4: selectedSupportTier !== 'none' ? "1" : "",
-    UnitPrice4: selectedSupportTier !== 'none' ? `£${selectedSupportCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : "",
-    TotalPrice4: selectedSupportTier !== 'none' ? `£${selectedSupportCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : "",
-
-    TotalPrice: `£${((subTotalsForProposal.hardware?.sell || 0) + (subTotalsForProposal.consumables?.sell || 0) + (subTotalsForProposal.services?.sell || 0)).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-
-    Support1: "Bronze", SupportQty1: "1",
-    SupportUnitPrice1: `£${bronzeCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-    SupportTotalPrice1: `£${bronzeCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-
-    Support2: "Silver", SupportQty2: "1",
-    SupportUnitPrice2: `£${silverCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-    SupportTotalPrice2: `£${silverCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-
-    Support3: "Gold", SupportQty3: "1",
-    SupportUnitPrice3: `£${goldCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-    SupportTotalPrice3: `£${goldCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-};
-
-doc.render(templateData);
-
-        const out = doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
-        
-        const customerName = document.getElementById('customer-name').value || 'Proposal';
-        const filename = `${customerName.replace(/ /g, '_')}_Proposal.docx`;
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(out);
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        button.innerHTML = 'Downloaded! ✅';
-
-    } catch (error) {
-        console.error('Error generating document:', error);
-        alert('Could not generate the document. Please check the console for errors.');
-        button.innerHTML = 'Failed! ❌';
-    } finally {
-        setTimeout(() => {
-            button.innerHTML = originalText;
-            button.disabled = false;
-        }, 3000);
     }
-}
+
     // --- NEW FEATURES (Make.com, Links, Validation) ---
     function initialize() {
         const stateLoaded = loadStateFromURL();
@@ -661,51 +590,10 @@ doc.render(templateData);
         button.disabled = true;
 
         try {
-            let totalHardwareSellPrice = 0, totalHardwareUnits = 0;
-            const hardwareKeys = ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB', 'extender_cat6', 'extender_fibre_cu', 'extender_fibre_nu'];
-            for (const key of hardwareKeys) { if (currentResults[key]) { const quantity = currentResults[key].override ?? currentResults[key].calculated; if (quantity > 0) { totalHardwareUnits += quantity; const priceInfo = priceData[key]; totalHardwareSellPrice += quantity * priceInfo.cost * (1 + priceInfo.margin); } } }
-            
-            let selectedSupportTier = 'none';
-            let selectedSupportName = "Please see the support options below";
-            const activeButton = document.querySelector('.support-presets-main button.active-preset');
-            if (activeButton && activeButton.id !== 'support-preset-none') {
-                selectedSupportTier = activeButton.id.replace('support-preset-', '');
-                selectedSupportName = selectedSupportTier.charAt(0).toUpperCase() + selectedSupportTier.slice(1);
-            }
-            const selectedSupportCost = getSpecificSupportCost(selectedSupportTier, totalHardwareUnits, totalHardwareSellPrice);
-            const professionalServicesCost = (subTotalsForProposal.services?.sell || 0) - selectedSupportCost;
-            const bronzeCost = getSpecificSupportCost('bronze', totalHardwareUnits, totalHardwareSellPrice);
-            const silverCost = getSpecificSupportCost('silver', totalHardwareUnits, totalHardwareSellPrice);
-            const goldCost = getSpecificSupportCost('gold', totalHardwareUnits, totalHardwareSellPrice);
-            const totalMargin = (subTotalsForProposal.hardware?.margin || 0) + (subTotalsForProposal.consumables?.margin || 0) + (subTotalsForProposal.services?.margin || 0);
-            const systemTypeSelect = document.getElementById('system-type');
-            const selectedValue = systemTypeSelect.value;
-            const selectedText = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
-            const solutionNameMap = {
-                'G41': 'GO G41 DAS', 'G43': 'GO G43 DAS',
-                'QUATRA': 'QUATRA 4000e Only', 'QUATRA_EVO': 'QUATRA EVO Only'
-            };
-            const solutionNameToSend = solutionNameMap[selectedValue] || selectedText;
-
-            const dataToSend = {
-                CustomerName: document.getElementById('customer-name').value,
-                Solution: solutionNameToSend,
-                NumberOfNetworks: document.getElementById('number-of-networks').value,
-                SurveyPrice: (parseFloat(document.getElementById('survey-price').value) || 0).toFixed(2),
-                Description1: "CEL-FI Hardware", Qty1: "1", UnitPrice1: (subTotalsForProposal.hardware?.sell || 0).toFixed(2), TotalPrice1: (subTotalsForProposal.hardware?.sell || 0).toFixed(2),
-                Description2: "Antennas, cables and connectors", Qty2: "1", UnitPrice2: (subTotalsForProposal.consumables?.sell || 0).toFixed(2), TotalPrice2: (subTotalsForProposal.consumables?.sell || 0).toFixed(2),
-                Description3: "Professional Services", Qty3: "1", UnitPrice3: professionalServicesCost.toFixed(2), TotalPrice3: professionalServicesCost.toFixed(2),
-                Description4: selectedSupportTier !== 'none' ? selectedSupportName : "Please see the support options below",
-                Qty4: selectedSupportTier !== 'none' ? "1" : "",
-                UnitPrice4: selectedSupportTier !== 'none' ? selectedSupportCost.toFixed(2) : "",
-                TotalPrice4: selectedSupportTier !== 'none' ? selectedSupportCost.toFixed(2) : "",
-                Support1: "Bronze", SupportQty1: "1", SupportUnitPrice1: bronzeCost.toFixed(2), SupportTotalPrice1: bronzeCost.toFixed(2),
-                Support2: "Silver", SupportQty2: "1", SupportUnitPrice2: silverCost.toFixed(2), SupportTotalPrice2: silverCost.toFixed(2),
-                Support3: "Gold", SupportQty3: "1", SupportUnitPrice3: goldCost.toFixed(2), SupportTotalPrice3: goldCost.toFixed(2),
-                MarginTotal: totalMargin.toFixed(2),
-                TotalMargin: totalMargin.toFixed(2),
-                QuoteNumber: dataType === 'quote' ? document.getElementById('quote-number').value : "",
-            };
+            const dataToSend = getTemplateData();
+            // Add a couple of extra fields needed by Make.com that aren't in the main data
+            dataToSend.MarginTotal = ((subTotalsForProposal.hardware?.margin || 0) + (subTotalsForProposal.consumables?.margin || 0) + (subTotalsForProposal.services?.margin || 0)).toFixed(2);
+            dataToSend.QuoteNumber = dataType === 'quote' ? document.getElementById('quote-number').value : "";
 
             const response = await fetch(MAKE_WEBHOOK_URL, {
                 method: 'POST',
@@ -725,20 +613,206 @@ doc.render(templateData);
             }, 3000);
         }
     }
-// Add this new library to the top of your calculator.js, after the other script includes.
-// This is not strictly necessary as it's loaded in index.html, but it's good practice to know what you're using.
-// Note: docx-preview.js is not needed, html2pdf.js handles the PDF creation.
 
+    function getTemplateData() {
+        // --- This is the data gathering logic from your generateDocument function ---
+        let totalHardwareSellPrice = 0, totalHardwareUnits = 0;
+        const hardwareKeys = ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB'];
+        hardwareKeys.forEach(key => {
+            if (currentResults[key]) {
+                const quantity = currentResults[key].override ?? currentResults[key].calculated;
+                if (quantity > 0) {
+                    totalHardwareUnits += quantity;
+                    totalHardwareSellPrice += quantity * priceData[key].cost * (1 + priceData[key].margin);
+                }
+            }
+        });
 
+        let selectedSupportTier = 'none';
+        let selectedSupportName = "Please see the support options below";
+        const activeButton = document.querySelector('.support-presets-main button.active-preset');
+        if (activeButton && activeButton.id !== 'support-preset-none') {
+            selectedSupportTier = activeButton.id.replace('support-preset-', '');
+            selectedSupportName = selectedSupportTier.charAt(0).toUpperCase() + selectedSupportTier.slice(1);
+        }
+        const selectedSupportCost = getSpecificSupportCost(selectedSupportTier, totalHardwareUnits, totalHardwareSellPrice);
+        const professionalServicesCost = (subTotalsForProposal.services?.sell || 0) - selectedSupportCost;
+        
+        const bronzeCost = getSpecificSupportCost('bronze', totalHardwareUnits, totalHardwareSellPrice);
+        const silverCost = getSpecificSupportCost('silver', totalHardwareUnits, totalHardwareSellPrice);
+        const goldCost = getSpecificSupportCost('gold', totalHardwareUnits, totalHardwareSellPrice);
 
-// REPLACE the old generatePdf function with this new one.
-async function generatePdf() {
-    alert("Generate PDF button test successful!");
-}
+        const systemTypeSelect = document.getElementById('system-type');
+        const selectedValue = systemTypeSelect.value;
+        const selectedText = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
+        const solutionNameMap = {
+            'G41': 'GO G41 DAS', 'G43': 'GO G43 DAS',
+            'QUATRA': 'QUATRA 4000e Only', 'QUATRA_EVO': 'QUATRA EVO Only'
+        };
+        const solutionNameToSend = solutionNameMap[selectedValue] || selectedText;
 
+        return {
+            Account: document.getElementById('customer-name').value,
+            Solution: solutionNameToSend,
+            NumberOfNetworks: document.getElementById('number-of-networks').value,
+            SurveyPrice: `£${(parseFloat(document.getElementById('survey-price').value) || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            Description1: "CEL-FI Hardware", Qty1: "1",
+            UnitPrice1: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            TotalPrice1: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            Description2: "Antennas, cables and connectors", Qty2: "1",
+            UnitPrice2: `£${(subTotalsForProposal.consumables?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            TotalPrice2: `£${(subTotalsForProposal.consumables?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            Description3: "Professional Services", Qty3: "1",
+            UnitPrice3: `£${professionalServicesCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            TotalPrice3: `£${professionalServicesCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            Description4: selectedSupportTier !== 'none' ? selectedSupportName : "Please see the support options below",
+            Qty4: selectedSupportTier !== 'none' ? "1" : "",
+            UnitPrice4: selectedSupportTier !== 'none' ? `£${selectedSupportCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : "",
+            TotalPrice4: selectedSupportTier !== 'none' ? `£${selectedSupportCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : "",
+            TotalPrice: `£${((subTotalsForProposal.hardware?.sell || 0) + (subTotalsForProposal.consumables?.sell || 0) + (subTotalsForProposal.services?.sell || 0)).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            Support1: "Bronze", SupportQty1: "1",
+            SupportUnitPrice1: `£${bronzeCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            SupportTotalPrice1: `£${bronzeCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            Support2: "Silver", SupportQty2: "1",
+            SupportUnitPrice2: `£${silverCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            SupportTotalPrice2: `£${silverCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            Support3: "Gold", SupportQty3: "1",
+            SupportUnitPrice3: `£${goldCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            SupportTotalPrice3: `£${goldCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        };
+    }
 
+    async function generatePdf() {
+        const button = document.getElementById('generate-pdf-btn');
+        const originalText = button.innerHTML;
+        if (!validateInputs(['customer-name', 'survey-price'])) return;
+        
+        button.innerHTML = 'Generating...';
+        button.disabled = true;
 
+        try {
+            const data = getTemplateData();
+            
+            const proposalHtml = `
+                <html>
+                <head>
+                    <style>
+                        body { font-family: sans-serif; margin: 40px; }
+                        h1, h2 { color: #004696; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th, td { border: 1px solid #dddddd; text-align: left; padding: 8px; }
+                        th { background-color: #f2f2f2; }
+                        .total-row td { font-weight: bold; }
+                        .header { text-align: center; margin-bottom: 40px; }
+                        .footer { text-align: center; margin-top: 40px; font-size: 12px; color: #777; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>Budgetary Proposal for ${data.Account}</h1>
+                    </div>
 
+                    <h2>Proposed Solution: ${data.Solution}</h2>
+                    <p>Based on the information provided, UCtel proposes the use of the CEL-FI ${data.Solution} solution to improve indoor mobile coverage for ${data.NumberOfNetworks} network(s).</p>
+                    
+                    <h2>Proposed Pricing</h2>
+                    <table>
+                        <tr>
+                            <th>Description</th>
+                            <th>Qty</th>
+                            <th>Unit Price</th>
+                            <th>Total Price</th>
+                        </tr>
+                        <tr>
+                            <td>${data.Description1}</td>
+                            <td>${data.Qty1}</td>
+                            <td>${data.UnitPrice1}</td>
+                            <td>${data.TotalPrice1}</td>
+                        </tr>
+                        <tr>
+                            <td>${data.Description2}</td>
+                            <td>${data.Qty2}</td>
+                            <td>${data.UnitPrice2}</td>
+                            <td>${data.TotalPrice2}</td>
+                        </tr>
+                        <tr>
+                            <td>${data.Description3}</td>
+                            <td>${data.Qty3}</td>
+                            <td>${data.UnitPrice3}</td>
+                            <td>${data.TotalPrice3}</td>
+                        </tr>
+                        <tr class="total-row">
+                            <td colspan="3" style="text-align: right;">Total Price:</td>
+                            <td>${data.TotalPrice}</td>
+                        </tr>
+                    </table>
+
+                    <h2>Annual Support Options</h2>
+                    <table>
+                        <tr>
+                            <th>Support Option</th>
+                            <th>Qty</th>
+                            <th>Unit Price</th>
+                            <th>Total Price</th>
+                        </tr>
+                        <tr>
+                            <td>${data.Support1}</td>
+                            <td>${data.SupportQty1}</td>
+                            <td>${data.SupportUnitPrice1}</td>
+                            <td>${data.SupportTotalPrice1}</td>
+                        </tr>
+                        <tr>
+                            <td>${data.Support2}</td>
+                            <td>${data.SupportQty2}</td>
+                            <td>${data.SupportUnitPrice2}</td>
+                            <td>${data.SupportTotalPrice2}</td>
+                        </tr>
+                         <tr>
+                            <td>${data.Support3}</td>
+                            <td>${data.SupportQty3}</td>
+                            <td>${data.SupportUnitPrice3}</td>
+                            <td>${data.SupportTotalPrice3}</td>
+                        </tr>
+                    </table>
+                    <p>Price for survey and report: ${data.SurveyPrice} + VAT</p>
+
+                    <div class="footer">
+                        <p>UCtel | In-Building Mobile Signal Specialists</p>
+                    </div>
+                </body>
+                </html>
+            `;
+            
+            const element = document.createElement('div');
+            element.innerHTML = proposalHtml;
+
+            const customerName = document.getElementById('customer-name').value || 'Proposal';
+            const filename = `${customerName.replace(/ /g, '_')}_Proposal.pdf`;
+            
+            const opt = {
+              margin:       0,
+              filename:     filename,
+              image:        { type: 'jpeg', quality: 0.98 },
+              html2canvas:  { scale: 2, useCORS: true },
+              jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+
+            await html2pdf().from(element).set(opt).save();
+            
+            button.innerHTML = 'PDF Downloaded! ✅';
+
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+            alert('Could not generate the PDF. Please check the console for errors.');
+            button.innerHTML = 'Failed! ❌';
+        } finally {
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }, 1000);
+        }
+    }
+    
     async function generateShareLink() {
         // ... (function body)
     }
@@ -748,15 +822,14 @@ async function generatePdf() {
     }
     
     initialize();
-});
 
-window.updateSellPriceDisplay = (key) => {
-    const costInput = document.getElementById(`cost-${key}`);
-    const marginInput = document.getElementById(`margin-${key}`);
-    const sellDisplay = document.getElementById(`sell-${key}`);
-    const cost = parseFloat(costInput.value) || 0;
-    const margin = parseFloat(marginInput.value) || 0;
-    const sellPrice = cost * (1 + margin / 100);
-    sellDisplay.textContent = `£${sellPrice.toFixed(2)}`;
-};
-// Trigger deployment - August 7, 2025
+    window.updateSellPriceDisplay = (key) => {
+        const costInput = document.getElementById(`cost-${key}`);
+        const marginInput = document.getElementById(`margin-${key}`);
+        const sellDisplay = document.getElementById(`sell-${key}`);
+        const cost = parseFloat(costInput.value) || 0;
+        const margin = parseFloat(marginInput.value) || 0;
+        const sellPrice = cost * (1 + margin / 100);
+        sellDisplay.textContent = `£${sellPrice.toFixed(2)}`;
+    };
+});
