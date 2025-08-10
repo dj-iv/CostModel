@@ -4,169 +4,94 @@
     <meta charset="UTF-8">
     <title>Proposal for {Account}</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            font-size: 11pt;
-            line-height: 1.5;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        .page {
-            width: 210mm;
-            min-height: 297mm;
-            padding: 20mm;
-            margin: 10mm auto;
-            border: 1px #D3D3D3 solid;
-            background: white;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-        }
-        h1, h2, h3 {
-            color: #333;
-            line-height: 1.2;
-        }
-        h1 {
-            font-size: 24pt;
-            text-align: center;
-            margin-top: 100px;
-        }
-        h2 {
-            font-size: 18pt;
-            text-align: center;
-            border-bottom: 2px solid #004696;
-            padding-bottom: 10px;
-            margin-top: 40px;
-            margin-bottom: 20px;
-        }
-        h3 {
-            font-size: 14pt;
-            margin-top: 30px;
-        }
-        p {
-            margin-bottom: 1em;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            font-size: 10pt;
-        }
-        th, td {
-            border: 1px solid #cccccc;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #004696;
-            color: white;
-            font-weight: bold;
-        }
-        td:nth-child(2), td:nth-child(3), td:nth-child(4) {
-            text-align: right;
-        }
-        .total-row td {
-            font-weight: bold;
-        }
+        body { font-family: Arial, sans-serif; font-size: 11pt; line-height: 1.5; background-color: #f4f4f4; margin: 0; padding: 0; }
+        .page { width: 210mm; min-height: 297mm; padding: 20mm; margin: 10mm auto; border: 1px #D3D3D3 solid; background: white; box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); }
+        h1, h2, h3 { color: #333; line-height: 1.2; font-weight: normal; }
+        h1 { font-size: 28pt; text-align: center; margin-top: 50px; color: #004696;}
+        h2 { font-size: 20pt; text-align: left; border-bottom: 2px solid #004696; padding-bottom: 10px; margin-top: 40px; margin-bottom: 20px; }
+        h3 { font-size: 16pt; margin-top: 30px; }
+        p, li { margin-bottom: 1em; }
+        ul { padding-left: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 10pt; }
+        th, td { border: 1px solid #cccccc; padding: 8px; text-align: left; vertical-align: top; }
+        th { background-color: #004696; color: white; font-weight: bold; }
+        .pricing-table td:nth-child(2), .pricing-table td:nth-child(3), .pricing-table td:nth-child(4) { text-align: right; }
+        .total-row td { font-weight: bold; }
+        img { max-width: 100%; height: auto; display: block; margin: 20px auto; }
+        .cover-for { text-align: center; font-size: 18pt; margin: 20px 0; }
+        .cover-account { text-align: center; font-size: 22pt; margin-bottom: 100px; }
+        .page-break { page-break-after: always; }
+
         @media print {
-            body, .page {
-                margin: 0;
-                box-shadow: none;
-                border: none;
-            }
+            body, .page { margin: 0; box-shadow: none; border: none; }
         }
     </style>
 </head>
 <body>
     <div class="page">
+        <img src="images/REPLACE_WITH_YOUR_UCTEL_LOGO.png" alt="UCtel Logo" style="max-width: 300px;">
         <h1>{Solution} Proposal</h1>
-        <p style="text-align: center; font-size: 18pt;">for</p>
-        <h2 style="border: none; margin-top: 0;">{Account}</h2>
-
-        <div style="page-break-after: always;"></div>
+        <p class="cover-for">for</p>
+        <h1 class="cover-account">{Account}</h1>
+        <div class="page-break"></div>
 
         <h2>Introduction</h2>
-        <p>
-            {Account} are looking to install a mobile boosting system to improve indoor mobile coverage.
-            Coverage is required over {NumberOfNetworks} of the UK Mobile Network Operators (MNOs).
-            Based on the information provided, UCtel proposes the use of the CEL-FI {Solution} solution.
-            This document sets out the details of the proposed solution, UCtel’s approach and budgetary pricing.
-        </p>
+        <p>{Account} are looking to install a mobile boosting system to improve indoor mobile coverage. Coverage is required over {NumberOfNetworks} of the UK Mobile Network Operators (MNOs) – EE, O2, Vodafone and Three (3). Based on the information provided, UCtel proposes the use of the CEL-FI {Solution} solution. This document sets out the details of the proposed solution, UCtel’s approach and budgetary pricing.</p>
+        
+        <h3>About UCtel</h3>
+        <p>UCtel specialises in the design, installation and management of in-building mobile signal systems.</p>
+        <h4>Why UCtel:</h4>
+        <ul>
+            <li>We have been installing in building mobile signal systems since 2019 and have deployed over 300 systems in a wide range of buildings including private houses, offices, factories and hospitals</li>
+            <li>We only work with equipment that complies with Ofcom's UK Interface Requirement 2102</li>
+            <li>We have developed our own survey tools which are tailored to the specific requirements of in-building signal boosters. This allows us to see the important information about the signals that matter to ensure the best result from the installation.</li>
+            <li>We deploy 5G Stand Alone (Up to 4.0GHz) ready DAS solutions so that when 5G SA can be boosted, the DAS elements of the solution do not need to be upgraded.</li>
+            <li>We provide a range of tailored support packages from break/fix maintenance to fully managed systems with onsite engineering support.</li>
+        </ul>
+
+        <h3>Key Contacts</h3>
+        <table>
+            <tr><th>Name</th><th>Title</th><th>Contact Details</th></tr>
+            <tr><td>Ivor Nicholls</td><td>Sales Director</td><td>ivor.nicholls@uctel.co.uk</td></tr>
+            <tr><td>Ivan Romanov</td><td>Technical Director</td><td>ivan.romanov@uctel.co.uk</td></tr>
+        </table>
+        
+        <h3>Confidentiality</h3>
+        <p>UCtel’s success in the IT marketplace is directly linked to the knowledge that we have and the best practices of innovation and creativity that we apply to our customer solutions. UCtel asks that you respect our intellectual property and consider the contents of this, and all other documents submitted by UCtel to be highly confidential.</p>
+        <div class="page-break"></div>
+
+        <h2>Proposed Solution</h2>
+        <h3>CEL-FI QUATRA 4000e</h3>
+        <p>CEL-FI QUATRA is a distributed antenna system (DAS) hybrid solution that combines the strength of passive and active DAS technologies to deliver high-quality mobile signal in buildings. CEL-FI QUATRA delivers a mobile signal that is up to 1000 times stronger than a pure analogue solution. Utilising CAT 5e/6 cabling for RF and power over ethernet, with no signal attenuation up to the transmitters within the perimeter of the building. The CEL-FI QUATRA solution consists of a donor antenna which is installed on the roof or outdoors where mobile signal is strongest, a network unit (NU) which amplifies and digitises the mobile signal and a network of coverage units (CU’s) which are connected to segments of passive DAS to distribute the signal around the building. The QUATRA 4000e boosts up to 4 network operators in a single system and complies with recent changes to Ofcom’s regulations in this regard.</p>
+        <p>The diagram below shows an example of the QUATRA 4000e architecture.</p>
+        <img src="images/REPLACE_WITH_DIAGRAM.png" alt="Two-Building Diagram">
+        
+        <div class="page-break"></div>
 
         <h2>Proposed Pricing</h2>
         <p>The following table provides indicative figures for the proposed solution.</p>
-        <table>
-            <thead>
-                <tr>
-                    <th>Description</th>
-                    <th>Qty</th>
-                    <th>Unit Price</th>
-                    <th>Total Price</th>
-                </tr>
-            </thead>
+        <table class="pricing-table">
+            <thead><tr><th>Description</th><th>Qty</th><th>Unit Price</th><th>Total Price</th></tr></thead>
             <tbody>
-                <tr>
-                    <td>{Description1}</td>
-                    <td>{Qty1}</td>
-                    <td>{UnitPrice1}</td>
-                    <td>{TotalPrice1}</td>
-                </tr>
-                <tr>
-                    <td>{Description2}</td>
-                    <td>{Qty2}</td>
-                    <td>{UnitPrice2}</td>
-                    <td>{TotalPrice2}</td>
-                </tr>
-                <tr>
-                    <td>{Description3}</td>
-                    <td>{Qty3}</td>
-                    <td>{UnitPrice3}</td>
-                    <td>{TotalPrice3}</td>
-                </tr>
-                <tr>
-                    <td>{Description4}</td>
-                    <td>{Qty4}</td>
-                    <td>{UnitPrice4}</td>
-                    <td>{TotalPrice4}</td>
-                </tr>
-                <tr class="total-row">
-                    <td colspan="3" style="text-align:right;">Total Price:</td>
-                    <td>{TotalPrice}</td>
-                </tr>
+                <tr><td>{Description1}</td><td>{Qty1}</td><td>{UnitPrice1}</td><td>{TotalPrice1}</td></tr>
+                <tr><td>{Description2}</td><td>{Qty2}</td><td>{UnitPrice2}</td><td>{TotalPrice2}</td></tr>
+                <tr><td>{Description3}</td><td>{Qty3}</td><td>{UnitPrice3}</td><td>{TotalPrice3}</td></tr>
+                <tr><td>{Description4}</td><td>{Qty4}</td><td>{UnitPrice4}</td><td>{TotalPrice4}</td></tr>
+                <tr class="total-row"><td colspan="3">Total Price:</td><td>{TotalPrice}</td></tr>
             </tbody>
         </table>
 
-        <h3>Support Options</h3>
         <p>The following support options are available. Please see section 6 for more details.</p>
-        <table>
-            <thead>
-                <tr>
-                    <th>Support Option</th>
-                    <th>Qty</th>
-                    <th>Unit Price</th>
-                    <th>Total Price</th>
-                </tr>
-            </thead>
+        <table class="pricing-table">
+            <thead><tr><th>Support Option</th><th>Qty</th><th>Unit Price</th><th>Total Price</th></tr></thead>
             <tbody>
-                <tr>
-                    <td>{Support1}</td>
-                    <td>{SupportQty1}</td>
-                    <td>{SupportUnitPrice1}</td>
-                    <td>{SupportTotalPrice1}</td>
-                </tr>
-                <tr>
-                    <td>{Support2}</td>
-                    <td>{SupportQty2}</td>
-                    <td>{SupportUnitPrice2}</td>
-                    <td>{SupportTotalPrice2}</td>
-                </tr>
-                <tr>
-                    <td>{Support3}</td>
-                    <td>{SupportQty3}</td>
-                    <td>{SupportUnitPrice3}</td>
-                    <td>{SupportTotalPrice3}</td>
-                </tr>
+                <tr><td>{Support1}</td><td>{SupportQty1}</td><td>{SupportUnitPrice1}</td><td>{SupportTotalPrice1}</td></tr>
+                <tr><td>{Support2}</td><td>{SupportQty2}</td><td>{SupportUnitPrice2}</td><td>{SupportTotalPrice2}</td></tr>
+                <tr><td>{Support3}</td><td>{SupportQty3}</td><td>{SupportUnitPrice3}</td><td>{SupportTotalPrice3}</td></tr>
             </tbody>
         </table>
+        <p>All figures shown are exclusive of VAT.</p>
+        <p><b>Terms:</b> Cel-Fi equipment to be paid on order. Other elements to be invoiced on completion and paid within 30 days.</p>
 
         <h3>Survey</h3>
         <p>In order to validate the above estimate a site survey is required. The price for the survey and report is {SurveyPrice} + VAT.</p>
