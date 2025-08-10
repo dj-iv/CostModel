@@ -404,38 +404,40 @@ document.addEventListener('DOMContentLoaded', () => {
 async function generateDocument() {
     const button = document.getElementById('generate-document-btn');
     const originalText = button.innerHTML;
+    
+    if (!validateInputs(['customer-name', 'survey-price'])) {
+        return; // Stop if validation fails
+    }
+
     button.innerHTML = 'Generating...';
     button.disabled = true;
 
-    if (!validateInputs(['customer-name', 'survey-price'])) {
-        button.innerHTML = originalText;
-        button.disabled = false;
-        return;
-    }
-
     try {
         const systemType = document.getElementById('system-type').value;
-const templateMap = {
-    'G41': 'CEL-FI-GO-G41-Proposal-Template.docx',
-    'G43': 'CEL-FI-GO-G43-Proposal-Template.docx',
-    'QUATRA': 'CEL-FI-QUATRA-4000e-Proposal-Template.docx',
-    'QUATRA_DAS': 'CEL-FI-QUATRA-4000e-Proposal-Template.docx',
-    'QUATRA_EVO': 'CEL-FI-QUATRA-EVO-Proposal-Template.docx',
-    'QUATRA_EVO_DAS': 'CEL-FI-QUATRA-EVO-Proposal-Template.docx'
-};
+        const templateMap = {
+            'G41': 'CEL-FI-GO-G41-Proposal-Template.docx',
+            'G43': 'CEL-FI-GO-G43-Proposal-Template.docx',
+            'QUATRA': 'CEL-FI-QUATRA-4000e-Proposal-Template.docx',
+            'QUATRA_DAS': 'CEL-FI-QUATRA-4000e-Proposal-Template.docx',
+            'QUATRA_EVO': 'CEL-FI-QUATRA-EVO-Proposal-Template.docx',
+            'QUATRA_EVO_DAS': 'CEL-FI-QUATRA-EVO-Proposal-Template.docx'
+        };
         const templateFilename = templateMap[systemType];
         if (!templateFilename) {
             throw new Error(`No template found for system type: ${systemType}`);
         }
 
         const response = await fetch(`templates/${templateFilename}`);
-        if (!response.ok) { throw new Error(`Could not fetch template: ${response.statusText}`); }
+        if (!response.ok) {
+            throw new Error(`Could not fetch template: ${response.statusText}`);
+        }
         const content = await response.arrayBuffer();
 
         const zip = new PizZip(content);
+        // Use the {{ }} delimiters that your template uses
         const doc = new docxtemplater(zip, { delimiters: { start: '{{', end: '}}' } });
 
-        // Prepare data matching the placeholders in your template
+        // --- Prepare Data for the Template ---
         let totalHardwareSellPrice = 0, totalHardwareUnits = 0;
         const hardwareKeys = ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB'];
         hardwareKeys.forEach(key => {
@@ -449,20 +451,35 @@ const templateMap = {
         });
 
         let selectedSupportTier = 'none';
+        let selectedSupportName = "Please see the support options below";
         const activeButton = document.querySelector('.support-presets-main button.active-preset');
         if (activeButton && activeButton.id !== 'support-preset-none') {
             selectedSupportTier = activeButton.id.replace('support-preset-', '');
+            selectedSupportName = selectedSupportTier.charAt(0).toUpperCase() + selectedSupportTier.slice(1);
         }
         const selectedSupportCost = getSpecificSupportCost(selectedSupportTier, totalHardwareUnits, totalHardwareSellPrice);
         const professionalServicesCost = (subTotalsForProposal.services?.sell || 0) - selectedSupportCost;
         
+        const bronzeCost = getSpecificSupportCost('bronze', totalHardwareUnits, totalHardwareSellPrice);
+        const silverCost = getSpecificSupportCost('silver', totalHardwareUnits, totalHardwareSellPrice);
+        const goldCost = getSpecificSupportCost('gold', totalHardwareUnits, totalHardwareSellPrice);
+
+        const systemTypeSelect = document.getElementById('system-type');
+        const selectedValue = systemTypeSelect.value;
+        const selectedText = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
+        const solutionNameMap = {
+            'G41': 'GO G41 DAS', 'G43': 'GO G43 DAS',
+            'QUATRA': 'QUATRA 4000e Only', 'QUATRA_EVO': 'QUATRA EVO Only'
+        };
+        const solutionNameToSend = solutionNameMap[selectedValue] || selectedText;
+
         const templateData = {
             Account: document.getElementById('customer-name').value,
-            Solution: systemTypeSelect.options[systemTypeSelect.selectedIndex].text,
+            Solution: solutionNameToSend,
             NumberOfNetworks: document.getElementById('number-of-networks').value,
             SurveyPrice: `£${(parseFloat(document.getElementById('survey-price').value) || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
             
-            Description1: "CEL-FI Hardware", Qty1: "1", 
+            Description1: "CEL-FI Hardware", Qty1: "1",
             UnitPrice1: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
             TotalPrice1: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
 
@@ -474,7 +491,7 @@ const templateMap = {
             UnitPrice3: `£${professionalServicesCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
             TotalPrice3: `£${professionalServicesCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
             
-            Description4: selectedSupportTier !== 'none' ? (selectedSupportTier.charAt(0).toUpperCase() + selectedSupportTier.slice(1)) : "Please see the support options below",
+            Description4: selectedSupportTier !== 'none' ? selectedSupportName : "Please see the support options below",
             Qty4: selectedSupportTier !== 'none' ? "1" : "",
             UnitPrice4: selectedSupportTier !== 'none' ? `£${selectedSupportCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : "",
             TotalPrice4: selectedSupportTier !== 'none' ? `£${selectedSupportCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : "",
@@ -482,21 +499,22 @@ const templateMap = {
             TotalPrice: `£${((subTotalsForProposal.hardware?.sell || 0) + (subTotalsForProposal.consumables?.sell || 0) + (subTotalsForProposal.services?.sell || 0)).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
 
             Support1: "Bronze", SupportQty1: "1",
-            SupportUnitPrice1: `£${getSpecificSupportCost('bronze', totalHardwareUnits, totalHardwareSellPrice).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-            SupportTotalPrice1: `£${getSpecificSupportCost('bronze', totalHardwareUnits, totalHardwareSellPrice).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            SupportUnitPrice1: `£${bronzeCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            SupportTotalPrice1: `£${bronzeCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
             
             Support2: "Silver", SupportQty2: "1",
-            SupportUnitPrice2: `£${getSpecificSupportCost('silver', totalHardwareUnits, totalHardwareSellPrice).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-            SupportTotalPrice2: `£${getSpecificSupportCost('silver', totalHardwareUnits, totalHardwareSellPrice).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            SupportUnitPrice2: `£${silverCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            SupportTotalPrice2: `£${silverCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
             
             Support3: "Gold", SupportQty3: "1",
-            SupportUnitPrice3: `£${getSpecificSupportCost('gold', totalHardwareUnits, totalHardwareSellPrice).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
-            SupportTotalPrice3: `£${getSpecificSupportCost('gold', totalHardwareUnits, totalHardwareSellPrice).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            SupportUnitPrice3: `£${goldCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+            SupportTotalPrice3: `£${goldCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
         };
 
         doc.render(templateData);
 
         const out = doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+        
         const customerName = document.getElementById('customer-name').value || 'Proposal';
         const filename = `${customerName.replace(/ /g, '_')}_Proposal.docx`;
         const link = document.createElement('a');
