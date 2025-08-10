@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Proposal for {Account}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.4;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            counter-reset: h2counter;
+        }
+        .page {
+            position: relative;
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            margin: 10mm auto;
+            border: 1px #D3D3D3 solid;
+            background: white;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+        }
+        .header, .footer {
+            position: absolute;
+            width: calc(100% - 40mm);
+            font-size: 9pt;
+            color: #777;
+        }
+        .header {
+            top: 10mm;
+            right: 20mm;
+            text-align: right;
+        }
+        .header img {
+            width: 100px;
+        }
+        .footer {
+            bottom: 10mm;
+            left: 20mm;
+            display: flex;
+            justify-content: space-between;
+        }
+        h1, h2, h3, h4 {
+            color: #386682;
+            line-height: 1.2;
+            font-weight: bold;
+        }
+        h1 { font-size: 28pt; text-align: center; margin-top: 50px;}
+        h2 {
+            font-size: 20pt;
+            text-align: left;
+            border-bottom: 2px solid #386682;
+            padding-bottom: 10px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            counter-reset: h3counter;
+        }
+        h2:before {
+            counter-increment: h2counter;
+            content: counter(h2counter) ". ";
+        }
+        h3 {
+            font-size: 16pt;
+            margin-top: 30px;
+        }
+        h3:before {
+            counter-increment: h3counter;
+            content: counter(h2counter) "." counter(h3counter) " ";
+        }
+        h4 { font-size: 12pt; margin-top: 20px;}
+        p, li { margin-bottom: 1em; }
+        ul { padding-left: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 10pt; }
+        th, td { border: 1px solid #cccccc; padding: 8px; text-align: left; vertical-align: top; }
+        th { background-color: #386682; color: white; font-weight: bold; }
+        .pricing-table td:nth-child(2), .pricing-table td:nth-child(3), .pricing-table td:nth-child(4) { text-align: right; }
+        .support-details-table td:nth-child(3), .support-details-table td:nth-child(4), .support-details-table td:nth-child(5) { text-align: center; }
+        .total-row td { font-weight: bold; }
+        img { max-width: 100%; height: auto; display: block; margin: 20px auto; }
+       .cover-title {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            font-size: 48pt;
+            font-weight: bold;
+            color: #386682;
+            line-height: 1.5;
+            margin-top: 80px;
+        }
+        .page-break { page-break-after: always; }
+        .toc {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .toc li {
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .toc-h2 {
+            font-weight: bold;
+        }
+        .toc-h3 {
+            padding-left: 20px;
+        }
+        .component-layout {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .component-layout.reverse {
+            flex-direction: row-reverse;
+        }
+        .image-container {
+            flex: 1;
+        }
+        .text-container {
+            flex: 2;
+        }
+        .text-container h3 {
+            margin-top: 0;
+        }
+
+        @media print {
+            body, .page { margin: 0; box-shadow: none; border: none; }
+            h2 { page-break-before: always; }
+            .cover-page, .toc-page { page-break-after: always; }
+            h2:first-of-type { page-break-before: auto; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page cover-page">
+        <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
+        
+        <div class="cover-title">
+            Budgetary CEL-FI<br>
+            {Solution}<br>
+            proposal<br>
+            for<br>
+            {Account}
+        </div>
+    </div>
+
+    <div class="page toc-page">
+        <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
+        <h2>CONTENTS</h2>
+        <ul class="toc">
+            <li class="toc-h2"><span>2 Introduction</span><span>3</span></li>
+            <li class="toc-h3"><span>2.1 About UCtel</span><span>3</span></li>
+            <li class="toc-h3"><span>2.2 Key Contacts</span><span>3</span></li>
+            <li class="toc-h3"><span>2.3 Confidentiality</span><span>3</span></li>
+            <li class="toc-h2"><span>3 Proposed Solution</span><span>4</span></li>
+            <li class="toc-h3"><span>3.1 CEL-FI</span><span>4</span></li>
+            <li class="toc-h3"><span>3.2 CEL-FI QUATRA 4000e</span><span>4</span></li>
+            <li class="toc-h3"><span>3.3 Donor Antenna</span><span>5</span></li>
+            <li class="toc-h3"><span>3.4 Network Unit</span><span>5</span></li>
+            <li class="toc-h3"><span>3.5 Coverage Unit</span><span>5</span></li>
+            <li class="toc-h3"><span>3.6 Server Antennas</span><span>6</span></li>
+            <li class="toc-h3"><span>3.7 Cabling</span><span>6</span></li>
+            <li class="toc-h3"><span>3.8 5G Ready DAS</span><span>6</span></li>
+            <li class="toc-h2"><span>4 Design and Installation Process</span><span>7</span></li>
+            <li class="toc-h3"><span>4.1 Site Survey</span><span>7</span></li>
+            <li class="toc-h3"><span>4.2 Report and Quotation</span><span>7</span></li>
+            <li class="toc-h3"><span>4.3 Project Coordination</span><span>7</span></li>
+            <li class="toc-h3"><span>4.4 Documentation</span><span>7</span></li>
+            <li class="toc-h2"><span>5 Proposed Pricing</span><span>8</span></li>
+            <li class="toc-h3"><span>5.1 Survey</span><span>8</span></li>
+            <li class="toc-h2"><span>6 CEL-FI Support Services</span><span>9</span></li>
+        </ul>
+        <div class="footer"><span>CEL-FI {Solution} solution proposal for {Account}</span><span>2</span></div>
+    </div>
+
+    <div class="page">
+        <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
+        <h2>Introduction</h2>
+        <p>{Account} are looking to install a mobile boosting system to improve indoor mobile coverage. Coverage is required over {NumberOfNetworks} of the UK Mobile Network Operators (MNOs) – EE, O2, Vodafone and Three (3). Based on the information provided, UCtel proposes the use of the CEL-FI {Solution} solution. This document sets out the details of the proposed solution, UCtel’s approach and budgetary pricing.</p>
+        <h3>About UCtel</h3>
+        <p>UCtel specialises in the design, installation and management of in-building mobile signal systems.</p>
+        <h4>Why UCtel:</h4>
+        <ul>
+            <li>We have been installing in building mobile signal systems since 2019 and have deployed over 300 systems in a wide range of buildings including private houses, offices, factories and hospitals</li>
+            <li>We only work with equipment that complies with Ofcom's UK Interface Requirement 2102</li>
+            <li>We have developed our own survey tools which are tailored to the specific requirements of in-building signal boosters. This allows us to see the important information about the signals that matter to ensure the best result from the installation.</li>
+            <li>We deploy 5G Stand Alone (Up to 4.0GHz) ready DAS solutions so that when 5G SA can be boosted, the DAS elements of the solution do not need to be upgraded.</li>
+            <li>We provide a range of tailored support packages from break/fix maintenance to fully managed systems with onsite engineering support.</li>
+        </ul>
+        <h3>Key Contacts</h3>
+        <table>
+            <tr><th>Name</th><th>Title</th><th>Contact Details</th></tr>
+            <tr><td>Ivor Nicholls</td><td>Sales Director</td><td>ivor.nicholls@uctel.co.uk</td></tr>
+            <tr><td>Ivan Romanov</td><td>Technical Director</td><td>ivan.romanov@uctel.co.uk</td></tr>
+        </table>
+        <h3>Confidentiality</h3>
+        <p>UCtel’s success in the IT marketplace is directly linked to the knowledge that we have and the best practices of innovation and creativity that we apply to our customer solutions. UCtel asks that you respect our intellectual property and consider the contents of this, and all other documents submitted by UCtel to be highly confidential.</p>
+        <div class="footer"><span>CEL-FI {Solution} solution proposal for {Account}</span><span>3</span></div>
+    </div>
+
+    <div class="page">
+        <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
+        <h2>Proposed Solution</h2>
+        <h3>CEL-FI</h3>
+        <p>UCtel proposes to deploy solutions from Nextivity. Nextivity manufactures the CEL-FI suite of cellular coverage solutions which are designed to optimise mobile signal coverage within buildings and vehicles. CEL-FI is unconditionally network safe, as it prevents interference with mobile operator networks and in the UK, CEL-FI products are licence-exempt and fully comply with Ofcom’s UK Interface requirement 2102 (IR2102).</p>
+        <h3>CEL-FI QUATRA 4000e</h3>
+        <p>CEL-FI QUATRA is a distributed antenna system (DAS) hybrid solution that combines the strength of passive and active DAS technologies to deliver high-quality mobile signal in buildings. CEL-FI QUATRA delivers a mobile signal that is up to 1000 times stronger than a pure analogue solution. Utilising CAT 5e/6 cabling for RF and power over ethernet, with no signal attenuation up to the transmitters within the perimeter of the building. The CEL-FI QUATRA solution consists of a donor antenna which is installed on the roof or outdoors where mobile signal is strongest, a network unit (NU) which amplifies and digitises the mobile signal and a network of coverage units (CU’s) which are connected to segments of passive DAS to distribute the signal around the building. The QUATRA 4000e boosts up to 4 network operators in a single system and complies with recent changes to Ofcom’s regulations in this regard.</p>
+        <p>The diagram below shows an example of the QUATRA 4000e architecture.</p>
+        <img src="/CostModel/images/quatra_diagram.png" alt="QUATRA 4000e Architecture Diagram">
+        <div class="footer"><span>CEL-FI {Solution} solution proposal for {Account}</span><span>4</span></div>
+    </div>
+
+    <div class="page">
+        <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
+        <div class="component-layout">
+            <div class="image-container">
+                <img src="/CostModel/images/donor_antenna.png" alt="Donor Antenna Example">
+            </div>
+            <div class="text-container">
+                <h3>Donor Antenna</h3>
+                <p>Donor antennas will be installed on the roof (or other suitable location) to obtain the best signal for boosting. The type of donor antenna will be selected during the site survey. The image shows an example of a roof installation. Low loss coaxial cables will be run from the donor antennas to the QUATRA Network Unit.</p>
+            </div>
+        </div>
+        <div class="component-layout reverse">
+            <div class="image-container">
+                <img src="/CostModel/images/network_unit.png" alt="QUATRA Network Unit">
+            </div>
+            <div class="text-container">
+                <h3>Network Unit</h3>
+                <p>CEL-FI QUATRA 4000e Network Units (NUs) will be installed in a suitable location and either wall or rack mounted. Typical locations are comms rooms or riser cupboard. Power will be required for the NU. An NU can support up to 6 CUs. A fibre hub can be added to expand the capacity to 12 CUs.</p>
+            </div>
+        </div>
+        <div class="component-layout">
+            <div class="image-container">
+                <img src="/CostModel/images/coverage_unit.png" alt="QUATRA Coverage Unit">
+            </div>
+            <div class="text-container">
+                <h3>Coverage Unit</h3>
+                <p>Coverage Units are installed on the wall or ceiling in each of the areas that require coverage. Two CAT6 cables connect each CU to the NU providing power over PoE. A server antenna or segments of passive DAS (coax based distributed antenna system) will be connected to each CU to distribute the signal across the required area.</p>
+            </div>
+        </div>
+        <div class="footer"><span>CEL-FI {Solution} solution proposal for {Account}</span><span>5</span></div>
+    </div>
+    
+    <div class="page">
+        <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
+        <div class="component-layout reverse">
+            <div class="image-container">
+                <img src="/CostModel/images/server_antennas.png" alt="Server Antenna Examples">
+            </div>
+            <div class="text-container">
+                <h3>Server Antennas</h3>
+                <p>Depending on the environment the appropriate type of antenna will be installed. There are a range of ceiling and panel omni antennas available and the most appropriate antenna will be recommended following the survey.</p>
+            </div>
+        </div>
+        <div class="component-layout">
+            <div class="image-container">
+                <img src="/CostModel/images/cabling_quatra.png" alt="Cabling types for QUATRA">
+            </div>
+            <div class="text-container">
+                <h3>Cabling</h3>
+                <p>Structured cabling will be used to connect active components together and coaxial cabling to connect antennas. Structured cabling carries digital signal and if necessary is amplified with range extenders. Coaxial cable carries analog signal and is low-loss to ensure the maximum signal is delivered to antennas. Some installations involve fibre optic cable to maximise the distance between NU and CU, but will require a dedicated power at the other end.</p>
+            </div>
+        </div>
+        <h3>5G Ready DAS</h3>
+        <p>All our DAS components, Donor Antennas, Server Antennas and Splitters support 5G in the 3500MHz - 3700MHz range (Band 78). Current Ofcom regulations do not allow these frequencies to be boosted, but the DAS elements will be capable of supporting this when it is available.</p>
+        <div class="footer"><span>CEL-FI {Solution} solution proposal for {Account}</span><span>6</span></div>
+    </div>
+
+    <div class="page">
+        <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
+        <h2>Design and Installation Process</h2>
+        <h3>Site Survey</h3>
+        <p>In order to validate the assumptions in this proposal, a site survey is required. The survey will determine:</p>
+        <ul>
+            <li>Signal strength and quality inside the building to identify where coverage is needed.</li>
+            <li>Potential locations to install the donor antennas. In these locations, measurements will be taken of the signal strength, quality and available frequency bands.</li>
+            <li>The type and quantity of donor antennas required</li>
+            <li>Cable routes from the donor antenna to the Network Unit(s)</li>
+            <li>Cable routes from the boosters to the server antennas and/or coverage units</li>
+            <li>Power locations and quantities</li>
+            <li>Other factors associated with the installation such as access equipment required, risks and working hours.</li>
+            <li>Final solution and price</li>
+        </ul>
+        <h3>Report and Quotation</h3>
+        <p>Following the survey, a report will be provided which will include the results of the signal survey as well as details of the solution and proposed equipment locations. A formal quotation will be provided for the installation of the solution.</p>
+        <h3>Project Coordination</h3>
+        <p>Once the order for the solution has been received, UCtel will introduce a project coordinator to manage the installation process. The project coordinator will be responsible for communicating dates, arranging any required risk assessments, method statements and permits and ensuring the smooth delivery of the project.</p>
+        <h3>Documentation</h3>
+        <p>Once the installation is complete, the project coordinator will produce the final as-built documentation and post installation survey document. A project completion sign off will be requested to confirm acceptance of the installation and that all deliverables have been completed.</p>
+        <div class="footer"><span>CEL-FI {Solution} solution proposal for {Account}</span><span>7</span></div>
+    </div>
+
+    <div class="page">
+        <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
+        <h2>Proposed Pricing</h2>
+        <p>The following table provides indicative figures for the proposed solution.</p>
+        <table class="pricing-table">
+            <thead><tr><th>Description</th><th>Qty</th><th>Unit Price</th><th>Total Price</th></tr></thead>
+            <tbody>
+                <tr><td>{Description1}</td><td>{Qty1}</td><td>{UnitPrice1}</td><td>{TotalPrice1}</td></tr>
+                <tr><td>{Description2}</td><td>{Qty2}</td><td>{UnitPrice2}</td><td>{TotalPrice2}</td></tr>
+                <tr><td>{Description3}</td><td>{Qty3}</td><td>{UnitPrice3}</td><td>{TotalPrice3}</td></tr>
+                <tr><td>{Description4}</td><td>{Qty4}</td><td>{UnitPrice4}</td><td>{TotalPrice4}</td></tr>
+                <tr class="total-row"><td colspan="3" style="text-align:right;">Total Price:</td><td>{TotalPrice}</td></tr>
+            </tbody>
+        </table>
+        <p>The following support options are available. Please see section 7 for more details.</p>
+        <table class="pricing-table">
+            <thead><tr><th>Support Option</th><th>Qty</th><th>Unit Price</th><th>Total Price</th></tr></thead>
+            <tbody>
+                <tr><td>{Support1}</td><td>{SupportQty1}</td><td>{SupportUnitPrice1}</td><td>{SupportTotalPrice1}</td></tr>
+                <tr><td>{Support2}</td><td>{SupportQty2}</td><td>{SupportUnitPrice2}</td><td>{SupportTotalPrice2}</td></tr>
+                <tr><td>{Support3}</td><td>{SupportQty3}</td><td>{SupportUnitPrice3}</td><td>{SupportTotalPrice3}</td></tr>
+            </tbody>
+        </table>
+        <p>All figures shown are exclusive of VAT.</p>
+        <p><b>Terms:</b> Cel-Fi equipment to be paid on order. Other elements to be invoiced on completion and paid within 30 days.</p>
+        <h3>Survey</h3>
+        <p>In order to validate the above estimate a site survey is required. The price for the survey and report is {SurveyPrice} + VAT.</p>
+        <div class="footer"><span>CEL-FI {Solution} solution proposal for {Account}</span><span>8</span></div>
+    </div>
+
+    <div class="page">
+        <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
+        <h2>CEL-FI Support Services</h2>
+        <p>The table below describes the available services that UCtel provides for the ongoing support of CEL-FI installations.</p>
+        <table class="support-details-table">
+            <thead>
+                <tr>
+                    <th>Included Services</th>
+                    <th>Description</th>
+                    <th>Bronze</th>
+                    <th>Silver</th>
+                    <th>Gold</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Health check</td><td>Scheduled on-site health check</td><td>O</td><td>O</td><td>O</td></tr>
+                <tr><td>Remote Monitoring</td><td>Alerts and events captured on the management portal</td><td>☐</td><td>✅</td><td>✅</td></tr>
+                <tr><td>Reactive Support</td><td>Customer identifies issue and reports to UCtel</td><td>✅</td><td>✅</td><td>✅</td></tr>
+                <tr><td>Proactive Alerting</td><td>Events and alerts received from management portal proactively investigated by UCtel</td><td>☐</td><td>✅</td><td>✅</td></tr>
+                <tr><td>Incident Management</td><td>Incident managed by UCtel via Email</td><td>✅</td><td>✅</td><td>✅</td></tr>
+                <tr><td>Change Management *</td><td>Remote changes (eg change in network operator where antenna does not need to be adjusted)</td><td>☐</td><td>✅</td><td>✅</td></tr>
+                <tr><td>On-site support</td><td>Engineer to site for equipment relocation or antenna repositioning</td><td>☐</td><td>☐</td><td>✅</td></tr>
+                <tr><td>Service Reports</td><td>Quarterly service reporting</td><td>☐</td><td>☐</td><td>O</td></tr>
+                <tr><td>Service Review Meetings</td><td>Quarterly service review meetings</td><td>☐</td><td>☐</td><td>O</td></tr>
+                <tr><td>Maintenance (Parts only)</td><td>Break/Fix maintenance - parts to site</td><td>✅</td><td>✅</td><td>☐</td></tr>
+                <tr><td>Maintenance (with engineer)</td><td>Break / fix maintenance with engineer to site</td><td>☐</td><td>☐</td><td>✅</td></tr>
+            </tbody>
+        </table>
+        <p>✅ - included in service O – optional ☐ - not included * Up to 4 changes per year per system</p>
+        <p><b>Notes:</b><br>
+        The services apply to remotely manageable CEL-FI products<br>
+        Management connectivity is included via cellular connections and does not need to run over customer infrastructure<br>
+        Proactive Alerting, Incident Management and Change Management operate in normal working hours unless agreed otherwise.<br>
+        Services are subject to UCtel’s standard Terms and Conditions.
+        </p>
+        <div class="footer"><span>CEL-FI {Solution} solution proposal for {Account}</span><span>9</span></div>
+    </div>
+</body>
+</html>
