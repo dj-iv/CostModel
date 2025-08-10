@@ -688,58 +688,103 @@ doc.render(templateData);
             }, 3000);
         }
     }
-
-    async function generateShareLink() {
-        // ... (function body)
-    }
-    
-    function loadStateFromURL() {
-        // ... (function body)
-    }
-    
-    initialize();
-});
-
-window.updateSellPriceDisplay = (key) => {
-    const costInput = document.getElementById(`cost-${key}`);
-    const marginInput = document.getElementById(`margin-${key}`);
-    const sellDisplay = document.getElementById(`sell-${key}`);
-    const cost = parseFloat(costInput.value) || 0;
-    const margin = parseFloat(marginInput.value) || 0;
-    const sellPrice = cost * (1 + margin / 100);
-    sellDisplay.textContent = `£${sellPrice.toFixed(2)}`;
-};
-// Trigger deployment - August 7, 2025
-// Paste this entire block at the end of calculator.js
+// Add this new library to the top of your calculator.js, after the other script includes.
+// This is not strictly necessary as it's loaded in index.html, but it's good practice to know what you're using.
+// Note: docx-preview.js is not needed, html2pdf.js handles the PDF creation.
 
 async function generatePdf() {
     const button = document.getElementById('generate-pdf-btn');
     const originalText = button.innerHTML;
-    if (!validateInputs(['customer-name', 'survey-price'])) return;
-    
+
+    // 1. Validate inputs (same as your generateDocument function)
+    if (!validateInputs(['customer-name', 'survey-price'])) {
+        return;
+    }
+
     button.innerHTML = 'Generating...';
     button.disabled = true;
 
     try {
-        // You will need to create an HTML template that mirrors your DOCX template's content and style.
-        const response = await fetch('templates/proposal_template.html');
-        if (!response.ok) throw new Error('Could not fetch the HTML template.');
-        let templateHtml = await response.text();
+        // --- This section is copied and adapted from your generateDocument function ---
+        const systemType = document.getElementById('system-type').value;
+        const templateMap = {
+            'G41': 'CEL-FI-GO-G41-Proposal-Template.docx',
+            'G43': 'CEL-FI-GO-G43-Proposal-Template.docx',
+            'QUATRA': 'CEL-FI-QUATRA-4000e-Proposal-Template.docx',
+            'QUATRA_DAS': 'CEL-FI-QUATRA-4000e-Proposal-Template.docx',
+            'QUATRA_EVO': 'CEL-FI-QUATRA-EVO-Proposal-Template.docx',
+            'QUATRA_EVO_DAS': 'CEL-FI-QUATRA-EVO-Proposal-Template.docx'
+        };
+        const templateFilename = templateMap[systemType];
+        if (!templateFilename) {
+            throw new Error(`No template found for system type: ${systemType}`);
+        }
 
-        const data = getTemplateData(); // Uses the new helper function
+        const response = await fetch(`templates/${templateFilename}`);
+        if (!response.ok) {
+            throw new Error(`Could not fetch template: ${response.statusText}`);
+        }
+        const content = await response.arrayBuffer();
         
-        // Replace placeholders in the HTML
+        // Use Docxtemplater to create the filled DOCX file in memory (as a blob)
+        // This reuses the exact same logic and data as your DOCX generation.
+        const zip = new PizZip(content);
+        const doc = new docxtemplater(zip, {
+            paragraphLoop: true,
+            linebreaks: true,
+        });
+
+        // The data gathering logic can be extracted into a separate function to avoid repetition
+        const templateData = getTemplateData(); // We will create this helper function
+        doc.render(templateData);
+
+        const out = doc.getZip().generate({
+            type: "blob",
+            mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        });
+        // --- End of adapted section ---
+
+        // 2. Render the generated DOCX to the hidden container
+        // Note: For client-side rendering, we need a library like docx-preview. 
+        // A simpler alternative is using an API, but let's try a pure client-side method first.
+        // The most direct way without another library is to use an external API or the server-side method.
+
+        // Given the complexity of direct browser DOCX-to-HTML rendering, let's pivot slightly.
+        // We will send the generated blob to an API that converts it and returns a PDF.
+        // A library like PDFTron WebViewer can do this purely client-side but is a paid product.
+        
+        // Let's reconsider the simplest path. The html2pdf.js library you added is for HTML -> PDF.
+        // Your old generatePdf function was on the right track by using an HTML template.
+        // Let's create an HTML version of your proposal and use that.
+        
+        // Since you already have the DOCX generation, the most consistent UX
+        // is to let the user download the DOCX and instruct them to "Save as PDF".
+        // A true DOCX -> PDF in-browser converter without a server or paid library is complex.
+
+        // **Revised Recommendation:**
+        // The simplest, most reliable solution without adding a server is to
+        // make the 'Generate PDF' button simply a 'Generate Document' button
+        // and instruct users to save it as a PDF themselves.
+        
+        // However, if you really want the PDF button to work directly, let's complete the
+        // HTML template approach from your original code.
+        
+        const htmlTemplateResponse = await fetch('templates/proposal_template.html'); // You need to create this HTML template
+        if (!htmlTemplateResponse.ok) throw new Error('Could not fetch the HTML template.');
+        let templateHtml = await htmlTemplateResponse.text();
+        
+        const data = getTemplateData();
         for (const key in data) {
             const regex = new RegExp(`{${key}}`, 'g');
-            templateHtml = templateHtml.replace(regex, data[key] || '');
+            templateHtml = templateHtml.replace(regex, data[key] || ''); // Ensure undefined values don't break it
         }
-        
+
         const element = document.createElement('div');
         element.innerHTML = templateHtml;
 
         const customerName = document.getElementById('customer-name').value || 'Proposal';
         const filename = `${customerName.replace(/ /g, '_')}_Proposal.pdf`;
-        
+
         const opt = {
           margin:       0.5,
           filename:     filename,
@@ -748,9 +793,11 @@ async function generatePdf() {
           jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
         };
 
+        // Use html2pdf to generate the PDF from the filled HTML template
         await html2pdf().from(element).set(opt).save();
         
         button.innerHTML = 'PDF Downloaded! ✅';
+
 
     } catch (error) {
         console.error('Error generating PDF:', error);
@@ -760,10 +807,11 @@ async function generatePdf() {
         setTimeout(() => {
             button.innerHTML = originalText;
             button.disabled = false;
-        }, 1000);
+        }, 3000);
     }
 }
 
+// Create this new helper function in calculator.js to avoid repeating code
 function getTemplateData() {
     // --- This is the data gathering logic from your generateDocument function ---
     let totalHardwareSellPrice = 0, totalHardwareUnits = 0;
@@ -831,3 +879,26 @@ function getTemplateData() {
         SupportTotalPrice3: `£${goldCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
     };
 }
+
+
+    async function generateShareLink() {
+        // ... (function body)
+    }
+    
+    function loadStateFromURL() {
+        // ... (function body)
+    }
+    
+    initialize();
+});
+
+window.updateSellPriceDisplay = (key) => {
+    const costInput = document.getElementById(`cost-${key}`);
+    const marginInput = document.getElementById(`margin-${key}`);
+    const sellDisplay = document.getElementById(`sell-${key}`);
+    const cost = parseFloat(costInput.value) || 0;
+    const margin = parseFloat(marginInput.value) || 0;
+    const sellPrice = cost * (1 + margin / 100);
+    sellDisplay.textContent = `£${sellPrice.toFixed(2)}`;
+};
+// Trigger deployment - August 7, 2025
