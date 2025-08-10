@@ -687,6 +687,67 @@ const doc = new docxtemplater(zip);
             }, 3000);
         }
     }
+    // Helper function to gather all data for templates
+function getTemplateData() {
+    // Calculate hardware totals for support calcs
+    let totalHardwareSellPrice = 0, totalHardwareUnits = 0;
+    const hardwareKeys = ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB'];
+    hardwareKeys.forEach(key => {
+        if (currentResults[key]) {
+            const quantity = currentResults[key].override ?? currentResults[key].calculated;
+            if (quantity > 0) {
+                totalHardwareUnits += quantity;
+                totalHardwareSellPrice += quantity * priceData[key].cost * (1 + priceData[key].margin);
+            }
+        }
+    });
+
+    // Determine selected support tier and its cost
+    let selectedSupportTier = 'none';
+    let selectedSupportName = "Please see the support options below";
+    const activeButton = document.querySelector('.support-presets-main button.active-preset');
+    if (activeButton && activeButton.id !== 'support-preset-none') {
+        selectedSupportTier = activeButton.id.replace('support-preset-', '');
+        selectedSupportName = selectedSupportTier.charAt(0).toUpperCase() + selectedSupportTier.slice(1);
+    }
+    const selectedSupportCost = getSpecificSupportCost(selectedSupportTier, totalHardwareUnits, totalHardwareSellPrice);
+    const professionalServicesCost = (subTotalsForProposal.services?.sell || 0) - selectedSupportCost;
+    
+    // Get other details
+    const systemTypeSelect = document.getElementById('system-type');
+    const solutionName = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
+    
+    // Return final data object matching placeholders
+    return {
+        Account: document.getElementById('customer-name').value,
+        Solution: solutionName,
+        NumberOfNetworks: document.getElementById('number-of-networks').value,
+        SurveyPrice: `£${(parseFloat(document.getElementById('survey-price').value) || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        Description1: "CEL-FI Hardware", Qty1: "1",
+        UnitPrice1: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        TotalPrice1: `£${(subTotalsForProposal.hardware?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        Description2: "Antennas, cables and connectors", Qty2: "1",
+        UnitPrice2: `£${(subTotalsForProposal.consumables?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        TotalPrice2: `£${(subTotalsForProposal.consumables?.sell || 0).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        Description3: "Professional Services", Qty3: "1",
+        UnitPrice3: `£${professionalServicesCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        TotalPrice3: `£${professionalServicesCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        Description4: selectedSupportName,
+        Qty4: selectedSupportTier !== 'none' ? "1" : "",
+        UnitPrice4: selectedSupportTier !== 'none' ? `£${selectedSupportCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : "",
+        TotalPrice4: selectedSupportTier !== 'none' ? `£${selectedSupportCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : "",
+        TotalPrice: `£${((subTotalsForProposal.hardware?.sell || 0) + (subTotalsForProposal.consumables?.sell || 0) + (subTotalsForProposal.services?.sell || 0)).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        Support1: "Bronze", SupportQty1: "1",
+        SupportUnitPrice1: `£${getSpecificSupportCost('bronze', totalHardwareUnits, totalHardwareSellPrice).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        SupportTotalPrice1: `£${getSpecificSupportCost('bronze', totalHardwareUnits, totalHardwareSellPrice).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        Support2: "Silver", SupportQty2: "1",
+        SupportUnitPrice2: `£${getSpecificSupportCost('silver', totalHardwareUnits, totalHardwareSellPrice).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        SupportTotalPrice2: `£${getSpecificSupportCost('silver', totalHardwareUnits, totalHardwareSellPrice).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        Support3: "Gold", SupportQty3: "1",
+        SupportUnitPrice3: `£${getSpecificSupportCost('gold', totalHardwareUnits, totalHardwareSellPrice).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+        SupportTotalPrice3: `£${getSpecificSupportCost('gold', totalHardwareUnits, totalHardwareSellPrice).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
+    };
+}
 async function generatePdf() {
     const button = document.getElementById('generate-pdf-btn');
     const originalText = button.innerHTML;
