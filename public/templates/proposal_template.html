@@ -110,6 +110,24 @@
         .toc-h3 {
             padding-left: 20px;
         }
+        .component-layout {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .component-layout.reverse {
+            flex-direction: row-reverse;
+        }
+        .image-container {
+            flex: 1;
+        }
+        .text-container {
+            flex: 2;
+        }
+        .text-container h3 {
+            margin-top: 0;
+        }
 
         @media print {
             body, .page { margin: 0; box-shadow: none; border: none; }
@@ -206,23 +224,47 @@
     <div class="page">
         <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
         <h2>Solution Components</h2>
-        <h3>Donor Antenna</h3>
-        <img src="/CostModel/images/donor_antenna.png" alt="Donor Antenna Example">
-        <p>One or more donor antennas will be installed on the roof (or other suitable location) to obtain the best signal for boosting. The type of donor antenna will be selected during the site survey. The image shows an example of a roof installation. Low loss coaxial cables will be run from the donor antennas to the boosters.</p>
-        <h3>G41 Booster</h3>
-        <img src="/CostModel/images/g41_boosters.png" alt="G41 Booster Units">
-        <p>CEL-FI Go G41 booster(s) will be installed in a suitable location and either wall or rack-mounted. Typical locations are comms rooms or riser cupboards. Power will be required for the booster(s) and management router if remote management is required.</p>
-        <h3>Server Antennas</h3>
-        <img src="/CostModel/images/server_antennas.png" alt="Server Antenna Examples">
-        <p>Depending on the environment the appropriate type of antenna will be installed. There are a range of ceiling and panel omni antennas available and the most appropriate antenna will be recommended following the survey.</p>
+        <div class="component-layout">
+            <div class="image-container">
+                <img src="/CostModel/images/donor_antenna.png" alt="Donor Antenna Example">
+            </div>
+            <div class="text-container">
+                <h3>Donor Antenna</h3>
+                <p>One or more donor antennas will be installed on the roof (or other suitable location) to obtain the best signal for boosting. The type of donor antenna will be selected during the site survey. The image shows an example of a roof installation. Low loss coaxial cables will be run from the donor antennas to the boosters.</p>
+            </div>
+        </div>
+        <div class="component-layout reverse">
+            <div class="image-container">
+                <img src="/CostModel/images/g41_boosters.png" alt="G41 Booster Units">
+            </div>
+            <div class="text-container">
+                <h3>G41 Booster</h3>
+                <p>CEL-FI Go G41 booster(s) will be installed in a suitable location and either wall or rack-mounted. Typical locations are comms rooms or riser cupboards. Power will be required for the booster(s) and management router if remote management is required.</p>
+            </div>
+        </div>
+        <div class="component-layout">
+            <div class="image-container">
+                <img src="/CostModel/images/server_antennas.png" alt="Server Antenna Examples">
+            </div>
+            <div class="text-container">
+                <h3>Server Antennas</h3>
+                <p>Depending on the environment the appropriate type of antenna will be installed. There are a range of ceiling and panel omni antennas available and the most appropriate antenna will be recommended following the survey.</p>
+            </div>
+        </div>
         <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>5</span></div>
     </div>
 
     <div class="page">
         <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
-        <h3>Cabling</h3>
-        <img src="/CostModel/images/cabling.png" alt="Coaxial Cable">
-        <p>Coaxial cable carries the analogue signal and is low-loss to ensure the maximum signal is delivered to antennas.</p>
+        <div class="component-layout reverse">
+             <div class="image-container">
+                <img src="/CostModel/images/cabling.png" alt="Coaxial Cable">
+            </div>
+            <div class="text-container">
+                <h3>Cabling</h3>
+                <p>Coaxial cable carries the analogue signal and is low-loss to ensure the maximum signal is delivered to antennas.</p>
+            </div>
+        </div>
         <h3>5G Ready DAS</h3>
         <p>All our DAS components, Donor Antennas, Server Antennas and Splitters support 5G in the 3500MHz - 3700MHz range (Band 78). Current Ofcom regulations do not allow these frequencies to be boosted, but the DAS elements will be capable of supporting this when it is available.</p>
         <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>6</span></div>
