@@ -51,16 +51,14 @@
         }
         h1 { font-size: 28pt; text-align: center; margin-top: 50px;}
         h2 {
-    font-size: 20pt;
-    text-align: left;
-    border-bottom: 2px solid #386682;
-    padding-bottom: 10px;
-    margin-top: 40px;
-    margin-bottom: 20px;
-    counter-reset: h3counter;
-    color: #386682;
-    page-break-before: always; /* Add this line */
-}
+            font-size: 20pt;
+            text-align: left;
+            border-bottom: 2px solid #386682;
+            padding-bottom: 10px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            counter-reset: h3counter;
+        }
         h2:before {
             counter-increment: h2counter;
             content: counter(h2counter) ". ";
@@ -83,14 +81,18 @@
         .support-details-table td:nth-child(3), .support-details-table td:nth-child(4), .support-details-table td:nth-child(5) { text-align: center; }
         .total-row td { font-weight: bold; }
         img { max-width: 100%; height: auto; display: block; margin: 20px auto; }
+        .cover-logo {
+            width: 300px;
+            margin: 40px auto 20px;
+        }
        .cover-title {
             text-align: center;
             font-family: Arial, sans-serif;
             font-size: 48pt;
             font-weight: bold;
-            color: #386682; /* Your company color */
+            color: #386682;
             line-height: 1.5;
-            margin-top: 80px;
+            margin-top: 20px;
         }
         .page-break { page-break-after: always; }
         .toc {
@@ -111,14 +113,16 @@
 
         @media print {
             body, .page { margin: 0; box-shadow: none; border: none; }
+            h2 { page-break-before: always; }
+            .cover-page, .toc-page { page-break-after: always; }
+            h2:first-of-type { page-break-before: auto; }
         }
     </style>
 </head>
 <body>
-    <div class="page">
-        <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
+    <div class="page cover-page">
+        <img class="cover-logo" src="/CostModel/images/uctel_logo.png" alt="UCtel Logo">
         
-        <!-- COVER PAGE -->
         <div class="cover-title">
             Budgetary CEL-FI<br>
             {Solution}<br>
@@ -126,9 +130,9 @@
             for<br>
             {Account}
         </div>
-        <div class="page-break"></div>
+    </div>
 
-        <!-- TABLE OF CONTENTS -->
+    <div class="page toc-page">
         <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
         <h2>CONTENTS</h2>
         <ul class="toc">
@@ -155,9 +159,9 @@
             <li class="toc-h2"><span>7 CEL-FI Support Services</span><span>9</span></li>
         </ul>
         <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>2</span></div>
-        <div class="page-break"></div>
+    </div>
 
-        <!-- INTRODUCTION -->
+    <div class="page">
         <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
         <h2>Introduction</h2>
         <p>{Account} are looking to install a mobile boosting system to improve indoor mobile coverage. Coverage is required over {NumberOfNetworks} of the UK Mobile Network Operators (MNOs) – EE, O2, Vodafone and Three (3). Based on the information provided, UCtel proposes the use of the CEL-FI {Solution} solution. This document sets out the details of the proposed solution, UCtel’s approach and budgetary pricing.</p>
@@ -180,9 +184,9 @@
         <h3>Confidentiality</h3>
         <p>UCtel’s success in the IT marketplace is directly linked to the knowledge that we have and the best practices of innovation and creativity that we apply to our customer solutions. UCtel asks that you respect our intellectual property and consider the contents of this, and all other documents submitted by UCtel to be highly confidential.</p>
         <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>3</span></div>
-        <div class="page-break"></div>
+    </div>
 
-        <!-- PROPOSED SOLUTION -->
+    <div class="page">
         <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
         <h2>Proposed Solution</h2>
         <h3>CEL-FI</h3>
@@ -197,9 +201,9 @@
         </ul>
         <img src="/CostModel/images/g41_diagrams.png" alt="G41 Installation Diagrams">
         <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>4</span></div>
-        <div class="page-break"></div>
+    </div>
 
-        <!-- SOLUTION COMPONENTS -->
+    <div class="page">
         <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
         <h2>Solution Components</h2>
         <h3>Donor Antenna</h3>
@@ -212,8 +216,9 @@
         <img src="/CostModel/images/server_antennas.png" alt="Server Antenna Examples">
         <p>Depending on the environment the appropriate type of antenna will be installed. There are a range of ceiling and panel omni antennas available and the most appropriate antenna will be recommended following the survey.</p>
         <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>5</span></div>
-        <div class="page-break"></div>
+    </div>
 
+    <div class="page">
         <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
         <h3>Cabling</h3>
         <img src="/CostModel/images/cabling.png" alt="Coaxial Cable">
@@ -221,9 +226,9 @@
         <h3>5G Ready DAS</h3>
         <p>All our DAS components, Donor Antennas, Server Antennas and Splitters support 5G in the 3500MHz - 3700MHz range (Band 78). Current Ofcom regulations do not allow these frequencies to be boosted, but the DAS elements will be capable of supporting this when it is available.</p>
         <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>6</span></div>
-        <div class="page-break"></div>
-        
-        <!-- DESIGN & INSTALLATION -->
+    </div>
+    
+    <div class="page">
         <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
         <h2>Design and Installation Process</h2>
         <h3>Site Survey</h3>
@@ -245,9 +250,9 @@
         <h3>Documentation</h3>
         <p>Once the installation is complete, the project coordinator will produce the final as-built documentation and post installation survey document. A project completion sign off will be requested to confirm acceptance of the installation and that all deliverables have been completed.</p>
         <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>7</span></div>
-        <div class="page-break"></div>
+    </div>
 
-        <!-- PRICING -->
+    <div class="page">
         <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
         <h2>Proposed Pricing</h2>
         <p>The following table provides indicative figures for the proposed solution.</p>
@@ -275,9 +280,9 @@
         <h3>Survey</h3>
         <p>In order to validate the above estimate a site survey is required. The price for the survey and report is {SurveyPrice} + VAT.</p>
         <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>8</span></div>
-        <div class="page-break"></div>
+    </div>
 
-        <!-- SUPPORT SERVICES -->
+    <div class="page">
         <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
         <h2>CEL-FI Support Services</h2>
         <p>The table below describes the available services that UCtel provides for the ongoing support of CEL-FI installations.</p>
