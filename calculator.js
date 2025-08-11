@@ -800,14 +800,17 @@ async function generatePdf() {
             templateHtml = templateHtml.replace(regex, data[key]);
         }
 
-        templateHtml = templateHtml.replace(/£/g, '&pound;');
+        // ---- FINAL FIX: Replace the invisible non-breaking space characters ----
+        templateHtml = templateHtml.replace(/ /g, ' ');
 
+        // We can now remove the previous attempts as they are no longer needed, but keeping them is harmless.
+        templateHtml = templateHtml.replace(/£/g, '&pound;');
         const emojiRegex = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g;
         templateHtml = templateHtml.replace(emojiRegex, '');
         
-        // ---- DEBUGGING LINES ADDED HERE ----
-        console.log("--- DEBUG: HTML Content for PDF Generation ---");
-        console.log(templateHtml);
+        // Remove the console log now that we're done debugging
+        // console.log("--- DEBUG: HTML Content for PDF Generation ---");
+        // console.log(templateHtml);
         
         const filename = generateFilename() + '.pdf';
         const opt = {
