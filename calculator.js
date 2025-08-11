@@ -401,6 +401,28 @@ document.addEventListener('DOMContentLoaded', () => {
         const maintenanceCost = totalHardwareSellPrice * (maintenancePercent / 100);
         return perSystemCost + fixedAnnualCost + maintenanceCost;
     }
+    function generateFilename() {
+    const systemTypeSelect = document.getElementById('system-type');
+    const solutionName = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
+    const networks = document.getElementById('number-of-networks').value;
+    const customerName = document.getElementById('customer-name').value || 'Customer';
+
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = now.toLocaleString('en-GB', { month: 'short' });
+    const year = now.getFullYear();
+    let hours = now.getHours();
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    const strHours = String(hours).padStart(2, '0');
+    
+    // Format: UCtel_Proposal_SOLUTION_#_Networks_for_CUSTOMER_DDMonYYYY_hh mmAMPM
+    const dateString = `${day}${month}${year}_${strHours} ${minutes}${ampm}`;
+    
+    return `UCtel_Proposal_${solutionName}_${networks}_Networks_for_${customerName}_${dateString}`;
+}
 async function generateDocument() {
     const button = document.getElementById('generate-document-btn');
     const originalText = button.innerHTML;
@@ -514,8 +536,7 @@ const doc = new docxtemplater(zip);
 
         const out = doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
         
-        const customerName = document.getElementById('customer-name').value || 'Proposal';
-        const filename = `${customerName.replace(/ /g, '_')}_Proposal.docx`;
+      const filename = generateFilename() + '.docx';
         const link = document.createElement('a');
         link.href = URL.createObjectURL(out);
         link.download = filename;
@@ -786,8 +807,9 @@ async function generatePdf() {
             templateHtml = templateHtml.replace(regex, data[key]);
         }
         
-        const newTab = window.open();
-        newTab.document.open();
+       const newTab = window.open();
+newTab.document.title = generateFilename(); // Add this line
+newTab.document.open();
         newTab.document.write(templateHtml);
         newTab.document.close();
         
