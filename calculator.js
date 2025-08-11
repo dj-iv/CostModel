@@ -897,10 +897,10 @@ async function generateShareLink() {
             }
         }
 
-        // 3. Compress and encode the state into a URL-safe string
+        // 3. Compress and encode the state using a more robust method
         const jsonString = JSON.stringify(state);
-        const compressed = pako.deflate(jsonString, { to: 'string' });
-        const encodedState = btoa(compressed);
+        const compressed = pako.deflate(jsonString); // Produces a Uint8Array
+        const encodedState = btoa(String.fromCharCode.apply(null, compressed));
 
         // 4. Create the final shareable URL
         const shareUrl = `${window.location.origin}${window.location.pathname}#${encodedState}`;
@@ -918,7 +918,6 @@ async function generateShareLink() {
         }, 3000);
     }
 }
-    
 
 
 function loadStateFromURL() {
@@ -928,8 +927,12 @@ function loadStateFromURL() {
         const encodedState = window.location.hash.substring(1);
         if (!encodedState) return false;
 
-        // 1. Decode and decompress the state from the URL
-        const compressed = atob(encodedState);
+        // 1. Decode and decompress using a more robust method
+        const compressedString = atob(encodedState);
+        const compressed = new Uint8Array(compressedString.length);
+        for (let i = 0; i < compressedString.length; i++) {
+            compressed[i] = compressedString.charCodeAt(i);
+        }
         const jsonString = pako.inflate(compressed, { to: 'string' });
         const state = JSON.parse(jsonString);
 
