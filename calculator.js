@@ -900,7 +900,13 @@ async function generateShareLink() {
         // 3. Compress and encode the state using a more robust method
         const jsonString = JSON.stringify(state);
         const compressed = pako.deflate(jsonString); // Produces a Uint8Array
-        const encodedState = btoa(String.fromCharCode.apply(null, compressed));
+        
+        // This is the updated, safer way to convert the data for encoding
+        let compressedString = '';
+        compressed.forEach((byte) => {
+            compressedString += String.fromCharCode(byte);
+        });
+        const encodedState = btoa(compressedString);
 
         // 4. Create the final shareable URL
         const shareUrl = `${window.location.origin}${window.location.pathname}#${encodedState}`;
@@ -908,7 +914,7 @@ async function generateShareLink() {
         // 5. Copy the URL to the clipboard and update the button
         await navigator.clipboard.writeText(shareUrl);
         button.innerHTML = 'Link Copied! ✅';
-
+        
     } catch (error) {
         console.error("Failed to generate share link:", error);
         button.innerHTML = 'Failed! ❌';
