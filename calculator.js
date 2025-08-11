@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- MAKE.COM WEBHOOK ---
     const MAKE_WEBHOOK_URL = 'https://hook.eu1.make.com/chemsqrmifjs5lwbrquhh1bha0vo96k2';
+    const PDF_MAKE_WEBHOOK_URL = 'https://hook.eu1.make.com/cfde3avwbdpr5y131ffkle13z40haem3'; 
 
     // --- DATA ---
     const coverageData = {
