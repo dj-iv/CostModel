@@ -563,7 +563,7 @@ const doc = new docxtemplater(zip);
         });
         document.getElementById('generate-pdf-btn').addEventListener('click', generatePdf);
         document.getElementById('generate-document-btn').addEventListener('click', generateDocument);
-        document.getElementById('send-to-make-btn').addEventListener('click', () => sendDataToMake('proposal'));
+        // document.getElementById('send-to-make-btn').addEventListener('click', () => sendDataToMake('proposal'));
         document.getElementById('quote-to-monday-btn').addEventListener('click', () => sendDataToMake('quote'));
         document.getElementById('generate-link-btn').addEventListener('click', generateShareLink);
         document.getElementById('support-preset-none').addEventListener('click', () => setSupportPreset('none'));
