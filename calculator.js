@@ -858,9 +858,70 @@ async function generatePdf() {
         }, 3000);
     }
 }
-    async function generateShareLink() {
-        // ... (function body)
+   // --- Find this function ---
+async function generateShareLink() {
+    // ... (function body)
+}
+
+// --- And replace it with this ---
+async function generateShareLink() {
+    const button = document.getElementById('generate-link-btn');
+    const originalText = button.innerHTML;
+
+    try {
+        // 1. Gather all input values into a state object
+        const state = {
+            inputs: {
+                'customer-name': document.getElementById('customer-name').value,
+                'survey-price': document.getElementById('survey-price').value,
+                'quote-number': document.getElementById('quote-number').value,
+                'floor-area': document.getElementById('floor-area').value,
+                'number-of-floors': document.getElementById('number-of-floors').value,
+                'unit-switch': document.querySelector('input[name="unit-switch"]:checked').value,
+                'band-switch': document.querySelector('input[name="band-switch"]:checked').value,
+                'percent-open': document.getElementById('percent-open').value,
+                'percent-cubical': document.getElementById('percent-cubical').value,
+                'percent-hollow': document.getElementById('percent-hollow').value,
+                'percent-solid': document.getElementById('percent-solid').value,
+                'high-ceiling-warehouse': document.getElementById('high-ceiling-warehouse').checked,
+                'system-type': document.getElementById('system-type').value,
+                'number-of-networks': document.getElementById('number-of-networks').value,
+                'max-antennas': document.getElementById('max-antennas').value,
+                'no-hardware-checkbox': document.getElementById('no-hardware-checkbox').checked,
+                'referral-fee-percent': document.getElementById('referral-fee-percent').value,
+                'maintenance-percent': document.getElementById('maintenance-percent').value,
+            },
+            overrides: {}
+        };
+
+        // 2. Gather all quantity overrides
+        for (const key in currentResults) {
+            if (currentResults[key].override !== null) {
+                state.overrides[key] = currentResults[key].override;
+            }
+        }
+
+        // 3. Compress and encode the state into a URL-safe string
+        const jsonString = JSON.stringify(state);
+        const compressed = pako.deflate(jsonString, { to: 'string' });
+        const encodedState = btoa(compressed);
+
+        // 4. Create the final shareable URL
+        const shareUrl = `${window.location.origin}${window.location.pathname}#${encodedState}`;
+
+        // 5. Copy the URL to the clipboard and update the button
+        await navigator.clipboard.writeText(shareUrl);
+        button.innerHTML = 'Link Copied! ✅';
+
+    } catch (error) {
+        console.error("Failed to generate share link:", error);
+        button.innerHTML = 'Failed! ❌';
+    } finally {
+        setTimeout(() => {
+            button.innerHTML = originalText;
+        }, 3000);
     }
+}
     
     function loadStateFromURL() {
         // ... (function body)
