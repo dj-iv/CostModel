@@ -401,7 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const maintenanceCost = totalHardwareSellPrice * (maintenancePercent / 100);
         return perSystemCost + fixedAnnualCost + maintenanceCost;
     }
-    function generateFilename() {
+   function generateFilename() {
     const systemTypeSelect = document.getElementById('system-type');
     const solutionName = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
     const networks = document.getElementById('number-of-networks').value;
@@ -411,17 +411,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const day = String(now.getDate()).padStart(2, '0');
     const month = now.toLocaleString('en-GB', { month: 'short' });
     const year = now.getFullYear();
-    let hours = now.getHours();
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
-    hours = hours ? hours : 12; // the hour '0' should be '12'
-    const strHours = String(hours).padStart(2, '0');
     
-    // Format: UCtel_Proposal_SOLUTION_#_Networks_for_CUSTOMER_DDMonYYYY_hh mmAMPM
-    const dateString = `${day}${month}${year}_${strHours} ${minutes}${ampm}`;
+    // Format: UCtel_Proposal_SOLUTION_#_Networks_for_CUSTOMER_DDMonYYYY
+    const dateString = `${day}${month}${year}`;
     
     return `UCtel_Proposal_${solutionName}_${networks}_Networks_for_${customerName}_${dateString}`;
+}
 }
 async function generateDocument() {
     const button = document.getElementById('generate-document-btn');
