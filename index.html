@@ -297,33 +297,39 @@
 <body>
     <button id="view-toggle-btn">Switch to Simple View</button>
 
-   <div class="calculator-container" id="main-container">
-    <div class="results-header">
-      <div class="header-buttons">
-        <button id="generate-pdf-btn">Proposal PDF 📄</button>
-        <button id="generate-document-btn">Proposal DOC 📄</button>
-        <button id="quote-to-monday-btn">Quote to Monday</button>
-        <button id="generate-link-btn">Generate Link 🔗</button>
-        <button id="toggle-zero-qty-btn">Show All Items</button>
-        <button id="settings-btn">Settings ⚙️</button>
-        <button id="reset-overrides">Reset Overrides</button>
-      </div>
-    </div>
-
-    <h1>Universal System Calculator</h1>
-
-    <div class="section" id="proposal-details-section">
+    <div class="calculator-container" id="main-container">
+        
+        <div class="results-header">
+            <div class="header-buttons">
+                <button id="generate-pdf-btn">Proposal PDF 📄</button>
+                <button id="generate-document-btn">Proposal DOC 📄</button>
+                <button id="quote-to-monday-btn">Quote to Monday</button>
+                <button id="generate-link-btn">Generate Link 🔗</button>
+                <button id="toggle-zero-qty-btn">Show All Items</button>
+                <button id="settings-btn">Settings ⚙️</button>
+                <button id="reset-overrides">Reset Overrides</button>
+            </div>
         </div>
 
-    <div class="section" id="results-section">
-        <div class="financial-summary">
+        <h1>Universal System Calculator</h1>
+
+        <div class="section" id="proposal-details-section">
+            <h2>Proposal Details</h2>
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="customer-name">Customer Name</label>
+                    <input type="text" id="customer-name" placeholder="e.g., One Globe Square">
+                </div>
+                <div class="input-group">
+                    <label for="survey-price">Survey Price (£)</label>
+                    <input type="number" id="survey-price" placeholder="e.g., 1200" value="" step="100">
+                </div>
+                 <div class="input-group">
+                    <label for="quote-number">Quote Number</label>
+                    <input type="text" id="quote-number" placeholder="e.g., Q-12345">
+                </div>
             </div>
-        <table class="results-table">
-            <thead id="results-thead"></thead>
-            <tbody id="results-tbody"></tbody>
-        </table>
-    </div>
-</div>
+        </div>
 
         <div class="section" id="antenna-section">
             <h2>Antenna Calculator</h2>
@@ -457,17 +463,6 @@
                     <div class="fee-amount" id="referral-fee-amount">£0.00</div>
                 </div>
             </div>
-            <div class="results-header">
-          <div class="header-buttons">
-    <button id="generate-pdf-btn">Proposal PDF 📄</button>
-    <button id="generate-document-btn">Proposal DOC 📄</button>
-    <button id="quote-to-monday-btn">Quote to Monday</button>
-    <button id="generate-link-btn">Generate Link 🔗</button>
-    <button id="toggle-zero-qty-btn">Show All Items</button>
-    <button id="settings-btn">Settings ⚙️</button>
-    <button id="reset-overrides">Reset Overrides</button>
-</div>
-            </div>
             
             <table class="results-table">
                 <thead id="results-thead"></thead>
@@ -518,5 +513,6 @@
 <script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.5/dist/pizzip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.47.1/docxtemplater.js"></script>
 <script type="module" src="./calculator.js"></script>
+
 </body>
 </html>
