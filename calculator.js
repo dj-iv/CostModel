@@ -800,12 +800,7 @@ async function generatePdf() {
             templateHtml = templateHtml.replace(regex, data[key]);
         }
 
-        // --- THE DEFINITIVE FIX ---
-        // This regex finds and removes the CSS rules for h2:before and h3:before that cause the crash.
-        const counterRegex = /(h2:before|h3:before)\s*\{[^}]*}/g;
-        templateHtml = templateHtml.replace(counterRegex, '');
-
-        // Also, replace non-breaking spaces, which can also cause issues.
+        // Replace non-breaking spaces, as this is still good practice.
         templateHtml = templateHtml.replace(/ /g, ' ');
         
         const filename = generateFilename() + '.pdf';
