@@ -801,9 +801,11 @@ async function generatePdf() {
             templateHtml = templateHtml.replace(regex, data[key]);
         }
         
-        // --- Reverted logic to open in a new tab ---
+        // --- NEW FIX: Replace the title within the HTML string itself ---
+        const filename = generateFilename();
+        templateHtml = templateHtml.replace(/<title>.*<\/title>/, `<title>${filename}</title>`);
+        
         const newTab = window.open();
-        newTab.document.title = generateFilename(); // This sets the correct filename for printing
         newTab.document.open();
         newTab.document.write(templateHtml);
         newTab.document.close();
