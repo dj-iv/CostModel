@@ -795,24 +795,18 @@ async function generatePdf() {
 
         const data = getTemplateData();
         
+        // Replace placeholders in the HTML
         for (const key in data) {
             const regex = new RegExp(`{${key}}`, 'g');
             templateHtml = templateHtml.replace(regex, data[key]);
         }
-
-        // Replace non-breaking spaces, as this is still good practice.
-        templateHtml = templateHtml.replace(/ /g, ' ');
         
-        const filename = generateFilename() + '.pdf';
-        const opt = {
-          margin:       0,
-          filename:     filename,
-          image:        { type: 'jpeg', quality: 0.98 },
-          html2canvas:  { scale: 2, useCORS: true },
-          jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
-        };
-
-        await html2pdf().from(templateHtml).set(opt).save();
+        // --- Reverted logic to open in a new tab ---
+        const newTab = window.open();
+        newTab.document.title = generateFilename(); // This sets the correct filename for printing
+        newTab.document.open();
+        newTab.document.write(templateHtml);
+        newTab.document.close();
         
     } catch (error) {
         console.error('Error generating PDF:', error);
