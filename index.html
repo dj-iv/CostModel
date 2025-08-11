@@ -205,7 +205,7 @@
         .screenshot-mode {
             display: grid;
             grid-template-columns: 400px 1fr;
-            grid-template-rows: auto auto auto 1fr;
+            grid-template-rows: auto auto auto auto 1fr;
             gap: 25px;
             max-width: 1800px;
         }
@@ -219,11 +219,22 @@
             padding-bottom: 0;
             border-bottom: none;
         }
-        .screenshot-mode #proposal-details-section { grid-area: 1 / 1 / 2 / 2; }
-        .screenshot-mode #antenna-section { grid-area: 2 / 1 / 3 / 2; }
-        .screenshot-mode #config-section { grid-area: 3 / 1 / 4 / 2; }
-        .screenshot-mode #support-section { grid-area: 4 / 1 / 5 / 2; }
-        .screenshot-mode #results-section { grid-area: 1 / 2 / 5 / 2; }
+        .screenshot-mode .results-header {
+    grid-column: 1 / -1; /* Span all columns */
+    grid-row: 1 / 2;
+}
+        /* Hides the h2 titles in the left-hand sections in dashboard view */
+.screenshot-mode #proposal-details-section h2,
+.screenshot-mode #antenna-section h2,
+.screenshot-mode #config-section h2,
+.screenshot-mode #support-section h2 {
+    display: none;
+}
+.screenshot-mode #proposal-details-section { grid-area: 2 / 1 / 3 / 2; }
+.screenshot-mode #antenna-section { grid-area: 3 / 1 / 4 / 2; }
+.screenshot-mode #config-section { grid-area: 4 / 1 / 5 / 2; }
+.screenshot-mode #support-section { grid-area: 5 / 1 / 6 / 2; }
+.screenshot-mode #results-section { grid-area: 2 / 2 / 6 / 2; }
         
         /* Main page support buttons */
         .support-presets-main {
@@ -286,26 +297,33 @@
 <body>
     <button id="view-toggle-btn">Switch to Simple View</button>
 
-    <div class="calculator-container" id="main-container">
-        <h1>Universal System Calculator</h1>
+   <div class="calculator-container" id="main-container">
+    <div class="results-header">
+      <div class="header-buttons">
+        <button id="generate-pdf-btn">Proposal PDF 📄</button>
+        <button id="generate-document-btn">Proposal DOC 📄</button>
+        <button id="quote-to-monday-btn">Quote to Monday</button>
+        <button id="generate-link-btn">Generate Link 🔗</button>
+        <button id="toggle-zero-qty-btn">Show All Items</button>
+        <button id="settings-btn">Settings ⚙️</button>
+        <button id="reset-overrides">Reset Overrides</button>
+      </div>
+    </div>
 
-        <div class="section" id="proposal-details-section">
-            <h2>Proposal Details</h2>
-            <div class="input-section">
-                <div class="input-group">
-                    <label for="customer-name">Customer Name</label>
-                    <input type="text" id="customer-name" placeholder="e.g., One Globe Square">
-                </div>
-                <div class="input-group">
-                    <label for="survey-price">Survey Price (£)</label>
-                    <input type="number" id="survey-price" placeholder="e.g., 1200" value="" step="100">
-                </div>
-                 <div class="input-group">
-                    <label for="quote-number">Quote Number</label>
-                    <input type="text" id="quote-number" placeholder="e.g., Q-12345">
-                </div>
-            </div>
+    <h1>Universal System Calculator</h1>
+
+    <div class="section" id="proposal-details-section">
         </div>
+
+    <div class="section" id="results-section">
+        <div class="financial-summary">
+            </div>
+        <table class="results-table">
+            <thead id="results-thead"></thead>
+            <tbody id="results-tbody"></tbody>
+        </table>
+    </div>
+</div>
 
         <div class="section" id="antenna-section">
             <h2>Antenna Calculator</h2>
