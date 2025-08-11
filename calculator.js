@@ -801,11 +801,17 @@ async function generatePdf() {
             templateHtml = templateHtml.replace(regex, data[key]);
         }
         
-       const newTab = window.open();
-newTab.document.title = generateFilename(); // Add this line
-newTab.document.open();
-        newTab.document.write(templateHtml);
-        newTab.document.close();
+        const filename = generateFilename() + '.pdf';
+        const opt = {
+          margin:       0,
+          filename:     filename,
+          image:        { type: 'jpeg', quality: 0.98 },
+          html2canvas:  { scale: 2, useCORS: true },
+          jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+        };
+
+        // Use the new library to generate and save the PDF directly
+        await html2pdf().from(templateHtml).set(opt).save();
         
     } catch (error) {
         console.error('Error generating PDF:', error);
