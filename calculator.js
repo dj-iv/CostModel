@@ -401,7 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const maintenanceCost = totalHardwareSellPrice * (maintenancePercent / 100);
         return perSystemCost + fixedAnnualCost + maintenanceCost;
     }
-   function generateFilename() {
+  function generateFilename() {
     const systemTypeSelect = document.getElementById('system-type');
     const solutionName = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
     const networks = document.getElementById('number-of-networks').value;
@@ -416,7 +416,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const dateString = `${day}${month}${year}`;
     
     return `UCtel_Proposal_${solutionName}_${networks}_Networks_for_${customerName}_${dateString}`;
-}
 }
 async function generateDocument() {
     const button = document.getElementById('generate-document-btn');
