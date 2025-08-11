@@ -802,9 +802,12 @@ async function generatePdf() {
 
         templateHtml = templateHtml.replace(/£/g, '&pound;');
 
-        // ---- NEW FIX: This regex removes emojis and other symbols ----
         const emojiRegex = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g;
         templateHtml = templateHtml.replace(emojiRegex, '');
+        
+        // ---- DEBUGGING LINES ADDED HERE ----
+        console.log("--- DEBUG: HTML Content for PDF Generation ---");
+        console.log(templateHtml);
         
         const filename = generateFilename() + '.pdf';
         const opt = {
