@@ -287,7 +287,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 subTotals[groupName] = { label: groupLabel, cost: (groupName === 'hardware' && excludeHardware) ? 0 : groupSubTotalCost, sell: finalGroupSell, margin: finalGroupMargin };
             }
         }
-        document.querySelectorAll('.item-qty').forEach(cell => { const key = cell.dataset.key; if(key !== 'support_package') { updateCellDisplay(cell, key); cell.addEventListener('click', () => activateEditMode(cell, key)); const inputField = cell.querySelector('.value-input'); inputField.addEventListener('blur', () => deactivateEditMode(cell, key, true)); inputField.addEventListener('keydown', e => { if (e.key === 'Enter') deactivateEditMode(cell, key, true); else if (e.key === 'Escape') deactivateEditMode(cell, key, false); }); }});
+        document.querySelectorAll('.item-qty').forEach(cell => {
+    const key = cell.dataset.key;
+    if(key !== 'support_package') {
+        updateCellDisplay(cell, key);
+        cell.addEventListener('click', () => activateEditMode(cell, key));
+        const inputField = cell.querySelector('.value-input');
+
+        // --- THIS NEW BLOCK IS THE FIX ---
+        // It stops the click on the input from triggering the cell's click event.
+        inputField.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+        // --- END OF FIX ---
+
+        inputField.addEventListener('blur', () => deactivateEditMode(cell, key, true));
+        inputField.addEventListener('keydown', e => {
+            if (e.key === 'Enter') deactivateEditMode(cell, key, true);
+            else if (e.key === 'Escape') deactivateEditMode(cell, key, false);
+        });
+    }
+});
         updateSupportTableSummaries(totalHardwareUnits);
         calculateAndDisplayGrandTotals(subTotals);
         subTotalsForProposal = subTotals;
