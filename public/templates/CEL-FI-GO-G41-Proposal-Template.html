@@ -11,10 +11,10 @@
             background-color: #f4f4f4;
             margin: 0;
             padding: 0;
-            counter-reset: h2counter;
         }
         .page {
-            position: relative;
+            display: flex; /* Use Flexbox for page structure */
+            flex-direction: column; /* Arrange content vertically */
             width: 210mm;
             min-height: 297mm;
             padding: 20mm;
@@ -24,6 +24,10 @@
             box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
             box-sizing: border-box;
         }
+        /* New wrapper style to push footer to the bottom */
+        .content-wrapper {
+            flex: 1;
+        }
         .header, .footer {
             width: calc(100% - 40mm);
             font-size: 9pt;
@@ -31,18 +35,19 @@
         }
         .header {
             text-align: right;
+            margin-bottom: 20px; /* Add space below header */
         }
         .header img {
             width: 100px;
         }
-      .footer {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 40px; /* Adds some space above the footer */
-}
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: auto; /* Push footer to bottom of flex container */
+            padding-top: 20px; /* Add space above footer */
         }
         h1, h2, h3, h4 {
-            color: #386682;
+            color: #386682 !important; /* Add !important to enforce color */
             line-height: 1.2;
             font-weight: bold;
         }
@@ -54,7 +59,6 @@
             padding-bottom: 10px;
             margin-top: 40px;
             margin-bottom: 20px;
-            counter-reset: h3counter;
         }
         h3 {
             font-size: 16pt;
@@ -65,7 +69,7 @@
         ul { padding-left: 20px; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 10pt; }
         th, td { border: 1px solid #cccccc; padding: 8px; text-align: left; vertical-align: top; }
-        th { background-color: #386682; color: white; font-weight: bold; }
+        th { background-color: #386682 !important; color: white; font-weight: bold; } /* Add !important */
         .pricing-table td:nth-child(2), .pricing-table td:nth-child(3), .pricing-table td:nth-child(4) { text-align: right; }
         .support-details-table td:nth-child(3), .support-details-table td:nth-child(4), .support-details-table td:nth-child(5) { text-align: center; }
         .total-row td { font-weight: bold; }
@@ -128,116 +132,126 @@
 </head>
 <body>
     <div class="page cover-page">
-        <img class="cover-logo" src="/CostModel/images/uctel_logo.png" alt="UCtel Logo">
-        
-        <div class="cover-title">
-            Budgetary CEL-FI<br>
-            {Solution}<br>
-            proposal<br>
-            for<br>
-            {Account}
+        <div class="content-wrapper">
+            <img class="cover-logo" src="/CostModel/images/uctel_logo.png" alt="UCtel Logo">
+            
+            <div class="cover-title">
+                Budgetary CEL-FI<br>
+                {Solution}<br>
+                proposal<br>
+                for<br>
+                {Account}
+            </div>
         </div>
     </div>
 
     <div class="page toc-page">
         <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
-        <h2>CONTENTS</h2>
-        <ul class="toc">
-            <li class="toc-h2"><span>2. Introduction</span><span>3</span></li>
-            <li class="toc-h3"><span>2.1 About UCtel</span><span>3</span></li>
-            <li class="toc-h3"><span>2.2 Key Contacts</span><span>3</span></li>
-            <li class="toc-h3"><span>2.3 Confidentiality</span><span>3</span></li>
-            <li class="toc-h2"><span>3. Proposed Solution</span><span>4</span></li>
-            <li class="toc-h3"><span>3.1 CEL-FI</span><span>4</span></li>
-            <li class="toc-h3"><span>3.2 CEL-FI G41 System Architecture</span><span>4</span></li>
-            <li class="toc-h2"><span>4. Solution Components</span><span>5</span></li>
-            <li class="toc-h3"><span>4.1 Donor Antenna</span><span>5</span></li>
-            <li class="toc-h3"><span>4.2 G41 Booster</span><span>5</span></li>
-            <li class="toc-h3"><span>4.3 Server Antennas</span><span>5</span></li>
-            <li class="toc-h3"><span>4.4 Cabling</span><span>6</span></li>
-            <li class="toc-h3"><span>4.5 5G Ready DAS</span><span>6</span></li>
-            <li class="toc-h2"><span>5. Design and Installation Process</span><span>7</span></li>
-            <li class="toc-h3"><span>5.1 Site Survey</span><span>7</span></li>
-            <li class="toc-h3"><span>5.2 Report and Quotation</span><span>7</span></li>
-            <li class="toc-h3"><span>5.3 Project Coordination</span><span>7</span></li>
-            <li class="toc-h3"><span>5.4 Documentation</span><span>7</span></li>
-            <li class="toc-h2"><span>6. Proposed Pricing</span><span>8</span></li>
-            <li class="toc-h3"><span>6.1 Survey</span><span>8</span></li>
-            <li class="toc-h2"><span>7. CEL-FI Support Services</span><span>9</span></li>
-        </ul>
+        <div class="content-wrapper">
+            <h2>CONTENTS</h2>
+            <ul class="toc">
+                <li class="toc-h2"><span>2. Introduction</span><span>3</span></li>
+                <li class="toc-h3"><span>2.1 About UCtel</span><span>3</span></li>
+                <li class="toc-h3"><span>2.2 Key Contacts</span><span>3</span></li>
+                <li class="toc-h3"><span>2.3 Confidentiality</span><span>3</span></li>
+                <li class="toc-h2"><span>3. Proposed Solution</span><span>4</span></li>
+                <li class="toc-h3"><span>3.1 CEL-FI</span><span>4</span></li>
+                <li class="toc-h3"><span>3.2 CEL-FI G41 System Architecture</span><span>4</span></li>
+                <li class="toc-h2"><span>4. Solution Components</span><span>5</span></li>
+                <li class="toc-h3"><span>4.1 Donor Antenna</span><span>5</span></li>
+                <li class="toc-h3"><span>4.2 G41 Booster</span><span>5</span></li>
+                <li class="toc-h3"><span>4.3 Server Antennas</span><span>5</span></li>
+                <li class="toc-h3"><span>4.4 Cabling</span><span>6</span></li>
+                <li class="toc-h3"><span>4.5 5G Ready DAS</span><span>6</span></li>
+                <li class="toc-h2"><span>5. Design and Installation Process</span><span>7</span></li>
+                <li class="toc-h3"><span>5.1 Site Survey</span><span>7</span></li>
+                <li class="toc-h3"><span>5.2 Report and Quotation</span><span>7</span></li>
+                <li class="toc-h3"><span>5.3 Project Coordination</span><span>7</span></li>
+                <li class="toc-h3"><span>5.4 Documentation</span><span>7</span></li>
+                <li class="toc-h2"><span>6. Proposed Pricing</span><span>8</span></li>
+                <li class="toc-h3"><span>6.1 Survey</span><span>8</span></li>
+                <li class="toc-h2"><span>7. CEL-FI Support Services</span><span>9</span></li>
+            </ul>
+        </div>
         <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>2</span></div>
     </div>
 
     <div class="page">
         <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
-        <h2>2. Introduction</h2>
-        <p>{Account} are looking to install a mobile boosting system to improve indoor mobile coverage. Coverage is required over {NumberOfNetworks} of the UK Mobile Network Operators (MNOs) – EE, O2, Vodafone and Three (3). Based on the information provided, UCtel proposes the use of the CEL-FI {Solution} solution. This document sets out the details of the proposed solution, UCtel’s approach and budgetary pricing.</p>
-        <h3>2.1 About UCtel</h3>
-        <p>UCtel specialises in the design, installation and management of in-building mobile signal systems.</p>
-        <h4>Why UCtel:</h4>
-        <ul>
-            <li>We have been installing in building mobile signal systems since 2019 and have deployed over 300 systems in a wide range of buildings including private houses, offices, factories and hospitals</li>
-            <li>We only work with equipment that complies with Ofcom's UK Interface Requirement 2102</li>
-            <li>We have developed our own survey tools which are tailored to the specific requirements of in-building signal boosters. This allows us to see the important information about the signals that matter to ensure the best result from the installation.</li>
-            <li>We deploy 5G Stand Alone (Up to 4.0GHz) ready DAS solutions so that when 5G SA can be boosted, the DAS elements of the solution do not need to be upgraded.</li>
-            <li>We provide a range of tailored support packages from break/fix maintenance to fully managed systems with onsite engineering support.</li>
-        </ul>
-        <h3>2.2 Key Contacts</h3>
-        <table>
-            <tr><th>Name</th><th>Title</th><th>Contact Details</th></tr>
-            <tr><td>Ivor Nicholls</td><td>Sales Director</td><td>ivor.nicholls@uctel.co.uk</td></tr>
-            <tr><td>Ivan Romanov</td><td>Technical Director</td><td>ivan.romanov@uctel.co.uk</td></tr>
-        </table>
-        <h3>2.3 Confidentiality</h3>
-        <p>UCtel’s success in the IT marketplace is directly linked to the knowledge that we have and the best practices of innovation and creativity that we apply to our customer solutions. UCtel asks that you respect our intellectual property and consider the contents of this, and all other documents submitted by UCtel to be highly confidential.</p>
+        <div class="content-wrapper">
+            <h2>2. Introduction</h2>
+            <p>{Account} are looking to install a mobile boosting system to improve indoor mobile coverage. Coverage is required over {NumberOfNetworks} of the UK Mobile Network Operators (MNOs) – EE, O2, Vodafone and Three (3). Based on the information provided, UCtel proposes the use of the CEL-FI {Solution} solution. This document sets out the details of the proposed solution, UCtel’s approach and budgetary pricing.</p>
+            <h3>2.1 About UCtel</h3>
+            <p>UCtel specialises in the design, installation and management of in-building mobile signal systems.</p>
+            <h4>Why UCtel:</h4>
+            <ul>
+                <li>We have been installing in building mobile signal systems since 2019 and have deployed over 300 systems in a wide range of buildings including private houses, offices, factories and hospitals</li>
+                <li>We only work with equipment that complies with Ofcom's UK Interface Requirement 2102</li>
+                <li>We have developed our own survey tools which are tailored to the specific requirements of in-building signal boosters. This allows us to see the important information about the signals that matter to ensure the best result from the installation.</li>
+                <li>We deploy 5G Stand Alone (Up to 4.0GHz) ready DAS solutions so that when 5G SA can be boosted, the DAS elements of the solution do not need to be upgraded.</li>
+                <li>We provide a range of tailored support packages from break/fix maintenance to fully managed systems with onsite engineering support.</li>
+            </ul>
+            <h3>2.2 Key Contacts</h3>
+            <table>
+                <tr><th>Name</th><th>Title</th><th>Contact Details</th></tr>
+                <tr><td>Ivor Nicholls</td><td>Sales Director</td><td>ivor.nicholls@uctel.co.uk</td></tr>
+                <tr><td>Ivan Romanov</td><td>Technical Director</td><td>ivan.romanov@uctel.co.uk</td></tr>
+            </table>
+            <h3>2.3 Confidentiality</h3>
+            <p>UCtel’s success in the IT marketplace is directly linked to the knowledge that we have and the best practices of innovation and creativity that we apply to our customer solutions. UCtel asks that you respect our intellectual property and consider the contents of this, and all other documents submitted by UCtel to be highly confidential.</p>
+        </div>
         <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>3</span></div>
     </div>
 
     <div class="page">
         <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
-        <h2>3. Proposed Solution</h2>
-        <h3>3.1 CEL-FI</h3>
-        <p>UCtel proposes to deploy solutions from Nextivity. Nextivity manufactures the CEL-FI suite of cellular coverage solutions which are designed to optimise mobile signal coverage within buildings and vehicles. CEL-FI is unconditionally network safe, as it prevents interference with mobile operator networks and in the UK CEL-FI products are licence-exempt and fully comply with Ofcom’s UK Interface requirement 2102 (IR2102).</p>
-        <h3>3.2 CEL-FI G41 System Architecture</h3>
-        <p>The CEL-FI solution needs to receive the best available donor signal from outside and transport the signal through low loss cable to the network repeaters that then distribute the signal through indoor antennas. A system comprises:</p>
-        <ul>
-            <li>Donor antenna installed where the best donor signal can be obtained</li>
-            <li>Low loss cables</li>
-            <li>Repeaters to receive donor signal and boost it</li>
-            <li>Internal antennas to broadcast the boosted signal</li>
-        </ul>
-        <img src="/CostModel/images/g41_diagrams.png" alt="G41 Installation Diagrams">
+        <div class="content-wrapper">
+            <h2>3. Proposed Solution</h2>
+            <h3>3.1 CEL-FI</h3>
+            <p>UCtel proposes to deploy solutions from Nextivity. Nextivity manufactures the CEL-FI suite of cellular coverage solutions which are designed to optimise mobile signal coverage within buildings and vehicles. CEL-FI is unconditionally network safe, as it prevents interference with mobile operator networks and in the UK CEL-FI products are licence-exempt and fully comply with Ofcom’s UK Interface requirement 2102 (IR2102).</p>
+            <h3>3.2 CEL-FI G41 System Architecture</h3>
+            <p>The CEL-FI solution needs to receive the best available donor signal from outside and transport the signal through low loss cable to the network repeaters that then distribute the signal through indoor antennas. A system comprises:</p>
+            <ul>
+                <li>Donor antenna installed where the best donor signal can be obtained</li>
+                <li>Low loss cables</li>
+                <li>Repeaters to receive donor signal and boost it</li>
+                <li>Internal antennas to broadcast the boosted signal</li>
+            </ul>
+            <img src="/CostModel/images/g41_diagrams.png" alt="G41 Installation Diagrams">
+        </div>
         <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>4</span></div>
     </div>
 
     <div class="page">
         <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
-        <h2>4. Solution Components</h2>
-        <div class="component-layout">
-            <div class="image-container">
-                <img src="/CostModel/images/donor_antenna.png" alt="Donor Antenna Example">
+        <div class="content-wrapper">
+            <h2>4. Solution Components</h2>
+            <div class="component-layout">
+                <div class="image-container">
+                    <img src="/CostModel/images/donor_antenna.png" alt="Donor Antenna Example">
+                </div>
+                <div class="text-container">
+                    <h3>4.1 Donor Antenna</h3>
+                    <p>One or more donor antennas will be installed on the roof (or other suitable location) to obtain the best signal for boosting. The type of donor antenna will be selected during the site survey. The image shows an example of a roof installation. Low loss coaxial cables will be run from the donor antennas to the boosters.</p>
+                </div>
             </div>
-            <div class="text-container">
-                <h3>4.1 Donor Antenna</h3>
-                <p>One or more donor antennas will be installed on the roof (or other suitable location) to obtain the best signal for boosting. The type of donor antenna will be selected during the site survey. The image shows an example of a roof installation. Low loss coaxial cables will be run from the donor antennas to the boosters.</p>
+            <div class="component-layout reverse">
+                <div class="image-container">
+                    <img src="/CostModel/images/g41_boosters.png" alt="G41 Booster Units">
+                </div>
+                <div class="text-container">
+                    <h3>4.2 G41 Booster</h3>
+                    <p>CEL-FI Go G41 booster(s) will be installed in a suitable location and either wall or rack-mounted. Typical locations are comms rooms or riser cupboards. Power will be required for the booster(s) and management router if remote management is required.</p>
+                </div>
             </div>
-        </div>
-        <div class="component-layout reverse">
-            <div class="image-container">
-                <img src="/CostModel/images/g41_boosters.png" alt="G41 Booster Units">
-            </div>
-            <div class="text-container">
-                <h3>4.2 G41 Booster</h3>
-                <p>CEL-FI Go G41 booster(s) will be installed in a suitable location and either wall or rack-mounted. Typical locations are comms rooms or riser cupboards. Power will be required for the booster(s) and management router if remote management is required.</p>
-            </div>
-        </div>
-        <div class="component-layout">
-            <div class="image-container">
-                <img src="/CostModel/images/server_antennas.png" alt="Server Antenna Examples">
-            </div>
-            <div class="text-container">
-                <h3>4.3 Server Antennas</h3>
-                <p>Depending on the environment the appropriate type of antenna will be installed. There are a range of ceiling and panel omni antennas available and the most appropriate antenna will be recommended following the survey.</p>
+            <div class="component-layout">
+                <div class="image-container">
+                    <img src="/CostModel/images/server_antennas.png" alt="Server Antenna Examples">
+                </div>
+                <div class="text-container">
+                    <h3>4.3 Server Antennas</h3>
+                    <p>Depending on the environment the appropriate type of antenna will be installed. There are a range of ceiling and panel omni antennas available and the most appropriate antenna will be recommended following the survey.</p>
+                </div>
             </div>
         </div>
         <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>5</span></div>
@@ -245,111 +259,112 @@
 
     <div class="page">
         <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
-        <div class="component-layout reverse">
-             <div class="image-container">
-                <img src="/CostModel/images/cabling.png" alt="Coaxial Cable">
+        <div class="content-wrapper">
+            <div class="component-layout reverse">
+                 <div class="image-container">
+                    <img src="/CostModel/images/cabling.png" alt="Coaxial Cable">
+                </div>
+                <div class="text-container">
+                    <h3>4.4 Cabling</h3>
+                    <p>Coaxial cable carries the analogue signal and is low-loss to ensure the maximum signal is delivered to antennas.</p>
+                </div>
             </div>
-            <div class="text-container">
-                <h3>4.4 Cabling</h3>
-                <p>Coaxial cable carries the analogue signal and is low-loss to ensure the maximum signal is delivered to antennas.</p>
-            </div>
+            <h3>4.5 5G Ready DAS</h3>
+            <p>All our DAS components, Donor Antennas, Server Antennas and Splitters support 5G in the 3500MHz - 3700MHz range (Band 78). Current Ofcom regulations do not allow these frequencies to be boosted, but the DAS elements will be capable of supporting this when it is available.</p>
         </div>
-        <h3>4.5 5G Ready DAS</h3>
-        <p>All our DAS components, Donor Antennas, Server Antennas and Splitters support 5G in the 3500MHz - 3700MHz range (Band 78). Current Ofcom regulations do not allow these frequencies to be boosted, but the DAS elements will be capable of supporting this when it is available.</p>
         <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>6</span></div>
     </div>
     
     <div class="page">
         <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
-        <h2>5. Design and Installation Process</h2>
-        <h3>5.1 Site Survey</h3>
-        <p>In order to validate the assumptions in this proposal, a site survey is required. The survey will determine:</p>
-        <ul>
-            <li>Signal strength and quality inside the building to identify where coverage is needed.</li>
-            <li>Potential locations to install the donor antennas. In these locations, measurements will be taken of the signal strength, quality and available frequency bands.</li>
-            <li>The type and quantity of donor antennas required</li>
-            <li>Cable routes from the donor antenna to the Network Unit(s)</li>
-            <li>Cable routes from the boosters to the server antennas and/or coverage units</li>
-            <li>Power locations and quantities</li>
-            <li>Other factors associated with the installation such as access equipment required, risks and working hours.</li>
-            <li>Final solution and price</li>
-        </ul>
-        <h3>5.2 Report and Quotation</h3>
-        <p>Following the survey, a report will be provided which will include the results of the signal survey as well as details of the solution and proposed equipment locations. A formal quotation will be provided for the installation of the solution.</p>
-        <h3>5.3 Project Coordination</h3>
-        <p>Once the order for the solution has been received, UCtel will introduce a project coordinator to manage the installation process. The project coordinator will be responsible for communicating dates, arranging any required risk assessments, method statements and permits and ensuring the smooth delivery of the project.</p>
-        <h3>5.4 Documentation</h3>
-        <p>Once the installation is complete, the project coordinator will produce the final as-built documentation and post installation survey document. A project completion sign off will be requested to confirm acceptance of the installation and that all deliverables have been completed.</p>
+        <div class="content-wrapper">
+            <h2>5. Design and Installation Process</h2>
+            <h3>5.1 Site Survey</h3>
+            <p>In order to validate the assumptions in this proposal, a site survey is required. The survey will determine:</p>
+            <ul>
+                <li>Signal strength and quality inside the building to identify where coverage is needed.</li>
+                <li>Potential locations to install the donor antennas. In these locations, measurements will be taken of the signal strength, quality and available frequency bands.</li>
+                <li>The type and quantity of donor antennas required</li>
+                <li>Cable routes from the donor antenna to the Network Unit(s)</li>
+                <li>Cable routes from the boosters to the server antennas and/or coverage units</li>
+                <li>Power locations and quantities</li>
+                <li>Other factors associated with the installation such as access equipment required, risks and working hours.</li>
+                <li>Final solution and price</li>
+            </ul>
+            <h3>5.2 Report and Quotation</h3>
+            <p>Following the survey, a report will be provided which will include the results of the signal survey as well as details of the solution and proposed equipment locations. A formal quotation will be provided for the installation of the solution.</p>
+            <h3>5.3 Project Coordination</h3>
+            <p>Once the order for the solution has been received, UCtel will introduce a project coordinator to manage the installation process. The project coordinator will be responsible for communicating dates, arranging any required risk assessments, method statements and permits and ensuring the smooth delivery of the project.</p>
+            <h3>5.4 Documentation</h3>
+            <p>Once the installation is complete, the project coordinator will produce the final as-built documentation and post installation survey document. A project completion sign off will be requested to confirm acceptance of the installation and that all deliverables have been completed.</p>
+        </div>
         <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>7</span></div>
     </div>
 
     <div class="page">
         <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
-        <h2>6. Proposed Pricing</h2>
-        <p>The following table provides indicative figures for the proposed solution.</p>
-        <table class="pricing-table">
-            <thead><tr><th>Description</th><th>Qty</th><th>Unit Price</th><th>Total Price</th></tr></thead>
-            <tbody>
-                <tr><td>{Description1}</td><td>{Qty1}</td><td>{UnitPrice1}</td><td>{TotalPrice1}</td></tr>
-                <tr><td>{Description2}</td><td>{Qty2}</td><td>{UnitPrice2}</td><td>{TotalPrice2}</td></tr>
-                <tr><td>{Description3}</td><td>{Qty3}</td><td>{UnitPrice3}</td><td>{TotalPrice3}</td></tr>
-                <tr><td>{Description4}</td><td>{Qty4}</td><td>{UnitPrice4}</td><td>{TotalPrice4}</td></tr>
-                <tr class="total-row"><td colspan="3" style="text-align:right;">Total Price:</td><td>{TotalPrice}</td></tr>
-            </tbody>
-        </table>
-        <p>The following support options are available. Please see section 7 for more details.</p>
-        <table class="pricing-table">
-            <thead><tr><th>Support Option</th><th>Qty</th><th>Unit Price</th><th>Total Price</th></tr></thead>
-            <tbody>
-                <tr><td>{Support1}</td><td>{SupportQty1}</td><td>{SupportUnitPrice1}</td><td>{SupportTotalPrice1}</td></tr>
-                <tr><td>{Support2}</td><td>{SupportQty2}</td><td>{SupportUnitPrice2}</td><td>{SupportTotalPrice2}</td></tr>
-                <tr><td>{Support3}</td><td>{SupportQty3}</td><td>{SupportUnitPrice3}</td><td>{SupportTotalPrice3}</td></tr>
-            </tbody>
-        </table>
-        <p>All figures shown are exclusive of VAT.</p>
-        <p><b>Terms:</b> Cel-Fi equipment to be paid on order. Other elements to be invoiced on completion and paid within 30 days.</p>
-        <h3>6.1 Survey</h3>
-        <p>In order to validate the above estimate a site survey is required. The price for the survey and report is {SurveyPrice} + VAT.</p>
+        <div class="content-wrapper">
+            <h2>6. Proposed Pricing</h2>
+            <p>The following table provides indicative figures for the proposed solution.</p>
+            <table class="pricing-table">
+                <thead><tr><th>Description</th><th>Qty</th><th>Unit Price</th><th>Total Price</th></tr></thead>
+                <tbody>
+                    <tr><td>{Description1}</td><td>{Qty1}</td><td>{UnitPrice1}</td><td>{TotalPrice1}</td></tr>
+                    <tr><td>{Description2}</td><td>{Qty2}</td><td>{UnitPrice2}</td><td>{TotalPrice2}</td></tr>
+                    <tr><td>{Description3}</td><td>{Qty3}</td><td>{UnitPrice3}</td><td>{TotalPrice3}</td></tr>
+                    <tr><td>{Description4}</td><td>{Qty4}</td><td>{UnitPrice4}</td><td>{TotalPrice4}</td></tr>
+                    <tr class="total-row"><td colspan="3" style="text-align:right;">Total Price:</td><td>{TotalPrice}</td></tr>
+                </tbody>
+            </table>
+            <p>The following support options are available. Please see section 7 for more details.</p>
+            <table class="pricing-table">
+                <thead><tr><th>Support Option</th><th>Qty</th><th>Unit Price</th><th>Total Price</th></tr></thead>
+                <tbody>
+                    <tr><td>{Support1}</td><td>{SupportQty1}</td><td>{SupportUnitPrice1}</td><td>{SupportTotalPrice1}</td></tr>
+                    <tr><td>{Support2}</td><td>{SupportQty2}</td><td>{SupportUnitPrice2}</td><td>{SupportTotalPrice2}</td></tr>
+                    <tr><td>{Support3}</td><td>{SupportQty3}</td><td>{SupportUnitPrice3}</td><td>{SupportTotalPrice3}</td></tr>
+                </tbody>
+            </table>
+            <p>All figures shown are exclusive of VAT.</p>
+            <p><b>Terms:</b> Cel-Fi equipment to be paid on order. Other elements to be invoiced on completion and paid within 30 days.</p>
+            <h3>6.1 Survey</h3>
+            <p>In order to validate the above estimate a site survey is required. The price for the survey and report is {SurveyPrice} + VAT.</p>
+        </div>
         <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>8</span></div>
     </div>
 
     <div class="page">
         <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
-        <h2>7. CEL-FI Support Services</h2>
-        <p>The table below describes the available services that UCtel provides for the ongoing support of CEL-FI installations.</p>
-        <table class="support-details-table">
-            <thead>
-                <tr>
-                    <th>Included Services</th>
-                    <th>Description</th>
-                    <th>Bronze</th>
-                    <th>Silver</th>
-                    <th>Gold</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>Health check</td><td>Scheduled on-site health check</td><td>O</td><td>O</td><td>O</td></tr>
-                <tr><td>Remote Monitoring</td><td>Alerts and events captured on the management portal</td><td>☐</td><td>✅</td><td>✅</td></tr>
-                <tr><td>Reactive Support</td><td>Customer identifies issue and reports to UCtel</td><td>✅</td><td>✅</td><td>✅</td></tr>
-                <tr><td>Proactive Alerting</td><td>Events and alerts received from management portal proactively investigated by UCtel</td><td>☐</td><td>✅</td><td>✅</td></tr>
-                <tr><td>Incident Management</td><td>Incident managed by UCtel via Email</td><td>✅</td><td>✅</td><td>✅</td></tr>
-                <tr><td>Change Management *</td><td>Remote changes (eg change in network operator where antenna does not need to be adjusted)</td><td>☐</td><td>✅</td><td>✅</td></tr>
-                <tr><td>On-site support</td><td>Engineer to site for equipment relocation or antenna repositioning</td><td>☐</td><td>☐</td><td>✅</td></tr>
-                <tr><td>Service Reports</td><td>Quarterly service reporting</td><td>☐</td><td>☐</td><td>O</td></tr>
-                <tr><td>Service Review Meetings</td><td>Quarterly service review meetings</td><td>☐</td><td>☐</td><td>O</td></tr>
-                <tr><td>Maintenance (Parts only)</td><td>Break/Fix maintenance - parts to site</td><td>✅</td><td>✅</td><td>☐</td></tr>
-                <tr><td>Maintenance (with engineer)</td><td>Break / fix maintenance with engineer to site</td><td>☐</td><td>☐</td><td>✅</td></tr>
-            </tbody>
-        </table>
-        <p>✅ - included in service O – optional ☐ - not included * Up to 4 changes per year per system</p>
-        <p><b>Notes:</b><br>
-        The services apply to remotely manageable CEL-FI products<br>
-        Management connectivity is included via cellular connections and does not need to run over customer infrastructure<br>
-        Proactive Alerting, Incident Management and Change Management operate in normal working hours unless agreed otherwise.<br>
-        Services are subject to UCtel’s standard Terms and Conditions.
-        </p>
+        <div class="content-wrapper">
+            <h2>7. CEL-FI Support Services</h2>
+            <p>The table below describes the available services that UCtel provides for the ongoing support of CEL-FI installations.</p>
+            <table class="support-details-table">
+                <thead>
+                    <tr>
+                        <th>Included Services</th>
+                        <th>Description</th>
+                        <th>Bronze</th>
+                        <th>Silver</th>
+                        <th>Gold</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Health check</td><td>Scheduled on-site health check</td><td>O</td><td>O</td><td>O</td></tr>
+                    <tr><td>Remote Monitoring</td><td>Alerts and events captured on the management portal</td><td><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JheSI+PHBhdGggZD0iTTE5IDV2MTRINVY1aDE0bTAtMkg1Yy0xLjEgMC0yIC45LTIgMnYxNGMwIDEuMS45IDIgMiAyaDE0YzEuMSAwIDItLjkgMi0yVjVjMC0xLjEtLjktMi0yLTJ6Ii8+PC9zdmc+" style="width: 14px; height: 14px; vertical-align: middle;" alt="Box"></td><td><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JlZW4iPjxwYXRoIGQ9Ik05IDE2LjE3TDQuODMgMTJsLTEuNDIgMS40MUw5IDE5IDIxIDdsLTEuNDEtMS40MXoiLz48L3N2Zz4=" style="width: 16px; height: 16px; vertical-align: middle;" alt="Check"></td><td><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JlZW4iPjxwYXRoIGQ9Ik05IDE2LjE3TDQuODMgMTJsLTEuNDIgMS40MUw5IDE5IDIxIDdsLTEuNDEtMS40MXoiLz48L3N2Zz4=" style="width: 16px; height: 16px; vertical-align: middle;" alt="Check"></td></tr>
+                    <tr><td>Reactive Support</td><td>Customer identifies issue and reports to UCtel</td><td><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JlZW4iPjxwYXRoIGQ9Ik05IDE2LjE3TDQuODMgMTJsLTEuNDIgMS40MUw5IDE5IDIxIDdsLTEuNDEtMS40MXoiLz48L3N2Zz4=" style="width: 16px; height: 16px; vertical-align: middle;" alt="Check"></td><td><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JlZW4iPjxwYXRoIGQ9Ik05IDE2LjE3TDQuODMgMTJsLTEuNDIgMS40MUw5IDE5IDIxIDdsLTEuNDEtMS40MXoiLz48L3N2Zz4=" style="width: 16px; height: 16px; vertical-align: middle;" alt="Check"></td><td><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JlZW4iPjxwYXRoIGQ9Ik05IDE2LjE3TDQuODMgMTJsLTEuNDIgMS40MUw5IDE5IDIxIDdsLTEuNDEtMS40MXoiLz48L3N2Zz4=" style="width: 16px; height: 16px; vertical-align: middle;" alt="Check"></td></tr>
+                    <tr><td>Proactive Alerting</td><td>Events and alerts received from management portal proactively investigated by UCtel</td><td><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JheSI+PHBhdGggZD0iTTE5IDV2MTRINVY1aDE0bTAtMkg1Yy0xLjEgMC0yIC45LTIgMnYxNGMwIDEuMS45IDIgMiAyaDE0YzEuMSAwIDItLjkgMi0yVjVjMC0xLjEtLjktMi0yLTJ6Ii8+PC9zdmc+" style="width: 14px; height: 14px; vertical-align: middle;" alt="Box"></td><td><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JlZW4iPjxwYXRoIGQ9Ik05IDE2LjE3TDQuODMgMTJsLTEuNDIgMS40MUw5IDE5IDIxIDdsLTEuNDEtMS40MXoiLz48L3N2Zz4=" style="width: 16px; height: 16px; vertical-align: middle;" alt="Check"></td><td><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JlZW4iPjxwYXRoIGQ9Ik05IDE2LjE3TDQuODMgMTJsLTEuNDIgMS40MUw5IDE5IDIxIDdsLTEuNDEtMS40MXoiLz48L3N2Zz4=" style="width: 16px; height: 16px; vertical-align: middle;" alt="Check"></td></tr>
+                    <tr><td>Incident Management</td><td>Incident managed by UCtel via Email</td><td><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JlZW4iPjxwYXRoIGQ9Ik05IDE2LjE3TDQuODMgMTJsLTEuNDIgMS40MUw5IDE5IDIxIDdsLTEuNDEtMS40MXoiLz48L3N2Zz4=" style="width: 16px; height: 16px; vertical-align: middle;" alt="Check"></td><td><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JlZW4iPjxwYXRoIGQ9Ik05IDE2LjE3TDQuODMgMTJsLTEuNDIgMS40MUw5IDE5IDIxIDdsLTEuNDEtMS40MXoiLz48L3N2Zz4=" style="width: 16px; height: 16px; vertical-align: middle;" alt="Check"></td><td><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JlZW4iPjxwYXRoIGQ9Ik05IDE2LjE3TDQuODMgMTJsLTEuNDIgMS40MUw5IDE5IDIxIDdsLTEuNDEtMS40MXoiLz48L3N2Zz4=" style="width: 16px; height: 16px; vertical-align: middle;" alt="Check"></td></tr>
+                    <tr><td>Change Management *</td><td>Remote changes (eg change in network operator where antenna does not need to be adjusted)</td><td><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JheSI+PHBhdGggZD0iTTE5IDV2MTRINVY1aDE0bTAtMkg1Yy0xLjEgMC0yIC45LTIgMnYxNGMwIDEuMS45IDIgMiAyaDE0YzEuMSAwIDItLjkgMi0yVjVjMC0xLjEtLjktMi0yLTJ6Ii8+PC9zdmc+" style="width: 14px; height: 14px; vertical-align: middle;" alt="Box"></td><td><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JlZW4iPjxwYXRoIGQ9Ik05IDE2LjE3TDQuODMgMTJsLTEuNDIgMS40MUw5IDE5IDIxIDdsLTEuNDEtMS40MXoiLz48L3N2Zz4=" style="width: 16px; height: 16px; vertical-align: middle;" alt="Check"></td><td><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JlZW4iPjxwYXRoIGQ9Ik05IDE2LjE3TDQuODMgMTJsLTEuNDIgMS40MUw5IDE5IDIxIDdsLTEuNDEtMS40MXoiLz48L3N2Zz4=" style="width: 16px; height: 16px; vertical-align: middle;" alt="Check"></td></tr>
+                    <tr><td>On-site support</td><td>Engineer to site for equipment relocation or antenna repositioning</td><td><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JheSI+PHBhdGggZD0iTTE5IDV2MTRINVY1aDE0bTAtMkg1Yy0xLjEgMC0yIC45LTIgMnYxNGMwIDEuMS45IDIgMiAyaDE0YzEuMSAwIDItLjkgMi0yVjVjMC0xLjEtLjktMi0yLTJ6Ii8+PC9zdmc+" style="width: 14px; height: 14px; vertical-align: middle;" alt="Box"></td><td><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JheSI+PHBhdGggZD0iTTE5IDV2MTRINVY1aDE0bTAtMkg1Yy0xLjEgMC0yIC45LTIgMnYxNGMwIDEuMS45IDIgMiAyaDE0YzEuMSAwIDItLjkgMi0yVjVjMC0xLjEtLjktMi0yLTJ6Ii8+PC9zdmc+" style="width: 14px; height: 14px; vertical-align: middle;" alt="Box"></td><td><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JlZW4iPjxwYXRoIGQ9Ik05IDE2LjE3TDQuODMgMTJsLTEuNDIgMS40MUw5IDE5IDIxIDdsLTEuNDEtMS40MXoiLz48L3N2Zz4=" style="width: 16px; height: 16px; vertical-align: middle;" alt="Check"></td></tr>
+                    <tr><td>Service Reports</td><td>Quarterly service reporting</td><td><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JheSI+PHBhdGggZD0iTTE5IDV2MTRINVY1aDE0bTAtMkg1Yy0xLjEgMC0yIC45LTIgMnYxNGMwIDEuMS45IDIgMiAyaDE0YzEuMSAwIDItLjkgMi0yVjVjMC0xLjEtLjktMi0yLTJ6Ii8+PC9zdmc+" style="width: 14px; height: 14px; vertical-align: middle;" alt="Box"></td><td><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JheSI+PHBhdGggZD0iTTE5IDV2MTRINVY1aDE0bTAtMkg1Yy0xLjEgMC0yIC45LTIgMnYxNGMwIDEuMS45IDIgMiAyaDE0YzEuMSAwIDItLjkgMi0yVjVjMC0xLjEtLjktMi0yLTJ6Ii8+PC9zdmc+" style="width: 14px; height: 14px; vertical-align: middle;" alt="Box"></td><td>O</td></tr>
+                    <tr><td>Service Review Meetings</td><td>Quarterly service review meetings</td><td><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JheSI+PHBhdGggZD0iTTE5IDV2MTRINVY1aDE0bTAtMkg1Yy0xLjEgMC0yIC45LTIgMnYxNGMwIDEuMS45IDIgMiAyaDE0YzEuMSAwIDItLjkgMi0yVjVjMC0xLjEtLjktMi0yLTJ6Ii8+PC9zdmc+" style="width: 14px; height: 14px; vertical-align: middle;" alt="Box"></td><td><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JheSI+PHBhdGggZD0iTTE5IDV2MTRINVY1aDE0bTAtMkg1Yy0xLjEgMC0yIC45LTIgMnYxNGMwIDEuMS45IDIgMiAyaDE0YzEuMSAwIDItLjkgMi0yVjVjMC0xLjEtLjktMi0yLTJ6Ii8+PC9zdmc+" style="width: 14px; height: 14px; vertical-align: middle;" alt="Box"></td><td>O</td></tr>
+                    <tr><td>Maintenance (Parts only)</td><td>Break/Fix maintenance - parts to site</td><td><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JlZW4iPjxwYXRoIGQ9Ik05IDE2LjE3TDQuODMgMTJsLTEuNDIgMS40MUw5IDE5IDIxIDdsLTEuNDEtMS40MXoiLz48L3N2Zz4=" style="width: 16px; height: 16px; vertical-align: middle;" alt="Check"></td><td><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JlZW4iPjxwYXRoIGQ9Ik05IDE2LjE3TDQuODMgMTJsLTEuNDIgMS40MUw5IDE5IDIxIDdsLTEuNDEtMS40MXoiLz48L3N2Zz4=" style="width: 16px; height: 16px; vertical-align: middle;" alt="Check"></td><td><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JheSI+PHBhdGggZD0iTTE5IDV2MTRINVY1aDE0bTAtMkg1Yy0xLjEgMC0yIC45LTIgMnYxNGMwIDEuMS45IDIgMiAyaDE0YzEuMSAwIDItLjkgMi0yVjVjMC0xLjEtLjktMi0yLTJ6Ii8+PC9zdmc+" style="width: 14px; height: 14px; vertical-align: middle;" alt="Box"></td></tr>
+                    <tr><td>Maintenance (with engineer)</td><td>Break / fix maintenance with engineer to site</td><td><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JheSI+PHBhdGggZD0iTTE5IDV2MTRINVY1aDE0bTAtMkg1Yy0xLjEgMC0yIC45LTIgMnYxNGMwIDEuMS45IDIgMiAyaDE0YzEuMSAwIDItLjkgMi0yVjVjMC0xLjEtLjktMi0yLTJ6Ii8+PC9zdmc+" style="width: 14px; height: 14px; vertical-align: middle;" alt="Box"></td><td><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JheSI+PHBhdGggZD0iTTE5IDV2MTRINVY1aDE0bTAtMkg1Yy0xLjEgMC0yIC45LTIgMnYxNGMwIDEuMS45IDIgMiAyaDE0YzEuMSAwIDItLjkgMi0yVjVjMC0xLjEtLjktMi0yLTJ6Ii8+PC9zdmc+" style="width: 14px; height: 14px; vertical-align: middle;" alt="Box"></td><td><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JlZW4iPjxwYXRoIGQ9Ik05IDE2LjE3TDQuODMgMTJsLTEuNDIgMS44MUw5IDE5IDIxIDdsLTEuNDEtMS40MXoiLz48L3N2Zz4=" style="width: 16px; height: 16px; vertical-align: middle;" alt="Check"></td></tr>
+                </tbody>
+            </table>
+            <p><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JlZW4iPjxwYXRoIGQ9Ik05IDE2LjE3TDQuODMgMTJsLTEuNDIgMS40MUw5IDE5IDIxIDdsLTEuNDEtMS40MXoiLz48L3N2Zz4=" style="width: 16px; height: 16px; vertical-align: middle;" alt="Check"> - included in service O – optional <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iZ3JheSI+PHBhdGggZD0iTTE5IDV2MTRINVY1aDE0bTAtMkg1Yy0xLjEgMC0yIC45LTIgMnYxNGMwIDEuMS45IDIgMiAyaDE0YzEuMSAwIDItLjkgMi0yVjVjMC0xLjEtLjktMi0yLTJ6Ii8+PC9zdmc+" style="width: 14px; height: 14px; vertical-align: middle;" alt="Box"> - not included * Up to 4 changes per year per system</p>
+        </div>
         <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>9</span></div>
     </div>
 </body>
 </html>
-
