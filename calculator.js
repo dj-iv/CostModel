@@ -406,7 +406,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const systemTypeSelect = document.getElementById('system-type');
     const solutionName = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
     const networks = document.getElementById('number-of-networks').value;
-    const customerName = document.getElementById('customer-name').value || 'Customer';
+    const customerName = (document.getElementById('customer-name').value || 'Customer').substring(0, 50);
 
     const now = new Date();
     const day = String(now.getDate()).padStart(2, '0');
