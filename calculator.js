@@ -800,6 +800,9 @@ async function generatePdf() {
             const regex = new RegExp(`{${key}}`, 'g');
             templateHtml = templateHtml.replace(regex, data[key]);
         }
+
+        // ---- THIS IS THE NEW LINE THAT FIXES THE BUG ----
+        templateHtml = templateHtml.replace(/£/g, '&pound;');
         
         const filename = generateFilename() + '.pdf';
         const opt = {
