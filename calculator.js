@@ -795,14 +795,16 @@ async function generatePdf() {
 
         const data = getTemplateData();
         
-        // Replace placeholders in the HTML
         for (const key in data) {
             const regex = new RegExp(`{${key}}`, 'g');
             templateHtml = templateHtml.replace(regex, data[key]);
         }
 
-        // ---- THIS IS THE NEW LINE THAT FIXES THE BUG ----
         templateHtml = templateHtml.replace(/£/g, '&pound;');
+
+        // ---- NEW FIX: This regex removes emojis and other symbols ----
+        const emojiRegex = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g;
+        templateHtml = templateHtml.replace(emojiRegex, '');
         
         const filename = generateFilename() + '.pdf';
         const opt = {
@@ -813,7 +815,6 @@ async function generatePdf() {
           jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
         };
 
-        // Use the new library to generate and save the PDF directly
         await html2pdf().from(templateHtml).set(opt).save();
         
     } catch (error) {
