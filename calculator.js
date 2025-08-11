@@ -926,60 +926,7 @@ async function generateShareLink() {
 }
 
 
-function loadStateFromURL() {
-    if (!window.location.hash) return false;
 
-    try {
-        const encodedState = window.location.hash.substring(1);
-        if (!encodedState) return false;
-
-        // 1. Decode and decompress using a more robust method
-        const compressedString = atob(encodedState);
-        const compressed = new Uint8Array(compressedString.length);
-        for (let i = 0; i < compressedString.length; i++) {
-            compressed[i] = compressedString.charCodeAt(i);
-        }
-        const jsonString = pako.inflate(compressed, { to: 'string' });
-        const state = JSON.parse(jsonString);
-
-        // 2. Apply all the saved input values
-        if (state.inputs) {
-            for (const id in state.inputs) {
-                const element = document.getElementById(id);
-                if (element) {
-                    if (element.type === 'checkbox' || element.type === 'radio') {
-                         if(element.value === state.inputs[id] || typeof state.inputs[id] === 'boolean') {
-                            element.checked = state.inputs[id];
-                         }
-                    } else {
-                        element.value = state.inputs[id];
-                    }
-                } else { // Handle radio buttons by name
-                     const radio = document.querySelector(`input[name="${id}"][value="${state.inputs[id]}"]`);
-                     if(radio) radio.checked = true;
-                }
-            }
-        }
-
-        // 3. Apply all the saved quantity overrides
-        if (state.overrides) {
-            for (const key in state.overrides) {
-                if (!currentResults[key]) {
-                    currentResults[key] = { calculated: 0, override: null, decimals: 0, unit: '' };
-                }
-                currentResults[key].override = state.overrides[key];
-            }
-        }
-
-        // 4. Clear the hash from the URL for a cleaner look
-        history.pushState("", document.title, window.location.pathname + window.location.search);
-        return true; // State was successfully loaded
-
-    } catch (error) {
-        console.error("Failed to load state from URL:", error);
-        return false;
-    }
-}
 
 
     
