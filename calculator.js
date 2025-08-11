@@ -813,19 +813,18 @@ async function generatePdf() {
 
         if (!makeResponse.ok) throw new Error(`Make.com webhook failed: ${makeResponse.statusText}`);
 
-        // 5. Receive the public download link and trigger the download
-        const result = await makeResponse.json();
-        const downloadUrl = result.downloadUrl;
-
-        if (!downloadUrl) throw new Error('Make.com did not return a download URL.');
+        // 5. Receive the PDF file directly and trigger the download
+        const pdfBlob = await makeResponse.blob();
+        const downloadUrl = window.URL.createObjectURL(pdfBlob);
 
         const link = document.createElement('a');
         link.href = downloadUrl;
-        link.setAttribute('download', generateFilename() + '.pdf'); // Set the final PDF filename
+        link.setAttribute('download', generateFilename() + '.pdf');
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-
+        window.URL.revokeObjectURL(downloadUrl);
+        
         button.innerHTML = 'Downloaded! ✅';
 
     } catch (error) {
