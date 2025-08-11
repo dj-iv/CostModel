@@ -768,57 +768,75 @@ async function generatePdf() {
     const button = document.getElementById('generate-pdf-btn');
     const originalText = button.innerHTML;
     if (!validateInputs(['customer-name', 'survey-price'])) return;
-    
-    button.innerHTML = 'Generating...';
+
+    button.innerHTML = 'Preparing...';
     button.disabled = true;
 
     try {
+        // 1. Get the correct DOCX template
         const systemType = document.getElementById('system-type').value;
-        const htmlTemplateMap = {
-            'G41': 'CEL-FI-GO-G41-Proposal-Template.html',
-            'G43': 'CEL-FI-GO-G43-Proposal-Template.html',
-            'QUATRA': 'CEL-FI-QUATRA-4000e-Proposal-Template.html',
-            'QUATRA_DAS': 'CEL-FI-QUATRA-4000e-Proposal-Template.html',
-            'QUATRA_EVO': 'CEL-FI-QUATRA-EVO-Proposal-Template.html',
-            'QUATRA_EVO_DAS': 'CEL-FI-QUATRA-EVO-Proposal-Template.html'
+        const docxTemplateMap = {
+            'G41': 'CEL-FI-GO-G41-Proposal-Template.docx',
+            'G43': 'CEL-FI-GO-G43-Proposal-Template.docx',
+            'QUATRA': 'CEL-FI-QUATRA-4000e-Proposal-Template.docx',
+            'QUATRA_DAS': 'CEL-FI-QUATRA-4000e-Proposal-Template.docx',
+            'QUATRA_EVO': 'CEL-FI-QUATRA-EVO-Proposal-Template.docx',
+            'QUATRA_EVO_DAS': 'CEL-FI-QUATRA-EVO-Proposal-Template.docx'
         };
+        const templateFilename = docxTemplateMap[systemType];
+        if (!templateFilename) throw new Error(`No template found for system type: ${systemType}`);
 
-        const templateFilename = htmlTemplateMap[systemType];
-        if (!templateFilename) {
-            throw new Error(`No HTML template found for system type: ${systemType}`);
-        }
-
+        // 2. Fetch the template and populate it with data
         const response = await fetch(`templates/${templateFilename}`);
-        if (!response.ok) {
-            throw new Error(`Could not fetch the HTML template: ${templateFilename}`);
-        }
-        let templateHtml = await response.text();
+        if (!response.ok) throw new Error(`Could not fetch template: ${response.statusText}`);
+        const content = await response.arrayBuffer();
+        const zip = new PizZip(content);
+        const doc = new docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+        doc.render(getTemplateData());
 
-        const data = getTemplateData();
-        
-        // Replace placeholders in the HTML
-        for (const key in data) {
-            const regex = new RegExp(`{${key}}`, 'g');
-            templateHtml = templateHtml.replace(regex, data[key]);
-        }
-        
-        // --- NEW FIX: Replace the title within the HTML string itself ---
-        const filename = generateFilename();
-        templateHtml = templateHtml.replace(/<title>.*<\/title>/, `<title>${filename}</title>`);
-        
-        const newTab = window.open();
-        newTab.document.open();
-        newTab.document.write(templateHtml);
-        newTab.document.close();
-        
+        // 3. Generate the DOCX file in memory as a "blob"
+        const blob = doc.getZip().generate({
+            type: "blob",
+            mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        });
+        const docxFilename = generateFilename() + '.docx';
+
+        // 4. Send the file to your Make.com webhook
+        button.innerHTML = 'Converting...';
+        const formData = new FormData();
+        formData.append('file', blob, docxFilename);
+
+        const makeResponse = await fetch(PDF_MAKE_WEBHOOK_URL, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!makeResponse.ok) throw new Error(`Make.com webhook failed: ${makeResponse.statusText}`);
+
+        // 5. Receive the public download link and trigger the download
+        const result = await makeResponse.json();
+        const downloadUrl = result.downloadUrl;
+
+        if (!downloadUrl) throw new Error('Make.com did not return a download URL.');
+
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.setAttribute('download', generateFilename() + '.pdf'); // Set the final PDF filename
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        button.innerHTML = 'Downloaded! ✅';
+
     } catch (error) {
         console.error('Error generating PDF:', error);
         alert('Could not generate the PDF. Please check the console for errors.');
+        button.innerHTML = 'Failed! ❌';
     } finally {
         setTimeout(() => {
             button.innerHTML = originalText;
             button.disabled = false;
-        }, 1000);
+        }, 3000);
     }
 }
     async function generateShareLink() {
