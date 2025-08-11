@@ -800,17 +800,13 @@ async function generatePdf() {
             templateHtml = templateHtml.replace(regex, data[key]);
         }
 
-        // ---- FINAL FIX: Replace the invisible non-breaking space characters ----
-        templateHtml = templateHtml.replace(/ /g, ' ');
+        // --- THE DEFINITIVE FIX ---
+        // This regex finds and removes the CSS rules for h2:before and h3:before that cause the crash.
+        const counterRegex = /(h2:before|h3:before)\s*\{[^}]*}/g;
+        templateHtml = templateHtml.replace(counterRegex, '');
 
-        // We can now remove the previous attempts as they are no longer needed, but keeping them is harmless.
-        templateHtml = templateHtml.replace(/£/g, '&pound;');
-        const emojiRegex = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g;
-        templateHtml = templateHtml.replace(emojiRegex, '');
-        
-        // Remove the console log now that we're done debugging
-        // console.log("--- DEBUG: HTML Content for PDF Generation ---");
-        // console.log(templateHtml);
+        // Also, replace non-breaking spaces, which can also cause issues.
+        templateHtml = templateHtml.replace(/ /g, ' ');
         
         const filename = generateFilename() + '.pdf';
         const opt = {
