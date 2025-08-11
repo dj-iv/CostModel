@@ -574,6 +574,63 @@ const doc = new docxtemplater(zip);
 }
     // --- NEW FEATURES (Make.com, Links, Validation) ---
    function initialize() {
+        const stateLoaded = loadStateFromURL();
+        const mainContainer = document.getElementById('main-container');
+        const viewToggleButton = document.getElementById('view-toggle-btn');
+
+        viewToggleButton.addEventListener('click', () => {
+            const isDashboard = mainContainer.classList.toggle('screenshot-mode');
+            viewToggleButton.textContent = isDashboard ? 'Switch to Simple View' : 'Switch to Dashboard View';
+        });
+        document.getElementById('generate-pdf-btn').addEventListener('click', generatePdf);
+        document.getElementById('generate-document-btn').addEventListener('click', generateDocument);
+        document.getElementById('send-to-make-btn').addEventListener('click', () => sendDataToMake('proposal'));
+        document.getElementById('quote-to-monday-btn').addEventListener('click', () => sendDataToMake('quote'));
+        document.getElementById('generate-link-btn').addEventListener('click', generateShareLink);
+        document.getElementById('support-preset-none').addEventListener('click', () => setSupportPreset('none'));
+        document.getElementById('support-preset-bronze').addEventListener('click', () => setSupportPreset('bronze'));
+        document.getElementById('support-preset-silver').addEventListener('click', () => setSupportPreset('silver'));
+        document.getElementById('support-preset-gold').addEventListener('click', () => setSupportPreset('gold'));
+
+        const validatedFields = ['customer-name', 'survey-price', 'quote-number'];
+        validatedFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if(field) { field.addEventListener('input', () => field.classList.remove('input-error')); }
+        });
+
+        document.querySelectorAll('#floor-area, input[name="unit-switch"], input[name="band-switch"], .wall-percent, #high-ceiling-warehouse, #number-of-floors').forEach(input => {
+            input.addEventListener('input', calculateCoverageRequirements);
+            input.addEventListener('change', calculateCoverageRequirements);
+        });
+        
+        document.getElementById('system-type').addEventListener('change', () => {
+            toggleMultiFloorUI();
+            calculateCoverageRequirements();
+        });
+
+        document.querySelectorAll('#number-of-networks, #max-antennas, #no-hardware-checkbox, #referral-fee-percent, #maintenance-percent, #customer-name, #survey-price, #quote-number').forEach(input => {
+            input.addEventListener('input', runFullCalculation);
+            input.addEventListener('change', runFullCalculation);
+        });
+
+        document.getElementById('reset-overrides').addEventListener('click', () => { for (const key in currentResults) { if (currentResults[key].hasOwnProperty('override')) currentResults[key].override = null; } setSupportPreset('none'); runFullCalculation(); });
+        document.getElementById('toggle-zero-qty-btn').addEventListener('click', (e) => { showZeroQuantityItems = !showZeroQuantityItems; e.target.textContent = showZeroQuantityItems ? 'Hide Zero Qty Items' : 'Show All Items'; runFullCalculation(); });
+
+        loadPrices();
+        setupSettingsModal();
+        populateSupportTable();
+        toggleMultiFloorUI();
+        
+        if (!stateLoaded) {
+            setSupportPreset('none'); // This calls runFullCalculation
+        } else {
+            runFullCalculation();
+        }
+        
+        calculateCoverageRequirements(); // Initial calculation on page load
+
+        mainContainer.classList.add('screenshot-mode');
+        viewToggleButton.textContent = 'Switch to Simple View';
     // --- Load state from URL first ---
     const stateLoaded = loadStateFromURL();
 
