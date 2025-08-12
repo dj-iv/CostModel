@@ -834,15 +834,19 @@ async function generatePdf() {
     }
 }
     
-    function loadStateFromURL() {
+   function loadStateFromURL() {
     if (!window.location.hash) return false;
 
     try {
         const encodedState = window.location.hash.substring(1);
         if (!encodedState) return false;
 
-        // 1. Decode and decompress the state from the URL
-        const compressed = atob(encodedState);
+        // 1. Decode and decompress using a more robust method
+        const compressedString = atob(encodedState);
+        const compressed = new Uint8Array(compressedString.length);
+        for (let i = 0; i < compressedString.length; i++) {
+            compressed[i] = compressedString.charCodeAt(i);
+        }
         const jsonString = pako.inflate(compressed, { to: 'string' });
         const state = JSON.parse(jsonString);
 
