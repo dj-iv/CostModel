@@ -573,155 +573,65 @@ const doc = new docxtemplater(zip);
     }
 }
     // --- NEW FEATURES (Make.com, Links, Validation) ---
-   function initialize() {
-        const stateLoaded = loadStateFromURL();
-        const mainContainer = document.getElementById('main-container');
-        const viewToggleButton = document.getElementById('view-toggle-btn');
+  function initialize() {
+    const stateLoaded = loadStateFromURL();
+    const mainContainer = document.getElementById('main-container');
+    const viewToggleButton = document.getElementById('view-toggle-btn');
 
-        viewToggleButton.addEventListener('click', () => {
-            const isDashboard = mainContainer.classList.toggle('screenshot-mode');
-            viewToggleButton.textContent = isDashboard ? 'Switch to Simple View' : 'Switch to Dashboard View';
-        });
-        document.getElementById('generate-pdf-btn').addEventListener('click', generatePdf);
-        document.getElementById('generate-document-btn').addEventListener('click', generateDocument);
-        document.getElementById('send-to-make-btn').addEventListener('click', () => sendDataToMake('proposal'));
-        document.getElementById('quote-to-monday-btn').addEventListener('click', () => sendDataToMake('quote'));
-        document.getElementById('generate-link-btn').addEventListener('click', generateShareLink);
-        document.getElementById('support-preset-none').addEventListener('click', () => setSupportPreset('none'));
-        document.getElementById('support-preset-bronze').addEventListener('click', () => setSupportPreset('bronze'));
-        document.getElementById('support-preset-silver').addEventListener('click', () => setSupportPreset('silver'));
-        document.getElementById('support-preset-gold').addEventListener('click', () => setSupportPreset('gold'));
+    viewToggleButton.addEventListener('click', () => {
+        const isDashboard = mainContainer.classList.toggle('screenshot-mode');
+        viewToggleButton.textContent = isDashboard ? 'Switch to Simple View' : 'Switch to Dashboard View';
+    });
+    document.getElementById('generate-pdf-btn').addEventListener('click', generatePdf);
+    document.getElementById('generate-document-btn').addEventListener('click', generateDocument);
+    // document.getElementById('send-to-make-btn').addEventListener('click', () => sendDataToMake('proposal'));
+    document.getElementById('quote-to-monday-btn').addEventListener('click', () => sendDataToMake('quote'));
+    document.getElementById('generate-link-btn').addEventListener('click', generateShareLink);
+    document.getElementById('support-preset-none').addEventListener('click', () => setSupportPreset('none'));
+    document.getElementById('support-preset-bronze').addEventListener('click', () => setSupportPreset('bronze'));
+    document.getElementById('support-preset-silver').addEventListener('click', () => setSupportPreset('silver'));
+    document.getElementById('support-preset-gold').addEventListener('click', () => setSupportPreset('gold'));
 
-        const validatedFields = ['customer-name', 'survey-price', 'quote-number'];
-        validatedFields.forEach(fieldId => {
-            const field = document.getElementById(fieldId);
-            if(field) { field.addEventListener('input', () => field.classList.remove('input-error')); }
-        });
+    const validatedFields = ['customer-name', 'survey-price', 'quote-number'];
+    validatedFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if(field) { field.addEventListener('input', () => field.classList.remove('input-error')); }
+    });
 
-        document.querySelectorAll('#floor-area, input[name="unit-switch"], input[name="band-switch"], .wall-percent, #high-ceiling-warehouse, #number-of-floors').forEach(input => {
-            input.addEventListener('input', calculateCoverageRequirements);
-            input.addEventListener('change', calculateCoverageRequirements);
-        });
-        
-        document.getElementById('system-type').addEventListener('change', () => {
-            toggleMultiFloorUI();
-            calculateCoverageRequirements();
-        });
-
-        document.querySelectorAll('#number-of-networks, #max-antennas, #no-hardware-checkbox, #referral-fee-percent, #maintenance-percent, #customer-name, #survey-price, #quote-number').forEach(input => {
-            input.addEventListener('input', runFullCalculation);
-            input.addEventListener('change', runFullCalculation);
-        });
-
-        document.getElementById('reset-overrides').addEventListener('click', () => { for (const key in currentResults) { if (currentResults[key].hasOwnProperty('override')) currentResults[key].override = null; } setSupportPreset('none'); runFullCalculation(); });
-        document.getElementById('toggle-zero-qty-btn').addEventListener('click', (e) => { showZeroQuantityItems = !showZeroQuantityItems; e.target.textContent = showZeroQuantityItems ? 'Hide Zero Qty Items' : 'Show All Items'; runFullCalculation(); });
-
-        loadPrices();
-        setupSettingsModal();
-        populateSupportTable();
+    document.querySelectorAll('#floor-area, input[name="unit-switch"], input[name="band-switch"], .wall-percent, #high-ceiling-warehouse, #number-of-floors').forEach(input => {
+        input.addEventListener('input', calculateCoverageRequirements);
+        input.addEventListener('change', calculateCoverageRequirements);
+    });
+    
+    document.getElementById('system-type').addEventListener('change', () => {
         toggleMultiFloorUI();
-        
-        if (!stateLoaded) {
-            setSupportPreset('none'); // This calls runFullCalculation
-        } else {
-            runFullCalculation();
-        }
-        
-        calculateCoverageRequirements(); // Initial calculation on page load
+        calculateCoverageRequirements();
+    });
 
-        mainContainer.classList.add('screenshot-mode');
-        viewToggleButton.textContent = 'Switch to Simple View';
+    document.querySelectorAll('#number-of-networks, #max-antennas, #no-hardware-checkbox, #referral-fee-percent, #maintenance-percent, #customer-name, #survey-price, #quote-number').forEach(input => {
+        input.addEventListener('input', runFullCalculation);
+        input.addEventListener('change', runFullCalculation);
+    });
 
-    function validateInputs(fieldIds) {
-        let isValid = true;
-        fieldIds.forEach(id => {
-            const field = document.getElementById(id);
-            if (!field.value.trim()) {
-                field.classList.add('input-error');
-                isValid = false;
-            } else {
-                field.classList.remove('input-error');
-            }
-        });
-        return isValid;
+    document.getElementById('reset-overrides').addEventListener('click', () => { for (const key in currentResults) { if (currentResults[key].hasOwnProperty('override')) currentResults[key].override = null; } setSupportPreset('none'); runFullCalculation(); });
+    document.getElementById('toggle-zero-qty-btn').addEventListener('click', (e) => { showZeroQuantityItems = !showZeroQuantityItems; e.target.textContent = showZeroQuantityItems ? 'Hide Zero Qty Items' : 'Show All Items'; runFullCalculation(); });
+
+    loadPrices();
+    setupSettingsModal();
+    populateSupportTable();
+    toggleMultiFloorUI();
+    
+    if (!stateLoaded) {
+        setSupportPreset('none'); // This calls runFullCalculation
+    } else {
+        runFullCalculation();
     }
+    
+    calculateCoverageRequirements(); // Initial calculation on page load
 
-    async function sendDataToMake(dataType) {
-        const buttonId = dataType === 'proposal' ? 'generate-proposal-btn' : 'quote-to-monday-btn';
-        const button = document.getElementById(buttonId);
-        const originalText = button.innerHTML;
-
-        if (dataType === 'proposal') { if (!validateInputs(['customer-name', 'survey-price'])) return;
-        } else if (dataType === 'quote') { if (!validateInputs(['quote-number'])) return; }
-
-        button.innerHTML = 'Sending...';
-        button.disabled = true;
-
-        try {
-            let totalHardwareSellPrice = 0, totalHardwareUnits = 0;
-            const hardwareKeys = ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB', 'extender_cat6', 'extender_fibre_cu', 'extender_fibre_nu'];
-            for (const key of hardwareKeys) { if (currentResults[key]) { const quantity = currentResults[key].override ?? currentResults[key].calculated; if (quantity > 0) { totalHardwareUnits += quantity; const priceInfo = priceData[key]; totalHardwareSellPrice += quantity * priceInfo.cost * (1 + priceInfo.margin); } } }
-            
-            let selectedSupportTier = 'none';
-            let selectedSupportName = "Please see the support options below";
-            const activeButton = document.querySelector('.support-presets-main button.active-preset');
-            if (activeButton && activeButton.id !== 'support-preset-none') {
-                selectedSupportTier = activeButton.id.replace('support-preset-', '');
-                selectedSupportName = selectedSupportTier.charAt(0).toUpperCase() + selectedSupportTier.slice(1);
-            }
-            const selectedSupportCost = getSpecificSupportCost(selectedSupportTier, totalHardwareUnits, totalHardwareSellPrice);
-            const professionalServicesCost = (subTotalsForProposal.services?.sell || 0) - selectedSupportCost;
-            const bronzeCost = getSpecificSupportCost('bronze', totalHardwareUnits, totalHardwareSellPrice);
-            const silverCost = getSpecificSupportCost('silver', totalHardwareUnits, totalHardwareSellPrice);
-            const goldCost = getSpecificSupportCost('gold', totalHardwareUnits, totalHardwareSellPrice);
-            const totalMargin = (subTotalsForProposal.hardware?.margin || 0) + (subTotalsForProposal.consumables?.margin || 0) + (subTotalsForProposal.services?.margin || 0);
-            const systemTypeSelect = document.getElementById('system-type');
-            const selectedValue = systemTypeSelect.value;
-            const selectedText = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
-            const solutionNameMap = {
-                'G41': 'GO G41 DAS', 'G43': 'GO G43 DAS',
-                'QUATRA': 'QUATRA 4000e Only', 'QUATRA_EVO': 'QUATRA EVO Only'
-            };
-            const solutionNameToSend = solutionNameMap[selectedValue] || selectedText;
-
-            const dataToSend = {
-                CustomerName: document.getElementById('customer-name').value,
-                Solution: solutionNameToSend,
-                NumberOfNetworks: document.getElementById('number-of-networks').value,
-                SurveyPrice: (parseFloat(document.getElementById('survey-price').value) || 0).toFixed(2),
-                Description1: "CEL-FI Hardware", Qty1: "1", UnitPrice1: (subTotalsForProposal.hardware?.sell || 0).toFixed(2), TotalPrice1: (subTotalsForProposal.hardware?.sell || 0).toFixed(2),
-                Description2: "Antennas, cables and connectors", Qty2: "1", UnitPrice2: (subTotalsForProposal.consumables?.sell || 0).toFixed(2), TotalPrice2: (subTotalsForProposal.consumables?.sell || 0).toFixed(2),
-                Description3: "Professional Services", Qty3: "1", UnitPrice3: professionalServicesCost.toFixed(2), TotalPrice3: professionalServicesCost.toFixed(2),
-                Description4: selectedSupportTier !== 'none' ? selectedSupportName : "Please see the support options below",
-                Qty4: selectedSupportTier !== 'none' ? "1" : "",
-                UnitPrice4: selectedSupportTier !== 'none' ? selectedSupportCost.toFixed(2) : "",
-                TotalPrice4: selectedSupportTier !== 'none' ? selectedSupportCost.toFixed(2) : "",
-                Support1: "Bronze", SupportQty1: "1", SupportUnitPrice1: bronzeCost.toFixed(2), SupportTotalPrice1: bronzeCost.toFixed(2),
-                Support2: "Silver", SupportQty2: "1", SupportUnitPrice2: silverCost.toFixed(2), SupportTotalPrice2: silverCost.toFixed(2),
-                Support3: "Gold", SupportQty3: "1", SupportUnitPrice3: goldCost.toFixed(2), SupportTotalPrice3: goldCost.toFixed(2),
-                MarginTotal: totalMargin.toFixed(2),
-                TotalMargin: totalMargin.toFixed(2),
-                QuoteNumber: dataType === 'quote' ? document.getElementById('quote-number').value : "",
-            };
-
-            const response = await fetch(MAKE_WEBHOOK_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify([dataToSend])
-            });
-
-            if (response.ok) { button.innerHTML = 'Sent! ✅'; } else { throw new Error(`Webhook failed: ${response.statusText}`); }
-        } catch (error) {
-            console.error(`Failed to send ${dataType}:`, error);
-            alert(`Error: Could not send ${dataType} to Make.com.`);
-            button.innerHTML = 'Failed! ❌';
-        } finally {
-            setTimeout(() => {
-                button.innerHTML = originalText;
-                button.disabled = false;
-            }, 3000);
-        }
-    }
+    mainContainer.classList.add('screenshot-mode');
+    viewToggleButton.textContent = 'Switch to Simple View';
+}
     // Helper function to gather all data for templates
 function getTemplateData() {
     // Calculate hardware totals for support calcs
