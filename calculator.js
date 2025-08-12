@@ -775,7 +775,7 @@ async function generatePdf() {
     }
 }
   
-  async function generateShareLink() {
+ async function generateShareLink() {
     const button = document.getElementById('generate-link-btn');
     const originalText = button.innerHTML;
 
@@ -812,10 +812,10 @@ async function generatePdf() {
             }
         }
 
-        // 3. Compress and encode the state into a URL-safe string
+        // 3. Compress and encode the state using a more robust method
         const jsonString = JSON.stringify(state);
-        const compressed = pako.deflate(jsonString, { to: 'string' });
-        const encodedState = btoa(compressed);
+        const compressed = pako.deflate(jsonString); // Produces a Uint8Array
+        const encodedState = btoa(String.fromCharCode.apply(null, compressed));
 
         // 4. Create the final shareable URL
         const shareUrl = `${window.location.origin}${window.location.pathname}#${encodedState}`;
