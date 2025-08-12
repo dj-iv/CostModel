@@ -229,6 +229,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function updateDOM() {
+        const systemTypeSelect = document.getElementById('system-type');
+    const solutionName = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
+    document.getElementById('solution-type-display').textContent = solutionName;
         const systemType = document.getElementById('system-type').value;
         const excludeHardware = document.getElementById('no-hardware-checkbox').checked;
         const referralPercent = parseFloat(document.getElementById('referral-fee-percent').value) || 0;
