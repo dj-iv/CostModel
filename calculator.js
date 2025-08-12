@@ -574,20 +574,17 @@ const doc = new docxtemplater(zip);
 }
     // --- NEW FEATURES (Make.com, Links, Validation) ---
   function initialize() {
-    // --- Load state from URL first ---
     const stateLoaded = loadStateFromURL();
-
-    // --- Get DOM elements ---
     const mainContainer = document.getElementById('main-container');
     const viewToggleButton = document.getElementById('view-toggle-btn');
 
-    // --- Attach all event listeners ---
     viewToggleButton.addEventListener('click', () => {
         const isDashboard = mainContainer.classList.toggle('screenshot-mode');
         viewToggleButton.textContent = isDashboard ? 'Switch to Simple View' : 'Switch to Dashboard View';
     });
     document.getElementById('generate-pdf-btn').addEventListener('click', generatePdf);
     document.getElementById('generate-document-btn').addEventListener('click', generateDocument);
+    // document.getElementById('send-to-make-btn').addEventListener('click', () => sendDataToMake('proposal'));
     document.getElementById('quote-to-monday-btn').addEventListener('click', () => sendDataToMake('quote'));
     document.getElementById('generate-link-btn').addEventListener('click', generateShareLink);
     document.getElementById('support-preset-none').addEventListener('click', () => setSupportPreset('none'));
@@ -619,23 +616,19 @@ const doc = new docxtemplater(zip);
     document.getElementById('reset-overrides').addEventListener('click', () => { for (const key in currentResults) { if (currentResults[key].hasOwnProperty('override')) currentResults[key].override = null; } setSupportPreset('none'); runFullCalculation(); });
     document.getElementById('toggle-zero-qty-btn').addEventListener('click', (e) => { showZeroQuantityItems = !showZeroQuantityItems; e.target.textContent = showZeroQuantityItems ? 'Hide Zero Qty Items' : 'Show All Items'; runFullCalculation(); });
 
-    // --- Initial Setup ---
     loadPrices();
     setupSettingsModal();
     populateSupportTable();
     toggleMultiFloorUI();
     
-    // --- Final Calculation Logic ---
-    // If no state was loaded from the URL, set the default 'None' support package.
     if (!stateLoaded) {
-        setSupportPreset('none');
+        setSupportPreset('none'); // This calls runFullCalculation
+    } else {
+        runFullCalculation();
     }
     
-    // Run the main antenna calculation, which will use the loaded state (if it exists)
-    // and will also trigger the final runFullCalculation().
-    calculateCoverageRequirements(); 
+    calculateCoverageRequirements(); // Initial calculation on page load
 
-    // Default to dashboard view
     mainContainer.classList.add('screenshot-mode');
     viewToggleButton.textContent = 'Switch to Simple View';
 }
