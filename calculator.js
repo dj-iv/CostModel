@@ -133,6 +133,18 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateCellDisplay(cell, key) { const item = currentResults[key], displaySpan = cell.querySelector('.value-display'), isOverridden = item.override !== null, value = isOverridden ? item.override : item.calculated; displaySpan.textContent = `${value.toFixed(item.decimals || 0)}`; displaySpan.classList.toggle('overridden', isOverridden); }
     
    function calculateCoverageRequirements() {
+    // --- This new block clears previous overrides ---
+    if (currentResults['service_antennas']) {
+        currentResults['service_antennas'].override = null;
+    }
+    if (currentResults['QUATRA_CU']) {
+        currentResults['QUATRA_CU'].override = null;
+    }
+    if (currentResults['QUATRA_EVO_CU']) {
+        currentResults['QUATRA_EVO_CU'].override = null;
+    }
+    // --- End of new block ---
+
     const pOpen = parseFloat(document.getElementById('percent-open').value) || 0;
     const pCubical = parseFloat(document.getElementById('percent-cubical').value) || 0;
     const pHollow = parseFloat(document.getElementById('percent-hollow').value) || 0;
@@ -147,11 +159,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const unit = document.querySelector('input[name="unit-switch"]:checked').value;
     const band = document.querySelector('input[name="band-switch"]:checked').value;
     
-    // --- THIS IS THE UPDATED LOGIC ---
-    // It now uses the 'go' metrics for any system that uses passive antennas (GO or DAS)
     const usesPassiveAntennas = systemType.includes('DAS') || systemType.includes('G4');
     const dataSource = usesPassiveAntennas ? coverageData.go : coverageData.quatra;
-    // --- END OF UPDATE ---
 
     const coverage = dataSource[band]?.[unit];
     let unitsForArea = 0;
@@ -160,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const isHighCeiling = document.getElementById('high-ceiling-warehouse').checked;
 
     if (floorArea > 0 && coverage) {
-        if (isQuatra && isHighCeiling) {
+        if (isQuatra && isHighCeiling && !usesPassiveAntennas) {
             unitsForArea = floorArea / coverage.open_high_ceiling;
         } else {
             const percentages = { open: pOpen, cubical: pCubical, hollow: pHollow, solid: pSolid };
@@ -186,65 +195,93 @@ document.addEventListener('DOMContentLoaded', () => {
 }
     
     function runFullCalculation() {
-        try {
-            const systemType = document.getElementById('system-type').value;
-            const networksInput = document.getElementById('number-of-networks');
-            if (systemType.includes('EVO') && parseInt(networksInput.value) > 2) { networksInput.value = '2'; }
-            const params = {
-                B_SA: parseInt(document.getElementById('total-service-antennas').value) || 0,
-                C_Net: parseInt(networksInput.value) || 0,
-                E_Max: parseInt(document.getElementById('max-antennas').value) || 0,
-            };
-            params.D_DA = params.C_Net > 1 ? 2 : params.C_Net;
-            const calculatedValues = systemCalculators[systemType](params);
-            for (const key in currentResults) { currentResults[key].calculated = 0; }
-            for (const key in calculatedValues) {
-                if (currentResults[key]) {
-                    currentResults[key].calculated = calculatedValues[key];
-                } else {
-                    currentResults[key] = { calculated: calculatedValues[key], override: null, decimals: 0, unit: { coax_half: ' (m)', coax_lmr400: ' (m)', cable_cat: ' (m)', install_internal: ' (Days)', install_external: ' (Days)' }[key] || '' };
-                }
+    try {
+        const systemType = document.getElementById('system-type').value;
+        const networksInput = document.getElementById('number-of-networks');
+        if (systemType.includes('EVO') && parseInt(networksInput.value) > 2) { networksInput.value = '2'; }
+
+        // --- New logic to check for and use overrides ---
+        let serviceAntennaCount = parseInt(document.getElementById('total-service-antennas').value) || 0;
+        const isNonDasQuatra = systemType === 'QUATRA' || systemType === 'QUATRA_EVO';
+        
+        // For non-DAS Quatra, the CU count is the primary driver
+        if (isNonDasQuatra) {
+            const cuKey = systemType === 'QUATRA' ? 'QUATRA_CU' : 'QUATRA_EVO_CU';
+            if (currentResults[cuKey] && currentResults[cuKey].override !== null) {
+                serviceAntennaCount = currentResults[cuKey].override;
             }
-            if(!currentResults['service_antennas']) { currentResults['service_antennas'] = { calculated: 0, override: null, decimals: 0, unit: '' }; }
-            currentResults['service_antennas'].calculated = params.B_SA;
-            const internal_days = currentResults['install_internal']?.override ?? currentResults['install_internal']?.calculated ?? 0;
-            if(currentResults['travel_expenses']) { currentResults['travel_expenses'].calculated = internal_days; } else { currentResults['travel_expenses'] = { calculated: internal_days, override: null, decimals: 0, unit: ' (Days)'}; }
-            let totalHardwareSellPrice = 0, totalHardwareUnits = 0;
-            const hardwareKeys = ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB', 'extender_cat6', 'extender_fibre_cu', 'extender_fibre_nu'];
-            for (const key of hardwareKeys) {
-                if (currentResults[key]) {
-                    const quantity = currentResults[key].override ?? currentResults[key].calculated;
-                    if (quantity > 0) {
-                        totalHardwareUnits += quantity;
-                        const priceInfo = priceData[key];
-                        totalHardwareSellPrice += quantity * priceInfo.cost * (1 + priceInfo.margin);
-                    }
-                }
+        // For GO and DAS systems, the service antenna count is the driver
+        } else {
+            if (currentResults['service_antennas'] && currentResults['service_antennas'].override !== null) {
+                serviceAntennaCount = currentResults['service_antennas'].override;
             }
-            const supportCost = calculateSupportCost(totalHardwareUnits, totalHardwareSellPrice);
-            if(!currentResults['support_package']) { currentResults['support_package'] = { calculated: 0, override: null, decimals: 2, unit: ''}; }
-            currentResults['support_package'].calculated = supportCost;
-            priceData['support_package'].cost = supportCost;
-            if (supportCost > 0) {
-                const activeButton = document.querySelector('.support-presets-main button.active-preset');
-                if (activeButton && activeButton.id !== 'support-preset-none') {
-                    const tier = activeButton.id.replace('support-preset-', '');
-                    const tierName = tier.charAt(0).toUpperCase() + tier.slice(1);
-                    priceData['support_package'].label = `Annual ${tierName} Support Package`;
-                } else {
-                    priceData['support_package'].label = `Annual Custom Support Package`;
-                }
-            } else {
-                priceData['support_package'].label = "Annual Support Package";
-            }
-            updateDOM();
-            updateAllSupportTierPrices();
-        } catch (error) {
-            console.error("A critical error occurred during calculation:", error);
-            const resultsBody = document.getElementById('results-tbody');
-            if(resultsBody) resultsBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: red;">An error occurred. Please refresh and try again.</td></tr>`;
         }
+
+        // Handle Donor Antenna overrides to drive bracket calculations
+        let donorAntennaCount = (parseInt(networksInput.value) || 0) > 1 ? 2 : (parseInt(networksInput.value) || 0);
+        if (currentResults['donor_wideband'] && currentResults['donor_wideband'].override !== null) {
+            donorAntennaCount = currentResults['donor_wideband'].override;
+        } else if (currentResults['donor_lpda'] && currentResults['donor_lpda'].override !== null) {
+            donorAntennaCount = currentResults['donor_lpda'].override;
+        }
+        // --- End of new logic ---
+
+        const params = {
+            B_SA: serviceAntennaCount,
+            C_Net: parseInt(networksInput.value) || 0,
+            E_Max: parseInt(document.getElementById('max-antennas').value) || 0,
+        };
+        params.D_DA = donorAntennaCount; // Use the potentially overridden value
+
+        const calculatedValues = systemCalculators[systemType](params);
+        for (const key in currentResults) { currentResults[key].calculated = 0; }
+        for (const key in calculatedValues) {
+            if (currentResults[key]) {
+                currentResults[key].calculated = calculatedValues[key];
+            } else {
+                currentResults[key] = { calculated: calculatedValues[key], override: null, decimals: 0, unit: { coax_half: ' (m)', coax_lmr400: ' (m)', cable_cat: ' (m)', install_internal: ' (Days)', install_external: ' (Days)' }[key] || '' };
+            }
+        }
+        if(!currentResults['service_antennas']) { currentResults['service_antennas'] = { calculated: 0, override: null, decimals: 0, unit: '' }; }
+        currentResults['service_antennas'].calculated = params.B_SA;
+        const internal_days = currentResults['install_internal']?.override ?? currentResults['install_internal']?.calculated ?? 0;
+        if(currentResults['travel_expenses']) { currentResults['travel_expenses'].calculated = internal_days; } else { currentResults['travel_expenses'] = { calculated: internal_days, override: null, decimals: 0, unit: ' (Days)'}; }
+        let totalHardwareSellPrice = 0, totalHardwareUnits = 0;
+        const hardwareKeys = ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB', 'extender_cat6', 'extender_fibre_cu', 'extender_fibre_nu'];
+        for (const key of hardwareKeys) {
+            if (currentResults[key]) {
+                const quantity = currentResults[key].override ?? currentResults[key].calculated;
+                if (quantity > 0) {
+                    totalHardwareUnits += quantity;
+                    const priceInfo = priceData[key];
+                    totalHardwareSellPrice += quantity * priceInfo.cost * (1 + priceInfo.margin);
+                }
+            }
+        }
+        const supportCost = calculateSupportCost(totalHardwareUnits, totalHardwareSellPrice);
+        if(!currentResults['support_package']) { currentResults['support_package'] = { calculated: 0, override: null, decimals: 2, unit: ''}; }
+        currentResults['support_package'].calculated = supportCost;
+        priceData['support_package'].cost = supportCost;
+        if (supportCost > 0) {
+            const activeButton = document.querySelector('.support-presets-main button.active-preset');
+            if (activeButton && activeButton.id !== 'support-preset-none') {
+                const tier = activeButton.id.replace('support-preset-', '');
+                const tierName = tier.charAt(0).toUpperCase() + tier.slice(1);
+                priceData['support_package'].label = `Annual ${tierName} Support Package`;
+            } else {
+                priceData['support_package'].label = `Annual Custom Support Package`;
+            }
+        } else {
+            priceData['support_package'].label = "Annual Support Package";
+        }
+        updateDOM();
+        updateAllSupportTierPrices();
+    } catch (error) {
+        console.error("A critical error occurred during calculation:", error);
+        const resultsBody = document.getElementById('results-tbody');
+        if(resultsBody) resultsBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: red;">An error occurred. Please refresh and try again.</td></tr>`;
     }
+}
     
     function updateDOM() {
         const systemTypeSelect = document.getElementById('system-type');
