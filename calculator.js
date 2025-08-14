@@ -132,40 +132,58 @@ document.addEventListener('DOMContentLoaded', () => {
     function deactivateEditMode(cell, key, save) { const displaySpan = cell.querySelector('.value-display'), inputField = cell.querySelector('.value-input'); if (save) { const newValue = parseFloat(inputField.value); if (!isNaN(newValue)) { currentResults[key].override = newValue; runFullCalculation(); } } else { inputField.classList.add('hidden'); displaySpan.classList.remove('hidden'); } }
     function updateCellDisplay(cell, key) { const item = currentResults[key], displaySpan = cell.querySelector('.value-display'), isOverridden = item.override !== null, value = isOverridden ? item.override : item.calculated; displaySpan.textContent = `${value.toFixed(item.decimals || 0)}`; displaySpan.classList.toggle('overridden', isOverridden); }
     
-    function calculateCoverageRequirements() {
-        const pOpen=parseFloat(document.getElementById('percent-open').value)||0, pCubical=parseFloat(document.getElementById('percent-cubical').value)||0, pHollow=parseFloat(document.getElementById('percent-hollow').value)||0, pSolid=parseFloat(document.getElementById('percent-solid').value)||0;
-        const sum = pOpen + pCubical + pHollow + pSolid;
-        const sumSpan = document.getElementById('percentage-sum');
-        sumSpan.textContent = `${sum.toFixed(0)}%`; sumSpan.style.color = (sum.toFixed(0) === "100") ? 'green' : 'red';
-        const systemType=document.getElementById('system-type').value;
-        const floorArea=parseFloat(document.getElementById('floor-area').value)||0;
-        const unit=document.querySelector('input[name="unit-switch"]:checked').value;
-        const band=document.querySelector('input[name="band-switch"]:checked').value;
-        const isQuatra = systemType.includes('QUATRA');
-        const isHighCeiling = document.getElementById('high-ceiling-warehouse').checked;
-        const dataSource = isQuatra ? coverageData.quatra : coverageData.go;
-        const coverage = dataSource[band]?.[unit];
-        let unitsForArea = 0;
-        if (floorArea > 0 && coverage) {
-            if (isQuatra && isHighCeiling) {
-                unitsForArea = floorArea / coverage.open_high_ceiling;
-            } else {
-                const percentages = { open: pOpen, cubical: pCubical, hollow: pHollow, solid: pSolid };
-                unitsForArea = ((floorArea*(percentages.open/100))/coverage.open) + ((floorArea*(percentages.cubical/100))/coverage.cubical) + ((floorArea*(percentages.hollow/100))/coverage.hollow) + ((floorArea*(percentages.solid/100))/coverage.solid);
-            }
-        }
-        let totalRequiredUnits;
-        const isNonDasQuatra = systemType === 'QUATRA' || systemType === 'QUATRA_EVO';
-        if (isNonDasQuatra) {
-            const numberOfFloors = parseInt(document.getElementById('number-of-floors').value) || 1;
-            const roundedUpUnitsPerFloor = Math.ceil(unitsForArea);
-            totalRequiredUnits = roundedUpUnitsPerFloor * numberOfFloors;
+   function calculateCoverageRequirements() {
+    const pOpen = parseFloat(document.getElementById('percent-open').value) || 0;
+    const pCubical = parseFloat(document.getElementById('percent-cubical').value) || 0;
+    const pHollow = parseFloat(document.getElementById('percent-hollow').value) || 0;
+    const pSolid = parseFloat(document.getElementById('percent-solid').value) || 0;
+    const sum = pOpen + pCubical + pHollow + pSolid;
+    const sumSpan = document.getElementById('percentage-sum');
+    sumSpan.textContent = `${sum.toFixed(0)}%`;
+    sumSpan.style.color = (sum.toFixed(0) === "100") ? 'green' : 'red';
+
+    const systemType = document.getElementById('system-type').value;
+    const floorArea = parseFloat(document.getElementById('floor-area').value) || 0;
+    const unit = document.querySelector('input[name="unit-switch"]:checked').value;
+    const band = document.querySelector('input[name="band-switch"]:checked').value;
+    
+    // --- THIS IS THE UPDATED LOGIC ---
+    // It now uses the 'go' metrics for any system that uses passive antennas (GO or DAS)
+    const usesPassiveAntennas = systemType.includes('DAS') || systemType.includes('G4');
+    const dataSource = usesPassiveAntennas ? coverageData.go : coverageData.quatra;
+    // --- END OF UPDATE ---
+
+    const coverage = dataSource[band]?.[unit];
+    let unitsForArea = 0;
+    
+    const isQuatra = systemType.includes('QUATRA');
+    const isHighCeiling = document.getElementById('high-ceiling-warehouse').checked;
+
+    if (floorArea > 0 && coverage) {
+        if (isQuatra && isHighCeiling) {
+            unitsForArea = floorArea / coverage.open_high_ceiling;
         } else {
-            totalRequiredUnits = Math.ceil(unitsForArea);
+            const percentages = { open: pOpen, cubical: pCubical, hollow: pHollow, solid: pSolid };
+            unitsForArea = ((floorArea * (percentages.open / 100)) / coverage.open) +
+                           ((floorArea * (percentages.cubical / 100)) / coverage.cubical) +
+                           ((floorArea * (percentages.hollow / 100)) / coverage.hollow) +
+                           ((floorArea * (percentages.solid / 100)) / coverage.solid);
         }
-        document.getElementById('total-service-antennas').value = totalRequiredUnits;
-        runFullCalculation();
     }
+
+    let totalRequiredUnits;
+    const isNonDasQuatra = systemType === 'QUATRA' || systemType === 'QUATRA_EVO';
+    if (isNonDasQuatra) {
+        const numberOfFloors = parseInt(document.getElementById('number-of-floors').value) || 1;
+        const roundedUpUnitsPerFloor = Math.ceil(unitsForArea);
+        totalRequiredUnits = roundedUpUnitsPerFloor * numberOfFloors;
+    } else {
+        totalRequiredUnits = Math.ceil(unitsForArea);
+    }
+    
+    document.getElementById('total-service-antennas').value = totalRequiredUnits;
+    runFullCalculation();
+}
     
     function runFullCalculation() {
         try {
