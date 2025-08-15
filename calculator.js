@@ -293,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const referralDecimal = referralPercent / 100;
         const uplift = (referralDecimal > 0 && referralDecimal < 1) ? 1 / (1 - referralDecimal) : 1;
         document.getElementById('high-ceiling-checkbox-group').style.display = ['QUATRA', 'QUATRA_EVO'].includes(systemType) ? 'block' : 'none';
-        document.getElementById('max-antennas-group').style.display = ['QUATRA', 'QUATRA_EVO', 'QUATRA_DAS', 'QUATRA_EVO_DAS'].includes(systemType) ? 'none' : 'flex';
+        document.getElementById('max-antennas-group').style.display = ['QUATRA', 'QUATRA_EVO'].includes(systemType) ? 'none' : 'flex';
         const resultsHead = document.getElementById('results-thead'), resultsBody = document.getElementById('results-tbody');
         resultsBody.innerHTML = '';
         resultsHead.innerHTML = `<tr><th class="col-item">Item</th><th class="col-qty">Qty</th><th class="col-sell">Unit Sell</th><th class="col-total">Total Sell</th><th class="col-margin">Margin (£)</th></tr>`;
