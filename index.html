@@ -429,12 +429,20 @@
                 <button id="support-preset-gold">Gold</button>
                 <button id="support-preset-none">None</button>
             </div>
-            <div class="support-prices-display">
-                <span class="support-price-item">B: <strong id="bronze-price-display">£0.00</strong></span>
-                <span class="support-price-item">S: <strong id="silver-price-display">£0.00</strong></span>
-                <span class="support-price-item">G: <strong id="gold-price-display">£0.00</strong></span>
-                <span class="support-price-item"></span>
-            </div>
+          <div class="support-prices-display">
+    <div class="support-price-item editable-price" data-tier="bronze">
+        B: <span class="value-display">£0.00</span><input type="number" step="any" class="value-input hidden" />
+    </div>
+    <div class="support-price-item editable-price" data-tier="silver">
+        S: <span class="value-display">£0.00</span><input type="number" step="any" class="value-input hidden" />
+    </div>
+    <div class="support-price-item editable-price" data-tier="gold">
+        G: <span class="value-display">£0.00</span><input type="number" step="any" class="value-input hidden" />
+    </div>
+    <div class="support-price-item">
+        <button id="reset-support-prices" style="padding: 2px 5px; font-size: 11px;">Reset</button>
+    </div>
+</div>
         </div>
 
         <div class="section" id="results-section">
