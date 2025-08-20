@@ -23,7 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
         'cable_fibre':{label:"Fibre Cable/Patch",cost:100,margin:0.3},'connectors':{label:"N-Type Connectors",cost:1.42,margin:3},'connectors_rg45':{label:"RJ45 Connectors",cost:0.4,margin:2.5},'adapters_sfp':{label:"SFP Adapter",cost:25,margin:3},
         'adapters_n':{label:"4.3/10 to N Adapter",cost:4.61,margin:5.0},
         'install_internal':{label:"Installation (Internal)",cost:150,margin:3},'install_external':{label:"Installation (External)",cost:600,margin:0.5},'cherry_picker':{label:"Cherry Picker",cost:480,margin:0.3},'travel_expenses':{label:"Travel Expenses",cost:150,margin:0},
-        'support_package': {label: "Annual Support Package", cost: 0, margin: 0}
+        'support_package': {label: "Annual Support Package", cost: 0, margin: 0},
+'survey_price_item': {label: "Site Survey", cost: 0, margin: 0}
     };    
     const supportData = {
         'remote_monitoring': { label: 'Remote Monitoring', description: 'Alerts and events captured on the management portal', dpm: 0.005, tiers: ['silver', 'gold'], type: 'per_system' },
