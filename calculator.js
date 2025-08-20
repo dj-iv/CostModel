@@ -458,42 +458,52 @@ function updateDOM() {
             if(yearSummaryCell) yearSummaryCell.textContent = `£${fixedServicesCost.toFixed(2)}`;
         }
     }
-    function getSpecificSupportCost(tier, totalHardwareUnits, totalHardwareSellPrice) {
-        let totalPerSystemDPY = 0, totalFixedAnnualDPY = 0;
-        const maintenancePercent = (tier === 'none') ? 0 : 5;
-        for (const key in supportData) {
-            if (supportData[key].tiers.includes(tier)) {
-                const dpyValue = (supportData[key].dpm || 0) * 12;
-                if (supportData[key].type === 'per_system') totalPerSystemDPY += dpyValue;
-                else totalFixedAnnualDPY += dpyValue;
+   function getSpecificSupportCost(tier, totalHardwareUnits, totalHardwareSellPrice) {
+    if (supportPriceOverrides[tier] !== null) {
+        return supportPriceOverrides[tier];
+    }
+    let totalPerSystemDPY = 0, totalFixedAnnualDPY = 0;
+    const maintenancePercent = (tier === 'none') ? 0 : 5;
+    for (const key in supportData) {
+        if (supportData[key].tiers.includes(tier)) {
+            const dpyValue = (supportData[key].dpm || 0) * 12;
+            if (supportData[key].type === 'per_system') totalPerSystemDPY += dpyValue;
+            else totalFixedAnnualDPY += dpyValue;
+        }
+    }
+    const dailyInstallRate = (priceData.install_internal?.cost * (1 + priceData.install_internal?.margin)) || 0;
+    const perSystemCost = totalPerSystemDPY * dailyInstallRate * totalHardwareUnits;
+    const fixedAnnualCost = totalFixedAnnualDPY * dailyInstallRate;
+    const maintenanceCost = totalHardwareSellPrice * (maintenancePercent / 100);
+    return perSystemCost + fixedAnnualCost + maintenanceCost;
+}
+   function updateAllSupportTierPrices() {
+    let totalHardwareSellPrice = 0, totalHardwareUnits = 0;
+    const hardwareKeys = ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB', 'extender_cat6', 'extender_fibre_cu', 'extender_fibre_nu'];
+    for (const key of hardwareKeys) {
+        if (currentResults[key]) {
+            const quantity = currentResults[key].override ?? currentResults[key].calculated;
+            if (quantity > 0) {
+                totalHardwareUnits += quantity;
+                const priceInfo = priceData[key];
+                totalHardwareSellPrice += quantity * priceInfo.cost * (1 + priceInfo.margin);
             }
         }
-        const dailyInstallRate = (priceData.install_internal?.cost * (1 + priceData.install_internal?.margin)) || 0;
-        const perSystemCost = totalPerSystemDPY * dailyInstallRate * totalHardwareUnits;
-        const fixedAnnualCost = totalFixedAnnualDPY * dailyInstallRate;
-        const maintenanceCost = totalHardwareSellPrice * (maintenancePercent / 100);
-        return perSystemCost + fixedAnnualCost + maintenanceCost;
     }
-    function updateAllSupportTierPrices() {
-        let totalHardwareSellPrice = 0, totalHardwareUnits = 0;
-        const hardwareKeys = ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB', 'extender_cat6', 'extender_fibre_cu', 'extender_fibre_nu'];
-        for (const key of hardwareKeys) {
-            if (currentResults[key]) {
-                const quantity = currentResults[key].override ?? currentResults[key].calculated;
-                if (quantity > 0) {
-                    totalHardwareUnits += quantity;
-                    const priceInfo = priceData[key];
-                    totalHardwareSellPrice += quantity * priceInfo.cost * (1 + priceInfo.margin);
-                }
-            }
+
+    ['bronze', 'silver', 'gold'].forEach(tier => {
+        const calculatedCost = getSpecificSupportCost(tier, totalHardwareUnits, totalHardwareSellPrice);
+        const displayPrice = supportPriceOverrides[tier] !== null ? supportPriceOverrides[tier] : calculatedCost;
+        
+        const container = document.querySelector(`.editable-price[data-tier="${tier}"]`);
+        if(container) {
+            const displaySpan = container.querySelector('.value-display');
+            displaySpan.textContent = `£${displayPrice.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            displaySpan.style.fontStyle = supportPriceOverrides[tier] !== null ? 'italic' : 'normal';
+            displaySpan.style.color = supportPriceOverrides[tier] !== null ? '#d9534f' : 'inherit';
         }
-        const bronzeCost = getSpecificSupportCost('bronze', totalHardwareUnits, totalHardwareSellPrice);
-        const silverCost = getSpecificSupportCost('silver', totalHardwareUnits, totalHardwareSellPrice);
-        const goldCost = getSpecificSupportCost('gold', totalHardwareUnits, totalHardwareSellPrice);
-        document.getElementById('bronze-price-display').textContent = `£${bronzeCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-        document.getElementById('silver-price-display').textContent = `£${silverCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-        document.getElementById('gold-price-display').textContent = `£${goldCost.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-    }
+    });
+}
     function calculateSupportCost(totalHardwareUnits, totalHardwareSellPrice) {
         let totalPerSystemDPY = 0, totalFixedAnnualDPY = 0;
         const selectedServices = document.querySelectorAll('.support-checkbox:checked');
@@ -666,17 +676,20 @@ const doc = new docxtemplater(zip);
 }
     // --- NEW FEATURES (Make.com, Links, Validation) ---
   function initialize() {
+    // --- Load state from URL first ---
     const stateLoaded = loadStateFromURL();
+
+    // --- Get DOM elements ---
     const mainContainer = document.getElementById('main-container');
     const viewToggleButton = document.getElementById('view-toggle-btn');
 
+    // --- Attach all event listeners ---
     viewToggleButton.addEventListener('click', () => {
         const isDashboard = mainContainer.classList.toggle('screenshot-mode');
         viewToggleButton.textContent = isDashboard ? 'Switch to Simple View' : 'Switch to Dashboard View';
     });
     document.getElementById('generate-pdf-btn').addEventListener('click', generatePdf);
     document.getElementById('generate-document-btn').addEventListener('click', generateDocument);
-    // document.getElementById('send-to-make-btn').addEventListener('click', () => sendDataToMake('proposal'));
     document.getElementById('quote-to-monday-btn').addEventListener('click', () => sendDataToMake('quote'));
     document.getElementById('generate-link-btn').addEventListener('click', generateShareLink);
     document.getElementById('support-preset-none').addEventListener('click', () => setSupportPreset('none'));
@@ -700,27 +713,67 @@ const doc = new docxtemplater(zip);
         calculateCoverageRequirements();
     });
 
-    document.querySelectorAll('#number-of-networks, #max-antennas, #no-hardware-checkbox, #referral-fee-percent, #maintenance-percent, #customer-name, #survey-price, #quote-number').forEach(input => {
+    document.querySelectorAll('#number-of-networks, #max-antennas, #no-hardware-checkbox, #referral-fee-percent, #maintenance-percent, #customer-name, #survey-price, #quote-number, #total-service-antennas').forEach(input => {
         input.addEventListener('input', runFullCalculation);
         input.addEventListener('change', runFullCalculation);
     });
 
     document.getElementById('reset-overrides').addEventListener('click', () => { for (const key in currentResults) { if (currentResults[key].hasOwnProperty('override')) currentResults[key].override = null; } setSupportPreset('none'); runFullCalculation(); });
     document.getElementById('toggle-zero-qty-btn').addEventListener('click', (e) => { showZeroQuantityItems = !showZeroQuantityItems; e.target.textContent = showZeroQuantityItems ? 'Hide Zero Qty Items' : 'Show All Items'; runFullCalculation(); });
+    
+    // --- New listeners for editable support prices ---
+    document.querySelectorAll('.editable-price').forEach(cell => {
+        const tier = cell.dataset.tier;
+        const displaySpan = cell.querySelector('.value-display');
+        const inputField = cell.querySelector('.value-input');
 
+        const activate = () => {
+            displaySpan.classList.add('hidden');
+            inputField.classList.remove('hidden');
+            inputField.value = supportPriceOverrides[tier] !== null ? supportPriceOverrides[tier] : getSpecificSupportCost(tier, 0, 0); // Simplified calc for placeholder
+            inputField.focus();
+            inputField.select();
+        };
+
+        const deactivate = (save) => {
+            if (save) {
+                const newValue = parseFloat(inputField.value);
+                if (!isNaN(newValue)) {
+                    supportPriceOverrides[tier] = newValue;
+                }
+            }
+            inputField.classList.add('hidden');
+            displaySpan.classList.remove('hidden');
+            runFullCalculation();
+        };
+
+        cell.addEventListener('click', activate);
+        inputField.addEventListener('blur', () => deactivate(true));
+        inputField.addEventListener('keydown', e => {
+            if (e.key === 'Enter') deactivate(true);
+            else if (e.key === 'Escape') deactivate(false);
+        });
+    });
+
+    document.getElementById('reset-support-prices').addEventListener('click', () => {
+        supportPriceOverrides = { bronze: null, silver: null, gold: null };
+        runFullCalculation();
+    });
+
+    // --- Initial Setup ---
     loadPrices();
     setupSettingsModal();
     populateSupportTable();
     toggleMultiFloorUI();
     
+    // --- Final Calculation Logic ---
     if (!stateLoaded) {
-        setSupportPreset('none'); // This calls runFullCalculation
-    } else {
-        runFullCalculation();
+        setSupportPreset('none');
     }
     
-    calculateCoverageRequirements(); // Initial calculation on page load
+    calculateCoverageRequirements(); 
 
+    // Default to dashboard view
     mainContainer.classList.add('screenshot-mode');
     viewToggleButton.textContent = 'Switch to Simple View';
 }
