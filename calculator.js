@@ -194,44 +194,39 @@ document.addEventListener('DOMContentLoaded', () => {
     runFullCalculation();
 }
     
-    function runFullCalculation() {
+function runFullCalculation() {
     try {
         const systemType = document.getElementById('system-type').value;
         const networksInput = document.getElementById('number-of-networks');
         if (systemType.includes('EVO') && parseInt(networksInput.value) > 2) { networksInput.value = '2'; }
 
-        // --- New logic to check for and use overrides ---
         let serviceAntennaCount = parseInt(document.getElementById('total-service-antennas').value) || 0;
         const isNonDasQuatra = systemType === 'QUATRA' || systemType === 'QUATRA_EVO';
         
-        // For non-DAS Quatra, the CU count is the primary driver
         if (isNonDasQuatra) {
             const cuKey = systemType === 'QUATRA' ? 'QUATRA_CU' : 'QUATRA_EVO_CU';
             if (currentResults[cuKey] && currentResults[cuKey].override !== null) {
                 serviceAntennaCount = currentResults[cuKey].override;
             }
-        // For GO and DAS systems, the service antenna count is the driver
         } else {
             if (currentResults['service_antennas'] && currentResults['service_antennas'].override !== null) {
                 serviceAntennaCount = currentResults['service_antennas'].override;
             }
         }
 
-        // Handle Donor Antenna overrides to drive bracket calculations
         let donorAntennaCount = (parseInt(networksInput.value) || 0) > 1 ? 2 : (parseInt(networksInput.value) || 0);
         if (currentResults['donor_wideband'] && currentResults['donor_wideband'].override !== null) {
             donorAntennaCount = currentResults['donor_wideband'].override;
         } else if (currentResults['donor_lpda'] && currentResults['donor_lpda'].override !== null) {
             donorAntennaCount = currentResults['donor_lpda'].override;
         }
-        // --- End of new logic ---
 
         const params = {
             B_SA: serviceAntennaCount,
             C_Net: parseInt(networksInput.value) || 0,
             E_Max: parseInt(document.getElementById('max-antennas').value) || 0,
         };
-        params.D_DA = donorAntennaCount; // Use the potentially overridden value
+        params.D_DA = donorAntennaCount;
 
         const calculatedValues = systemCalculators[systemType](params);
         for (const key in currentResults) { currentResults[key].calculated = 0; }
@@ -246,6 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentResults['service_antennas'].calculated = params.B_SA;
         const internal_days = currentResults['install_internal']?.override ?? currentResults['install_internal']?.calculated ?? 0;
         if(currentResults['travel_expenses']) { currentResults['travel_expenses'].calculated = internal_days; } else { currentResults['travel_expenses'] = { calculated: internal_days, override: null, decimals: 0, unit: ' (Days)'}; }
+        
         let totalHardwareSellPrice = 0, totalHardwareUnits = 0;
         const hardwareKeys = ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB', 'extender_cat6', 'extender_fibre_cu', 'extender_fibre_nu'];
         for (const key of hardwareKeys) {
@@ -258,22 +254,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
-        const supportCost = calculateSupportCost(totalHardwareUnits, totalHardwareSellPrice);
-        if(!currentResults['support_package']) { currentResults['support_package'] = { calculated: 0, override: null, decimals: 2, unit: ''}; }
-        currentResults['support_package'].calculated = supportCost;
-        priceData['support_package'].cost = supportCost;
-        if (supportCost > 0) {
+
+        // --- UPDATED SUPPORT COST LOGIC ---
+        const baseSupportCost = calculateSupportCost(totalHardwareUnits, totalHardwareSellPrice);
+        if (!currentResults['support_package']) {
+            currentResults['support_package'] = { calculated: 0, override: null, decimals: 2, unit: ''};
+        }
+        currentResults['support_package'].calculated = baseSupportCost;
+        
+        const finalSupportCost = currentResults['support_package'].override !== null ? currentResults['support_package'].override : baseSupportCost;
+        priceData['support_package'].cost = finalSupportCost;
+        // --- END OF UPDATE ---
+
+        if (finalSupportCost > 0) {
             const activeButton = document.querySelector('.support-presets-main button.active-preset');
             if (activeButton && activeButton.id !== 'support-preset-none') {
                 const tier = activeButton.id.replace('support-preset-', '');
                 const tierName = tier.charAt(0).toUpperCase() + tier.slice(1);
                 priceData['support_package'].label = `Annual ${tierName} Support Package`;
+            } else if (currentResults['support_package'].override !== null) {
+                 priceData['support_package'].label = `Annual Support Package (Manual)`;
             } else {
-                priceData['support_package'].label = `Annual Custom Support Package`;
+                 priceData['support_package'].label = `Annual Custom Support Package`;
             }
         } else {
             priceData['support_package'].label = "Annual Support Package";
         }
+
         updateDOM();
         updateAllSupportTierPrices();
     } catch (error) {
@@ -283,93 +290,104 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 }
     
-    function updateDOM() {
-        const systemTypeSelect = document.getElementById('system-type');
+function updateDOM() {
+    const systemType = document.getElementById('system-type').value;
+    const excludeHardware = document.getElementById('no-hardware-checkbox').checked;
+    const referralPercent = parseFloat(document.getElementById('referral-fee-percent').value) || 0;
+    const referralDecimal = referralPercent / 100;
+    const uplift = (referralDecimal > 0 && referralDecimal < 1) ? 1 / (1 - referralDecimal) : 1;
+    
+    const systemTypeSelect = document.getElementById('system-type');
     const solutionName = systemTypeSelect.options[systemTypeSelect.selectedIndex].text;
     document.getElementById('solution-type-display').textContent = solutionName;
-        const systemType = document.getElementById('system-type').value;
-        const excludeHardware = document.getElementById('no-hardware-checkbox').checked;
-        const referralPercent = parseFloat(document.getElementById('referral-fee-percent').value) || 0;
-        const referralDecimal = referralPercent / 100;
-        const uplift = (referralDecimal > 0 && referralDecimal < 1) ? 1 / (1 - referralDecimal) : 1;
-        document.getElementById('high-ceiling-checkbox-group').style.display = ['QUATRA', 'QUATRA_EVO'].includes(systemType) ? 'block' : 'none';
-        document.getElementById('max-antennas-group').style.display = ['QUATRA', 'QUATRA_EVO'].includes(systemType) ? 'none' : 'flex';
-        const resultsHead = document.getElementById('results-thead'), resultsBody = document.getElementById('results-tbody');
-        resultsBody.innerHTML = '';
-        resultsHead.innerHTML = `<tr><th class="col-item">Item</th><th class="col-qty">Qty</th><th class="col-sell">Unit Sell</th><th class="col-total">Total Sell</th><th class="col-margin">Margin (£)</th></tr>`;
-        let totalHardwareUnits = 0;
-        const hardwareKeys = ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB', 'extender_cat6', 'extender_fibre_cu', 'extender_fibre_nu'];
-        for (const key of hardwareKeys) { if (currentResults[key]) { const quantity = currentResults[key].override ?? currentResults[key].calculated; if (quantity > 0) { totalHardwareUnits += quantity; } } }
-        const itemGroups = {
-            hardware: ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB', 'extender_cat6', 'extender_fibre_cu', 'extender_fibre_nu'],
-            consumables: ['service_antennas', 'donor_wideband', 'donor_lpda', 'antenna_bracket', 'hybrids_4x4', 'hybrids_2x2', 'splitters_4way', 'splitters_3way', 'splitters_2way', 'pigtails', 'coax_lmr400', 'coax_half', 'cable_cat', 'cable_fibre', 'connectors', 'connectors_rg45', 'adapters_sfp', 'adapters_n'],
-            services: ['install_internal', 'install_external', 'cherry_picker', 'travel_expenses', 'support_package']
-        };
-        const componentRelevance = {
-            all: ['service_antennas', 'donor_wideband', 'donor_lpda', 'antenna_bracket', 'splitters_4way', 'splitters_3way', 'splitters_2way', 'coax_lmr400', 'coax_half', 'connectors', 'install_internal', 'install_external', 'cherry_picker', 'travel_expenses', 'support_package'],
-            go: ['hybrids_4x4', 'hybrids_2x2', 'pigtails'],
-            quatra: ['cable_cat', 'cable_fibre', 'connectors_rg45', 'adapters_sfp', 'adapters_n', 'extender_cat6', 'extender_fibre_cu', 'extender_fibre_nu'],
-            G41: ['G41'], G43: ['G43'],
-            QUATRA: ['QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB'], QUATRA_DAS: ['QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB'],
-            QUATRA_EVO: ['QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB'], QUATRA_EVO_DAS: ['QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB'],
-        };
-        let subTotals = { hardware: { cost: 0, sell: 0, margin: 0 }, consumables: { cost: 0, sell: 0, margin: 0 }, services: { cost: 0, sell: 0, margin: 0 } };
-        for (const groupName in itemGroups) {
-            let groupHTML = '', groupSubTotalCost = 0, groupSubTotalSell = 0, groupSubTotalMargin = 0, itemsInGroupDisplayed = 0;
-            itemGroups[groupName].forEach(key => {
-                if (!currentResults[key]) currentResults[key] = { calculated: 0, override: null, decimals: 0, unit: '' };
-                const itemResult = currentResults[key], priceInfo = priceData[key] || { cost: 0, margin: 0, label: 'N/A' };
-                const quantity = itemResult.override !== null ? itemResult.override : (key === 'support_package' ? 1 : itemResult.calculated);
-                let isRelevant = true;
-                if (groupName === 'hardware' || groupName === 'consumables') { isRelevant = false; if (componentRelevance.all.includes(key)) isRelevant = true; if (componentRelevance[systemType]?.includes(key)) isRelevant = true; if (systemType.includes('G4') && componentRelevance.go.includes(key)) isRelevant = true; if (systemType.includes('QUATRA') && componentRelevance.quatra.includes(key)) isRelevant = true; }
-                if (key === 'support_package' && (itemResult.calculated <= 0 && itemResult.override === null)) isRelevant = false;
-                if (isRelevant && (quantity > 0 || showZeroQuantityItems)) {
-                    const baseUnitSell = priceInfo.cost * (1 + priceInfo.margin);
-                    const finalUnitSell = baseUnitSell * uplift;
-                    const finalTotalSell = finalUnitSell * quantity;
-                    let trueLineMargin = (baseUnitSell - priceInfo.cost) * quantity;
-                    if (key === 'support_package') { trueLineMargin = finalTotalSell; groupSubTotalSell += finalTotalSell; groupSubTotalMargin += finalTotalSell; } else { groupSubTotalSell += finalTotalSell; groupSubTotalCost += (priceInfo.cost * quantity); groupSubTotalMargin += trueLineMargin; }
-                    itemsInGroupDisplayed++;
-                    const qtyDisplay = (key === 'support_package') ? '1' : `<span class="value-display"></span><input type="number" step="any" class="value-input hidden" />`;
-                    const qtyClass = (key === 'support_package') ? '' : 'item-qty';
-                    groupHTML += `<tr><td class="col-item item-name">${priceInfo.label}${itemResult.unit || ''}</td><td class="col-qty ${qtyClass}" data-key="${key}">${qtyDisplay}</td><td class="col-sell">£${finalUnitSell.toFixed(2)}</td><td class="col-total">£${finalTotalSell.toFixed(2)}</td><td class="col-margin">£${trueLineMargin.toFixed(2)}</td></tr>`;
+
+    document.getElementById('max-antennas-group').style.display = ['QUATRA', 'QUATRA_EVO'].includes(systemType) ? 'none' : 'flex';
+    const resultsHead = document.getElementById('results-thead'), resultsBody = document.getElementById('results-tbody');
+    resultsBody.innerHTML = '';
+    resultsHead.innerHTML = `<tr><th class="col-item">Item</th><th class="col-qty">Qty</th><th class="col-sell">Unit Sell</th><th class="col-total">Total Sell</th><th class="col-margin">Margin (£)</th></tr>`;
+    let totalHardwareUnits = 0;
+    const hardwareKeys = ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB', 'extender_cat6', 'extender_fibre_cu', 'extender_fibre_nu'];
+    for (const key of hardwareKeys) { if (currentResults[key]) { const quantity = currentResults[key].override ?? currentResults[key].calculated; if (quantity > 0) { totalHardwareUnits += quantity; } } }
+    const itemGroups = {
+        hardware: ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB', 'extender_cat6', 'extender_fibre_cu', 'extender_fibre_nu'],
+        consumables: ['service_antennas', 'donor_wideband', 'donor_lpda', 'antenna_bracket', 'hybrids_4x4', 'hybrids_2x2', 'splitters_4way', 'splitters_3way', 'splitters_2way', 'pigtails', 'coax_lmr400', 'coax_half', 'cable_cat', 'cable_fibre', 'connectors', 'connectors_rg45', 'adapters_sfp', 'adapters_n'],
+        services: ['install_internal', 'install_external', 'cherry_picker', 'travel_expenses', 'support_package']
+    };
+    const componentRelevance = {
+        all: ['service_antennas', 'donor_wideband', 'donor_lpda', 'antenna_bracket', 'splitters_4way', 'splitters_3way', 'splitters_2way', 'coax_lmr400', 'coax_half', 'connectors', 'install_internal', 'install_external', 'cherry_picker', 'travel_expenses', 'support_package'],
+        go: ['hybrids_4x4', 'hybrids_2x2', 'pigtails'],
+        quatra: ['cable_cat', 'cable_fibre', 'connectors_rg45', 'adapters_sfp', 'adapters_n', 'extender_cat6', 'extender_fibre_cu', 'extender_fibre_nu'],
+        G41: ['G41'], G43: ['G43'],
+        QUATRA: ['QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB'], QUATRA_DAS: ['QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB'],
+        QUATRA_EVO: ['QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB'], QUATRA_EVO_DAS: ['QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB'],
+    };
+    let subTotals = { hardware: { cost: 0, sell: 0, margin: 0 }, consumables: { cost: 0, sell: 0, margin: 0 }, services: { cost: 0, sell: 0, margin: 0 } };
+    for (const groupName in itemGroups) {
+        let groupHTML = '', groupSubTotalCost = 0, groupSubTotalSell = 0, groupSubTotalMargin = 0, itemsInGroupDisplayed = 0;
+        itemGroups[groupName].forEach(key => {
+            if (!currentResults[key]) currentResults[key] = { calculated: 0, override: null, decimals: 0, unit: '' };
+            const itemResult = currentResults[key], priceInfo = priceData[key] || { cost: 0, margin: 0, label: 'N/A' };
+            const quantity = itemResult.override !== null ? itemResult.override : (key === 'support_package' ? 1 : itemResult.calculated);
+            let isRelevant = true;
+            if (groupName === 'hardware' || groupName === 'consumables') { isRelevant = false; if (componentRelevance.all.includes(key)) isRelevant = true; if (componentRelevance[systemType]?.includes(key)) isRelevant = true; if (systemType.includes('G4') && componentRelevance.go.includes(key)) isRelevant = true; if (systemType.includes('QUATRA') && componentRelevance.quatra.includes(key)) isRelevant = true; }
+            if (key === 'support_package' && (priceData['support_package']?.cost <= 0 && itemResult.override === null)) isRelevant = false;
+            
+            if (isRelevant && (quantity > 0 || showZeroQuantityItems)) {
+                const isSupport = key === 'support_package';
+                const finalCost = isSupport ? (itemResult.override !== null ? itemResult.override : priceData[key].cost) : priceInfo.cost;
+                const baseUnitSell = isSupport ? finalCost : (priceInfo.cost * (1 + priceInfo.margin));
+                const finalUnitSell = baseUnitSell * uplift;
+                const finalTotalSell = finalUnitSell * quantity;
+                let trueLineMargin = (baseUnitSell - finalCost) * quantity;
+                
+                groupSubTotalSell += finalTotalSell;
+                groupSubTotalCost += (finalCost * quantity);
+                groupSubTotalMargin += trueLineMargin;
+                
+                itemsInGroupDisplayed++;
+                const qtyDisplay = isSupport ? '1' : `<span class="value-display"></span><input type="number" step="any" class="value-input hidden" />`;
+                const qtyClass = isSupport ? '' : 'item-qty';
+
+                let totalSellDisplay, totalSellClass = '';
+                if (isSupport) {
+                    totalSellClass = 'price-override item-qty';
+                    const displayValue = finalTotalSell;
+                    totalSellDisplay = `<span class="value-display"></span><input type="number" step="any" class="value-input hidden" />`;
+                } else {
+                    totalSellDisplay = `£${finalTotalSell.toFixed(2)}`;
                 }
-            });
-            if (itemsInGroupDisplayed > 0) {
-                const groupLabel = groupName.charAt(0).toUpperCase() + groupName.slice(1);
-                resultsBody.innerHTML += `<tr class="group-header"><td colspan="5">${groupLabel}</td></tr>`;
-                resultsBody.innerHTML += groupHTML;
-                const finalGroupSell = (groupName === 'hardware' && excludeHardware) ? 0 : groupSubTotalSell;
-                const finalGroupMargin = (groupName === 'hardware' && excludeHardware) ? 0 : groupSubTotalMargin;
-                resultsBody.innerHTML += `<tr class="summary-row"><td colspan="3" style="text-align: right;">${groupLabel} Sub-Total:</td><td style="text-align: right;">£${finalGroupSell.toFixed(2)}</td><td style="text-align: right;">£${finalGroupMargin.toFixed(2)}</td></tr>`;
-                subTotals[groupName] = { label: groupLabel, cost: (groupName === 'hardware' && excludeHardware) ? 0 : groupSubTotalCost, sell: finalGroupSell, margin: finalGroupMargin };
+
+                groupHTML += `<tr><td class="col-item item-name">${priceInfo.label}${itemResult.unit || ''}</td><td class="col-qty ${qtyClass}" data-key="${key}">${qtyDisplay}</td><td class="col-sell">£${finalUnitSell.toFixed(2)}</td><td class="col-total ${totalSellClass}" data-key="${key}">${totalSellDisplay}</td><td class="col-margin">£${trueLineMargin.toFixed(2)}</td></tr>`;
             }
+        });
+        if (itemsInGroupDisplayed > 0) {
+            const groupLabel = groupName.charAt(0).toUpperCase() + groupName.slice(1);
+            resultsBody.innerHTML += `<tr class="group-header"><td colspan="5">${groupLabel}</td></tr>`;
+            resultsBody.innerHTML += groupHTML;
+            const finalGroupSell = (groupName === 'hardware' && excludeHardware) ? 0 : groupSubTotalSell;
+            const finalGroupMargin = (groupName === 'hardware' && excludeHardware) ? 0 : groupSubTotalMargin;
+            resultsBody.innerHTML += `<tr class="summary-row"><td colspan="3" style="text-align: right;">${groupLabel} Sub-Total:</td><td style="text-align: right;">£${finalGroupSell.toFixed(2)}</td><td style="text-align: right;">£${finalGroupMargin.toFixed(2)}</td></tr>`;
+            subTotals[groupName] = { label: groupLabel, cost: (groupName === 'hardware' && excludeHardware) ? 0 : groupSubTotalCost, sell: finalGroupSell, margin: finalGroupMargin };
         }
-        document.querySelectorAll('.item-qty').forEach(cell => {
-    const key = cell.dataset.key;
-    if(key !== 'support_package') {
-        updateCellDisplay(cell, key);
+    }
+
+    document.querySelectorAll('.item-qty').forEach(cell => {
+        const key = cell.dataset.key;
+        updateCellDisplay(cell, key); // Use a unified display updater
         cell.addEventListener('click', () => activateEditMode(cell, key));
         const inputField = cell.querySelector('.value-input');
-
-        // --- THIS NEW BLOCK IS THE FIX ---
-        // It stops the click on the input from triggering the cell's click event.
-        inputField.addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
-        // --- END OF FIX ---
-
+        inputField.addEventListener('click', (e) => e.stopPropagation());
         inputField.addEventListener('blur', () => deactivateEditMode(cell, key, true));
         inputField.addEventListener('keydown', e => {
             if (e.key === 'Enter') deactivateEditMode(cell, key, true);
             else if (e.key === 'Escape') deactivateEditMode(cell, key, false);
         });
-    }
-});
-        updateSupportTableSummaries(totalHardwareUnits);
-        calculateAndDisplayGrandTotals(subTotals);
-        subTotalsForProposal = subTotals;
-    }
+    });
+    
+    updateSupportTableSummaries(totalHardwareUnits);
+    calculateAndDisplayGrandTotals(subTotals);
+    subTotalsForProposal = subTotals;
+}
 
     function calculateAndDisplayGrandTotals(subTotals) {
         const totalSell = (subTotals.hardware?.sell || 0) + (subTotals.consumables?.sell || 0) + (subTotals.services?.sell || 0);
