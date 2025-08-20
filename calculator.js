@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentResults = {};
     let showZeroQuantityItems = false;
     let subTotalsForProposal = {};
+    let supportPriceOverrides = { bronze: null, silver: null, gold: null };
     function populateSettingsModal() {
         const container = document.getElementById('settings-form-container');
         let html = `<div class="setting-item setting-header"><span>Component</span><span>Cost (£)</span><span>Margin (%)</span><span>Sell (£)</span></div>`;
