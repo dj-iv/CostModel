@@ -197,15 +197,23 @@ document.addEventListener('DOMContentLoaded', () => {
     
 function runFullCalculation() {
     try {
-         const includeSurvey = document.getElementById('include-survey-checkbox').checked;
+        // --- THIS BLOCK IS UPDATED TO CONTROL VISIBILITY ---
+        const includeSurvey = document.getElementById('include-survey-checkbox').checked;
+        if (!currentResults['survey_price_item']) {
+            currentResults['survey_price_item'] = { calculated: 0, override: null, decimals: 2 };
+        }
         if (priceData['survey_price_item']) {
             if (includeSurvey) {
                 const surveyPrice = parseFloat(document.getElementById('survey-price').value) || 0;
                 priceData['survey_price_item'].cost = surveyPrice;
+                currentResults['survey_price_item'].calculated = 1; // Set quantity to 1 to show the row
             } else {
                 priceData['survey_price_item'].cost = 0;
+                currentResults['survey_price_item'].calculated = 0; // Set quantity to 0 to hide the row
             }
         }
+        // --- END OF UPDATE ---
+
         const systemType = document.getElementById('system-type').value;
         const networksInput = document.getElementById('number-of-networks');
         if (systemType.includes('EVO') && parseInt(networksInput.value) > 2) { networksInput.value = '2'; }
@@ -239,7 +247,9 @@ function runFullCalculation() {
         params.D_DA = donorAntennaCount;
 
         const calculatedValues = systemCalculators[systemType](params);
-        for (const key in currentResults) { currentResults[key].calculated = 0; }
+        for (const key in currentResults) { 
+            if(key !== 'survey_price_item') currentResults[key].calculated = 0; 
+        }
         for (const key in calculatedValues) {
             if (currentResults[key]) {
                 currentResults[key].calculated = calculatedValues[key];
@@ -265,29 +275,23 @@ function runFullCalculation() {
             }
         }
 
-        // --- UPDATED SUPPORT COST LOGIC ---
         let supportCost = 0;
         const activeButton = document.querySelector('.support-presets-main button.active-preset');
         
-        // Check if a preset button (Bronze, Silver, or Gold) is active
         if (activeButton && activeButton.id !== 'support-preset-none') {
             const tier = activeButton.id.replace('support-preset-', '');
-            // Use the specific cost for that tier (which already checks for overrides)
             supportCost = getSpecificSupportCost(tier, totalHardwareUnits, totalHardwareSellPrice);
         } else {
-            // Otherwise, calculate based on the custom checkbox selection
             supportCost = calculateSupportCost(totalHardwareUnits, totalHardwareSellPrice);
         }
         
         if(!currentResults['support_package']) { 
             currentResults['support_package'] = { calculated: 0, override: null, decimals: 2, unit: ''}; 
         }
-        // The override for support_package is no longer used for price, but we can keep it for consistency.
-        // The cost is now driven by the selected tier or custom calculation.
+        
         currentResults['support_package'].calculated = supportCost;
         priceData['support_package'].cost = supportCost;
-        // --- END OF UPDATE ---
-
+        
         if (supportCost > 0) {
             if (activeButton && activeButton.id !== 'support-preset-none') {
                 const tier = activeButton.id.replace('support-preset-', '');
