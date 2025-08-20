@@ -305,14 +305,13 @@ function updateDOM() {
     const resultsHead = document.getElementById('results-thead'), resultsBody = document.getElementById('results-tbody');
     resultsBody.innerHTML = '';
     resultsHead.innerHTML = `<tr><th class="col-item">Item</th><th class="col-qty">Qty</th><th class="col-sell">Unit Sell</th><th class="col-total">Total Sell</th><th class="col-margin">Margin (£)</th></tr>`;
-    let totalHardwareUnits = 0;
-    const hardwareKeys = ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB', 'extender_cat6', 'extender_fibre_cu', 'extender_fibre_nu'];
-    for (const key of hardwareKeys) { if (currentResults[key]) { const quantity = currentResults[key].override ?? currentResults[key].calculated; if (quantity > 0) { totalHardwareUnits += quantity; } } }
+    
     const itemGroups = {
         hardware: ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB', 'extender_cat6', 'extender_fibre_cu', 'extender_fibre_nu'],
         consumables: ['service_antennas', 'donor_wideband', 'donor_lpda', 'antenna_bracket', 'hybrids_4x4', 'hybrids_2x2', 'splitters_4way', 'splitters_3way', 'splitters_2way', 'pigtails', 'coax_lmr400', 'coax_half', 'cable_cat', 'cable_fibre', 'connectors', 'connectors_rg45', 'adapters_sfp', 'adapters_n'],
         services: ['install_internal', 'install_external', 'cherry_picker', 'travel_expenses', 'support_package']
     };
+
     const componentRelevance = {
         all: ['service_antennas', 'donor_wideband', 'donor_lpda', 'antenna_bracket', 'splitters_4way', 'splitters_3way', 'splitters_2way', 'coax_lmr400', 'coax_half', 'connectors', 'install_internal', 'install_external', 'cherry_picker', 'travel_expenses', 'support_package'],
         go: ['hybrids_4x4', 'hybrids_2x2', 'pigtails'],
@@ -321,59 +320,71 @@ function updateDOM() {
         QUATRA: ['QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB'], QUATRA_DAS: ['QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB'],
         QUATRA_EVO: ['QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB'], QUATRA_EVO_DAS: ['QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB'],
     };
+
     let subTotals = { hardware: { cost: 0, sell: 0, margin: 0 }, consumables: { cost: 0, sell: 0, margin: 0 }, services: { cost: 0, sell: 0, margin: 0 } };
+
     for (const groupName in itemGroups) {
-        let groupHTML = '', groupSubTotalCost = 0, groupSubTotalSell = 0, groupSubTotalMargin = 0, itemsInGroupDisplayed = 0;
+        let groupHTML = '';
+        let itemsInGroupDisplayed = 0;
+
         itemGroups[groupName].forEach(key => {
             if (!currentResults[key]) currentResults[key] = { calculated: 0, override: null, decimals: 0, unit: '' };
-            const itemResult = currentResults[key], priceInfo = priceData[key] || { cost: 0, margin: 0, label: 'N/A' };
-            const quantity = itemResult.override !== null ? itemResult.override : (key === 'support_package' ? 1 : itemResult.calculated);
+            const itemResult = currentResults[key];
+            const priceInfo = priceData[key] || { cost: 0, margin: 0, label: 'N/A' };
+            
+            const isSupport = key === 'support_package';
+            const quantity = isSupport ? 1 : (itemResult.override !== null ? itemResult.override : itemResult.calculated);
+            
             let isRelevant = true;
             if (groupName === 'hardware' || groupName === 'consumables') { isRelevant = false; if (componentRelevance.all.includes(key)) isRelevant = true; if (componentRelevance[systemType]?.includes(key)) isRelevant = true; if (systemType.includes('G4') && componentRelevance.go.includes(key)) isRelevant = true; if (systemType.includes('QUATRA') && componentRelevance.quatra.includes(key)) isRelevant = true; }
-            if (key === 'support_package' && (priceData['support_package']?.cost <= 0 && itemResult.override === null)) isRelevant = false;
-            
+            if (isSupport && priceInfo.cost === 0 && itemResult.override === null) isRelevant = false;
+
             if (isRelevant && (quantity > 0 || showZeroQuantityItems)) {
-                const isSupport = key === 'support_package';
-                const finalCost = isSupport ? (itemResult.override !== null ? itemResult.override : priceData[key].cost) : priceInfo.cost;
-                const baseUnitSell = isSupport ? finalCost : (priceInfo.cost * (1 + priceInfo.margin));
-                const finalUnitSell = baseUnitSell * uplift;
-                const finalTotalSell = finalUnitSell * quantity;
-                let trueLineMargin = (baseUnitSell - finalCost) * quantity;
-                
-                groupSubTotalSell += finalTotalSell;
-                groupSubTotalCost += (finalCost * quantity);
-                groupSubTotalMargin += trueLineMargin;
-                
                 itemsInGroupDisplayed++;
+
+                const finalCost = priceInfo.cost;
+                const finalUnitSell = isSupport ? (finalCost * uplift) : (finalCost * (1 + priceInfo.margin) * uplift);
+                const finalTotalSell = finalUnitSell * quantity;
+                const trueLineMargin = finalTotalSell - (finalCost * quantity);
+                
+                // Add to sub-totals, ensuring they are numbers
+                subTotals[groupName].sell += parseFloat(finalTotalSell) || 0;
+                subTotals[groupName].cost += parseFloat(finalCost * quantity) || 0;
+                subTotals[groupName].margin += parseFloat(trueLineMargin) || 0;
+
                 const qtyDisplay = isSupport ? '1' : `<span class="value-display"></span><input type="number" step="any" class="value-input hidden" />`;
                 const qtyClass = isSupport ? '' : 'item-qty';
-
-                let totalSellDisplay, totalSellClass = '';
+                
+                let totalSellDisplay = `£${finalTotalSell.toFixed(2)}`;
+                let totalSellClass = '';
                 if (isSupport) {
-                    totalSellClass = 'price-override item-qty';
-                    const displayValue = finalTotalSell;
+                    totalSellClass = 'price-override item-qty'; // Re-use item-qty class for event handling
                     totalSellDisplay = `<span class="value-display"></span><input type="number" step="any" class="value-input hidden" />`;
-                } else {
-                    totalSellDisplay = `£${finalTotalSell.toFixed(2)}`;
                 }
 
-                groupHTML += `<tr><td class="col-item item-name">${priceInfo.label}${itemResult.unit || ''}</td><td class="col-qty ${qtyClass}" data-key="${key}">${qtyDisplay}</td><td class="col-sell">£${finalUnitSell.toFixed(2)}</td><td class="col-total ${totalSellClass}" data-key="${key}">${totalSellDisplay}</td><td class="col-margin">£${trueLineMargin.toFixed(2)}</td></tr>`;
+                groupHTML += `<tr>
+                    <td class="col-item item-name">${priceInfo.label}${itemResult.unit || ''}</td>
+                    <td class="col-qty ${qtyClass}" data-key="${key}">${qtyDisplay}</td>
+                    <td class="col-sell">£${finalUnitSell.toFixed(2)}</td>
+                    <td class="col-total ${totalSellClass}" data-key="${key}">${totalSellDisplay}</td>
+                    <td class="col-margin">£${trueLineMargin.toFixed(2)}</td>
+                </tr>`;
             }
         });
+
         if (itemsInGroupDisplayed > 0) {
             const groupLabel = groupName.charAt(0).toUpperCase() + groupName.slice(1);
             resultsBody.innerHTML += `<tr class="group-header"><td colspan="5">${groupLabel}</td></tr>`;
             resultsBody.innerHTML += groupHTML;
-            const finalGroupSell = (groupName === 'hardware' && excludeHardware) ? 0 : groupSubTotalSell;
-            const finalGroupMargin = (groupName === 'hardware' && excludeHardware) ? 0 : groupSubTotalMargin;
+            const finalGroupSell = (groupName === 'hardware' && excludeHardware) ? 0 : subTotals[groupName].sell;
+            const finalGroupMargin = (groupName === 'hardware' && excludeHardware) ? 0 : subTotals[groupName].margin;
             resultsBody.innerHTML += `<tr class="summary-row"><td colspan="3" style="text-align: right;">${groupLabel} Sub-Total:</td><td style="text-align: right;">£${finalGroupSell.toFixed(2)}</td><td style="text-align: right;">£${finalGroupMargin.toFixed(2)}</td></tr>`;
-            subTotals[groupName] = { label: groupLabel, cost: (groupName === 'hardware' && excludeHardware) ? 0 : groupSubTotalCost, sell: finalGroupSell, margin: finalGroupMargin };
         }
     }
 
     document.querySelectorAll('.item-qty').forEach(cell => {
         const key = cell.dataset.key;
-        updateCellDisplay(cell, key); // Use a unified display updater
+        updateCellDisplay(cell, key);
         cell.addEventListener('click', () => activateEditMode(cell, key));
         const inputField = cell.querySelector('.value-input');
         inputField.addEventListener('click', (e) => e.stopPropagation());
@@ -384,7 +395,11 @@ function updateDOM() {
         });
     });
     
-    updateSupportTableSummaries(totalHardwareUnits);
+    // Adjust subtotal for excluded hardware
+    if (excludeHardware) {
+        subTotals.hardware = { cost: 0, sell: 0, margin: 0 };
+    }
+
     calculateAndDisplayGrandTotals(subTotals);
     subTotalsForProposal = subTotals;
 }
