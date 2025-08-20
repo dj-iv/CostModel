@@ -197,6 +197,15 @@ document.addEventListener('DOMContentLoaded', () => {
     
 function runFullCalculation() {
     try {
+         const includeSurvey = document.getElementById('include-survey-checkbox').checked;
+        if (priceData['survey_price_item']) {
+            if (includeSurvey) {
+                const surveyPrice = parseFloat(document.getElementById('survey-price').value) || 0;
+                priceData['survey_price_item'].cost = surveyPrice;
+            } else {
+                priceData['survey_price_item'].cost = 0;
+            }
+        }
         const systemType = document.getElementById('system-type').value;
         const networksInput = document.getElementById('number-of-networks');
         if (systemType.includes('EVO') && parseInt(networksInput.value) > 2) { networksInput.value = '2'; }
@@ -319,8 +328,8 @@ function updateDOM() {
     const itemGroups = {
         hardware: ['G41', 'G43', 'QUATRA_NU', 'QUATRA_CU', 'QUATRA_HUB', 'QUATRA_EVO_NU', 'QUATRA_EVO_CU', 'QUATRA_EVO_HUB', 'extender_cat6', 'extender_fibre_cu', 'extender_fibre_nu'],
         consumables: ['service_antennas', 'donor_wideband', 'donor_lpda', 'antenna_bracket', 'hybrids_4x4', 'hybrids_2x2', 'splitters_4way', 'splitters_3way', 'splitters_2way', 'pigtails', 'coax_lmr400', 'coax_half', 'cable_cat', 'cable_fibre', 'connectors', 'connectors_rg45', 'adapters_sfp', 'adapters_n'],
-        services: ['install_internal', 'install_external', 'cherry_picker', 'travel_expenses', 'support_package']
-    };
+        services: ['install_internal', 'install_external', 'cherry_picker', 'travel_expenses', 'support_package', 'survey_price_item']
+};
 
     const componentRelevance = {
         all: ['service_antennas', 'donor_wideband', 'donor_lpda', 'antenna_bracket', 'splitters_4way', 'splitters_3way', 'splitters_2way', 'coax_lmr400', 'coax_half', 'connectors', 'install_internal', 'install_external', 'cherry_picker', 'travel_expenses', 'support_package'],
@@ -722,7 +731,7 @@ const doc = new docxtemplater(zip);
         calculateCoverageRequirements();
     });
 
-    document.querySelectorAll('#number-of-networks, #max-antennas, #no-hardware-checkbox, #referral-fee-percent, #maintenance-percent, #customer-name, #survey-price, #quote-number, #total-service-antennas').forEach(input => {
+   document.querySelectorAll('#number-of-networks, #max-antennas, #no-hardware-checkbox, #referral-fee-percent, #maintenance-percent, #customer-name, #survey-price, #quote-number, #total-service-antennas, #include-survey-checkbox').forEach(input => {
         input.addEventListener('input', runFullCalculation);
         input.addEventListener('change', runFullCalculation);
     });
