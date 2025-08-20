@@ -433,11 +433,9 @@ function updateDOM() {
         const totalCost = (subTotals.hardware?.cost || 0) + (subTotals.consumables?.cost || 0) + (subTotals.services?.cost || 0);
         const totalMargin = (subTotals.hardware?.margin || 0) + (subTotals.consumables?.margin || 0) + (subTotals.services?.margin || 0);
         const totalReferralFee = totalSell - totalCost - totalMargin;
-        const marginPercent = totalCost > 0 ? (totalMargin / totalCost) * 100 : 0;
         document.getElementById('total-cost').textContent = `£${totalCost.toFixed(2)}`;
         document.getElementById('total-sell').textContent = `£${totalSell.toFixed(2)}`;
         document.getElementById('total-margin-value').textContent = `£${totalMargin.toFixed(2)}`;
-        document.getElementById('total-margin-percent').textContent = `(${marginPercent.toFixed(2)}%)`;
         document.getElementById('referral-fee-amount').textContent = `£${totalReferralFee.toFixed(2)}`;
     }
     
