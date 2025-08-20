@@ -257,24 +257,33 @@ function runFullCalculation() {
         }
 
         // --- UPDATED SUPPORT COST LOGIC ---
-        const baseSupportCost = calculateSupportCost(totalHardwareUnits, totalHardwareSellPrice);
-        if (!currentResults['support_package']) {
-            currentResults['support_package'] = { calculated: 0, override: null, decimals: 2, unit: ''};
-        }
-        currentResults['support_package'].calculated = baseSupportCost;
+        let supportCost = 0;
+        const activeButton = document.querySelector('.support-presets-main button.active-preset');
         
-        const finalSupportCost = currentResults['support_package'].override !== null ? currentResults['support_package'].override : baseSupportCost;
-        priceData['support_package'].cost = finalSupportCost;
+        // Check if a preset button (Bronze, Silver, or Gold) is active
+        if (activeButton && activeButton.id !== 'support-preset-none') {
+            const tier = activeButton.id.replace('support-preset-', '');
+            // Use the specific cost for that tier (which already checks for overrides)
+            supportCost = getSpecificSupportCost(tier, totalHardwareUnits, totalHardwareSellPrice);
+        } else {
+            // Otherwise, calculate based on the custom checkbox selection
+            supportCost = calculateSupportCost(totalHardwareUnits, totalHardwareSellPrice);
+        }
+        
+        if(!currentResults['support_package']) { 
+            currentResults['support_package'] = { calculated: 0, override: null, decimals: 2, unit: ''}; 
+        }
+        // The override for support_package is no longer used for price, but we can keep it for consistency.
+        // The cost is now driven by the selected tier or custom calculation.
+        currentResults['support_package'].calculated = supportCost;
+        priceData['support_package'].cost = supportCost;
         // --- END OF UPDATE ---
 
-        if (finalSupportCost > 0) {
-            const activeButton = document.querySelector('.support-presets-main button.active-preset');
+        if (supportCost > 0) {
             if (activeButton && activeButton.id !== 'support-preset-none') {
                 const tier = activeButton.id.replace('support-preset-', '');
                 const tierName = tier.charAt(0).toUpperCase() + tier.slice(1);
                 priceData['support_package'].label = `Annual ${tierName} Support Package`;
-            } else if (currentResults['support_package'].override !== null) {
-                 priceData['support_package'].label = `Annual Support Package (Manual)`;
             } else {
                  priceData['support_package'].label = `Annual Custom Support Package`;
             }
