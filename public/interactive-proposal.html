@@ -415,47 +415,64 @@
 
         // --- NEW INTERACTIVITY LOGIC ---
         function addInteractivity(data) {
-            if (!data) return;
+    if (!data) return;
 
-            const supportOptions = document.querySelectorAll('.support-tier-option');
-            const grandTotalElem = document.getElementById('grand-total-price');
-            const supportDescElem = document.getElementById('support-package-description');
-            const supportQtyElem = document.getElementById('support-package-qty');
-            const supportUnitElem = document.getElementById('support-package-unit-price');
-            const supportTotalElem = document.getElementById('support-package-total-price');
+    const supportOptions = document.querySelectorAll('.support-tier-option');
+    const grandTotalElem = document.getElementById('grand-total-price');
+    const supportDescElem = document.getElementById('support-package-description');
+    const supportQtyElem = document.getElementById('support-package-qty');
+    const supportUnitElem = document.getElementById('support-package-unit-price');
+    const supportTotalElem = document.getElementById('support-package-total-price');
 
-            const parsePrice = (priceString) => parseFloat(priceString.replace(/[£,]/g, ''));
+    const parsePrice = (priceString) => parseFloat(String(priceString).replace(/[£,]/g, ''));
 
-            const initialTotal = parsePrice(data.TotalPrice);
-            const initialSupport = parsePrice(data.TotalPrice4 || '£0.00');
-            const baseTotal = initialTotal - initialSupport;
+    const initialTotal = parsePrice(data.TotalPrice);
+    const initialSupport = parsePrice(data.TotalPrice4 || '£0.00');
+    const baseTotal = initialTotal - initialSupport;
 
-            const tierPrices = {
-                bronze: parsePrice(data.SupportTotalPrice1),
-                silver: parsePrice(data.SupportTotalPrice2),
-                gold: parsePrice(data.SupportTotalPrice3)
-            };
+    const tierPrices = {
+        bronze: parsePrice(data.SupportTotalPrice1),
+        silver: parsePrice(data.SupportTotalPrice2),
+        gold: parsePrice(data.SupportTotalPrice3)
+    };
+    
+    // Store original "no support" text
+    const originalSupportDescription = data.Description4;
 
-            supportOptions.forEach(option => {
-                option.addEventListener('click', () => {
-                    supportOptions.forEach(opt => opt.classList.remove('selected'));
-                    option.classList.add('selected');
+    supportOptions.forEach(option => {
+        option.addEventListener('click', () => {
+            const isAlreadySelected = option.classList.contains('selected');
 
-                    const tier = option.dataset.tier;
-                    const tierPrice = tierPrices[tier];
-                    const tierName = tier.charAt(0).toUpperCase() + tier.slice(1);
+            // First, clear all selections
+            supportOptions.forEach(opt => opt.classList.remove('selected'));
 
-                    const newGrandTotal = baseTotal + tierPrice;
+            // --- THIS IS THE NEW LOGIC ---
+            if (isAlreadySelected) {
+                // If it was already selected, revert to the "no support" state
+                supportDescElem.textContent = originalSupportDescription;
+                supportQtyElem.textContent = data.Qty4;
+                supportUnitElem.textContent = data.UnitPrice4;
+                supportTotalElem.textContent = data.TotalPrice4;
+                grandTotalElem.textContent = `£${baseTotal.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            } else {
+                // Otherwise, select the new option and update the totals
+                option.classList.add('selected');
 
-                    supportDescElem.textContent = `Annual ${tierName} Support Package`;
-                    supportQtyElem.textContent = '1';
-                    supportUnitElem.textContent = `£${tierPrice.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-                    supportTotalElem.textContent = `£${tierPrice.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-                    grandTotalElem.textContent = `£${newGrandTotal.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-                });
-            });
-        }
+                const tier = option.dataset.tier;
+                const tierPrice = tierPrices[tier];
+                const tierName = tier.charAt(0).toUpperCase() + tier.slice(1);
 
+                const newGrandTotal = baseTotal + tierPrice;
+
+                supportDescElem.textContent = `Annual ${tierName} Support Package`;
+                supportQtyElem.textContent = '1';
+                supportUnitElem.textContent = `£${tierPrice.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                supportTotalElem.textContent = `£${tierPrice.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                grandTotalElem.textContent = `£${newGrandTotal.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            }
+        });
+    });
+}
         // --- RUN EVERYTHING ---
         populateProposal(proposalData);
         addInteractivity(proposalData);
