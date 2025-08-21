@@ -11,6 +11,7 @@
             background-color: #f4f4f4;
             margin: 0;
             padding: 0;
+            counter-reset: section; /* 1. Create a master counter for sections */
         }
         .page {
             position: relative;
@@ -57,10 +58,24 @@
             margin-top: 40px;
             margin-bottom: 20px;
         }
+        /* 2. Style the H2 headings to show the numbers */
+        h2:not(.no-number)::before {
+            counter-increment: section; /* Increment the section counter */
+            counter-reset: subsection; /* Reset the subsection counter each time we have a new H2 */
+            content: counter(section) ". "; /* Display the counter value */
+            margin-right: 8px;
+        }
         h3 {
             font-size: 16pt;
             margin-top: 30px;
         }
+        /* 3. Style the H3 headings for sub-numbering like 2.1, 2.2 */
+        h3:not(.no-number)::before {
+            counter-increment: subsection;
+            content: counter(section) "." counter(subsection) ". ";
+            margin-right: 8px;
+        }
+
         h4 { font-size: 12pt; margin-top: 20px;}
         p, li { margin-bottom: 1em; }
         ul { padding-left: 20px; }
@@ -89,10 +104,17 @@
             list-style-type: none;
             padding-left: 0;
         }
-        .toc li {
-            margin-bottom: 10px;
+        .toc li a {
+            text-decoration: none;
+            color: #333;
             display: flex;
             justify-content: space-between;
+        }
+         .toc li a:hover {
+            color: #386682;
+        }
+        .toc li {
+            margin-bottom: 10px;
         }
         .toc-h2 {
             font-weight: bold;
@@ -130,7 +152,7 @@
         }
         @media print {
             body, .page { margin: 0; box-shadow: none; border: none; }
-            h2 { page-break-before: always; }
+            h2:not(.no-number) { page-break-before: always; }
             .cover-page, .toc-page { page-break-after: always; }
             h2:first-of-type { page-break-before: auto; }
         }
@@ -153,30 +175,9 @@
 
     <div class="page toc-page">
         <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
-        <h2>CONTENTS</h2>
-        <ul class="toc">
-            <li class="toc-h2"><span>2 Introduction</span><span>3</span></li>
-            <li class="toc-h3"><span>2.1 About UCtel</span><span>3</span></li>
-            <li class="toc-h3"><span>2.2 Key Contacts</span><span>3</span></li>
-            <li class="toc-h3"><span>2.3 Confidentiality</span><span>3</span></li>
-            <li class="toc-h2"><span>3 Proposed Solution</span><span>4</span></li>
-            <li class="toc-h3"><span>3.1 CEL-FI</span><span>4</span></li>
-            <li class="toc-h3"><span>3.2 CEL-FI G41 System Architecture</span><span>4</span></li>
-            <li class="toc-h2"><span>4 Solution Components</span><span>5</span></li>
-            <li class="toc-h3"><span>4.1 Donor Antenna</span><span>5</span></li>
-            <li class="toc-h3"><span>4.2 G41 Booster</span><span>5</span></li>
-            <li class="toc-h3"><span>4.3 Server Antennas</span><span>5</span></li>
-            <li class="toc-h3"><span>4.4 Cabling</span><span>6</span></li>
-            <li class="toc-h3"><span>4.5 5G Ready DAS</span><span>6</span></li>
-            <li class="toc-h2"><span>5 Design and Installation Process</span><span>7</span></li>
-            <li class="toc-h3"><span>5.1 Site Survey</span><span>7</span></li>
-            <li class="toc-h3"><span>5.2 Report and Quotation</span><span>7</span></li>
-            <li class="toc-h3"><span>5.3 Project Coordination</span><span>7</span></li>
-            <li class="toc-h3"><span>5.4 Documentation</span><span>7</span></li>
-            <li class="toc-h2"><span>6 Proposed Pricing</span><span>8</span></li>
-            <li class="toc-h3"><span>6.1 Survey</span><span>8</span></li>
-            <li class="toc-h2"><span>7 CEL-FI Support Services</span><span>9</span></li>
-        </ul>
+        <h2 class="no-number">CONTENTS</h2>
+        <ul class="toc" id="toc-list">
+            </ul>
         <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>2</span></div>
     </div>
 
@@ -202,7 +203,7 @@
         </table>
         <h3>Confidentiality</h3>
         <p>UCtel’s success in the IT marketplace is directly linked to the knowledge that we have and the best practices of innovation and creativity that we apply to our customer solutions. UCtel asks that you respect our intellectual property and consider the contents of this, and all other documents submitted by UCtel to be highly confidential.</p>
-        <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>3</span></div>
+        <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span class="page-number">3</span></div>
     </div>
 
     <div class="page">
@@ -211,8 +212,8 @@
         <h3>CEL-FI</h3>
         <p>UCtel proposes to deploy solutions from Nextivity. Nextivity manufactures the CEL-FI suite of cellular coverage solutions which are designed to optimise mobile signal coverage within buildings and vehicles. CEL-FI is unconditionally network safe, as it prevents interference with mobile operator networks and in the UK CEL-FI products are licence-exempt and fully comply with Ofcom’s UK Interface requirement 2102 (IR2102).</p>
         <div style="padding:20px 0;">
-    <iframe width="100%" height="315" src="https://www.youtube.com/embed/x_kXPIDpMcE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-</div>
+            <iframe width="100%" height="315" src="https://www.youtube.com/embed/x_kXPIDpMcE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        </div>
         <h3>CEL-FI G41 System Architecture</h3>
         <p>The CEL-FI solution needs to receive the best available donor signal from outside and transport the signal through low loss cable to the network repeaters that then distribute the signal through indoor antennas. A system comprises:</p>
         <ul>
@@ -222,7 +223,7 @@
             <li>Internal antennas to broadcast the boosted signal</li>
         </ul>
         <img src="/CostModel/images/g41_diagrams.png" alt="G41 Installation Diagrams">
-        <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>4</span></div>
+        <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span class="page-number">4</span></div>
     </div>
 
     <div class="page">
@@ -255,7 +256,7 @@
                 <p>Depending on the environment the appropriate type of antenna will be installed. There are a range of ceiling and panel omni antennas available and the most appropriate antenna will be recommended following the survey.</p>
             </div>
         </div>
-        <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>5</span></div>
+        <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span class="page-number">5</span></div>
     </div>
 
     <div class="page">
@@ -271,7 +272,7 @@
         </div>
         <h3>5G Ready DAS</h3>
         <p>All our DAS components, Donor Antennas, Server Antennas and Splitters support 5G in the 3500MHz - 3700MHz range (Band 78). Current Ofcom regulations do not allow these frequencies to be boosted, but the DAS elements will be capable of supporting this when it is available.</p>
-        <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>6</span></div>
+        <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span class="page-number">6</span></div>
     </div>
     
     <div class="page">
@@ -295,7 +296,7 @@
         <p>Once the order for the solution has been received, UCtel will introduce a project coordinator to manage the installation process. The project coordinator will be responsible for communicating dates, arranging any required risk assessments, method statements and permits and ensuring the smooth delivery of the project.</p>
         <h3>Documentation</h3>
         <p>Once the installation is complete, the project coordinator will produce the final as-built documentation and post installation survey document. A project completion sign off will be requested to confirm acceptance of the installation and that all deliverables have been completed.</p>
-        <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>7</span></div>
+        <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span class="page-number">7</span></div>
     </div>
 
     <div class="page">
@@ -339,7 +340,7 @@
         <p><b>Terms:</b> Cel-Fi equipment to be paid on order. Other elements to be invoiced on completion and paid within 30 days.</p>
         <h3>Survey</h3>
         <p>In order to validate the above estimate a site survey is required. The price for the survey and report is {SurveyPrice} + VAT.</p>
-        <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>8</span></div>
+        <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span class="page-number">8</span></div>
     </div>
 
     <div class="page">
@@ -377,13 +378,14 @@
         Proactive Alerting, Incident Management and Change Management operate in normal working hours unless agreed otherwise.<br>
         Services are subject to UCtel’s standard Terms and Conditions.
         </p>
-        <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>9</span></div>
+        <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span class="page-number">9</span></div>
     </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+
         // --- DATA LOADING & POPULATION ---
         const proposalData = (function loadProposalData() {
             if (!window.location.hash) return null;
@@ -415,8 +417,48 @@
             }
             container.innerHTML = bodyHtml;
         }
+        
+        // --- DYNAMIC TABLE OF CONTENTS GENERATION ---
+        function generateDynamicTOC() {
+            const tocList = document.getElementById('toc-list');
+            if (!tocList) return;
 
-        // --- NEW INTERACTIVITY LOGIC ---
+            const headings = document.querySelectorAll('.page:not(.cover-page, .toc-page) h2:not(.no-number), .page:not(.cover-page, .toc-page) h3:not(.no-number)');
+            let h2Counter = 0;
+            let h3Counter = 0;
+            
+            headings.forEach((heading, index) => {
+                const title = heading.textContent;
+                const slug = 'section-' + title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                heading.id = slug;
+
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = '#' + slug;
+                
+                let displayNumber;
+                if (heading.tagName === 'H2') {
+                    h2Counter++;
+                    h3Counter = 0;
+                    displayNumber = `${h2Counter}`;
+                    li.className = 'toc-h2';
+                } else { // H3
+                    h3Counter++;
+                    displayNumber = `${h2Counter}.${h3Counter}`;
+                    li.className = 'toc-h3';
+                }
+
+                const pageNumberElem = heading.closest('.page')?.querySelector('.footer .page-number');
+                const pageNumber = pageNumberElem ? pageNumberElem.textContent : '';
+
+                a.innerHTML = `<span>${displayNumber} ${title}</span><span>${pageNumber}</span>`;
+                li.appendChild(a);
+                tocList.appendChild(li);
+            });
+        }
+
+
+        // --- PRICING INTERACTIVITY ---
         function addInteractivity(data) {
             if (!data) return;
 
@@ -426,6 +468,8 @@
             const supportQtyElem = document.getElementById('support-package-qty');
             const supportUnitElem = document.getElementById('support-package-unit-price');
             const supportTotalElem = document.getElementById('support-package-total-price');
+
+            if (!grandTotalElem) return; // Exit if pricing table not found
 
             const parsePrice = (priceString) => parseFloat(String(priceString).replace(/[£,]/g, ''));
 
@@ -451,7 +495,7 @@
                         supportQtyElem.textContent = data.Qty4;
                         supportUnitElem.textContent = data.UnitPrice4;
                         supportTotalElem.textContent = data.TotalPrice4;
-                        grandTotalElem.textContent = `£${baseTotal.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                        grandTotalElem.textContent = `£${initialTotal.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
                     } else {
                         option.classList.add('selected');
                         const tier = option.dataset.tier;
@@ -471,6 +515,7 @@
         
         // --- RUN EVERYTHING ---
         populateProposal(proposalData);
+        generateDynamicTOC();
         addInteractivity(proposalData);
     });
 </script>
