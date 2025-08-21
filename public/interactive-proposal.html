@@ -118,6 +118,16 @@
         .text-container h3 {
             margin-top: 0;
         }
+        .support-tier-option {
+    cursor: pointer;
+}
+.support-tier-option:hover {
+    background-color: #f0f8ff;
+}
+.support-tier-option.selected {
+    background-color: #d4edda;
+    font-weight: bold;
+}
         @media print {
             body, .page { margin: 0; box-shadow: none; border: none; }
             h2 { page-break-before: always; }
@@ -291,22 +301,36 @@
         <p>The following table provides indicative figures for the proposed solution.</p>
         <table class="pricing-table">
             <thead><tr><th>Description</th><th>Qty</th><th>Unit Price</th><th>Total Price</th></tr></thead>
-            <tbody>
-                <tr><td>{Description1}</td><td>{Qty1}</td><td>{UnitPrice1}</td><td>{TotalPrice1}</td></tr>
-                <tr><td>{Description2}</td><td>{Qty2}</td><td>{UnitPrice2}</td><td>{TotalPrice2}</td></tr>
-                <tr><td>{Description3}</td><td>{Qty3}</td><td>{UnitPrice3}</td><td>{TotalPrice3}</td></tr>
-                <tr><td>{Description4}</td><td>{Qty4}</td><td>{UnitPrice4}</td><td>{TotalPrice4}</td></tr>
-                <tr class="total-row"><td colspan="3" style="text-align:right;">Total Price:</td><td>{TotalPrice}</td></tr>
-            </tbody>
+          <tbody>
+    <tr><td>{Description1}</td><td>{Qty1}</td><td>{UnitPrice1}</td><td>{TotalPrice1}</td></tr>
+    <tr><td>{Description2}</td><td>{Qty2}</td><td>{UnitPrice2}</td><td>{TotalPrice2}</td></tr>
+    <tr><td>{Description3}</td><td>{Qty3}</td><td>{UnitPrice3}</td><td>{TotalPrice3}</td></tr>
+    <tr>
+        <td id="support-package-description">{Description4}</td>
+        <td id="support-package-qty">{Qty4}</td>
+        <td id="support-package-unit-price">{UnitPrice4}</td>
+        <td id="support-package-total-price">{TotalPrice4}</td>
+    </tr>
+    <tr class="total-row">
+        <td colspan="3" style="text-align:right;">Total Price:</td>
+        <td id="grand-total-price">{TotalPrice}</td>
+    </tr>
+</tbody>
         </table>
         <p>The following support options are available. Please see section 7 for more details.</p>
         <table class="pricing-table">
             <thead><tr><th>Support Option</th><th>Qty</th><th>Unit Price</th><th>Total Price</th></tr></thead>
-            <tbody>
-                <tr><td>{Support1}</td><td>{SupportQty1}</td><td>{SupportUnitPrice1}</td><td>{SupportTotalPrice1}</td></tr>
-                <tr><td>{Support2}</td><td>{SupportQty2}</td><td>{SupportUnitPrice2}</td><td>{SupportTotalPrice2}</td></tr>
-                <tr><td>{Support3}</td><td>{SupportQty3}</td><td>{SupportUnitPrice3}</td><td>{SupportTotalPrice3}</td></tr>
-            </tbody>
+           <tbody id="support-options-body">
+    <tr class="support-tier-option" data-tier="bronze">
+        <td>{Support1}</td><td>{SupportQty1}</td><td>{SupportUnitPrice1}</td><td>{SupportTotalPrice1}</td>
+    </tr>
+    <tr class="support-tier-option" data-tier="silver">
+        <td>{Support2}</td><td>{SupportQty2}</td><td>{SupportUnitPrice2}</td><td>{SupportTotalPrice2}</td>
+    </tr>
+    <tr class="support-tier-option" data-tier="gold">
+        <td>{Support3}</td><td>{SupportQty3}</td><td>{SupportUnitPrice3}</td><td>{SupportTotalPrice3}</td>
+    </tr>
+</tbody>
         </table>
         <p>All figures shown are exclusive of VAT.</p>
         <p><b>Terms:</b> Cel-Fi equipment to be paid on order. Other elements to be invoiced on completion and paid within 30 days.</p>
@@ -357,12 +381,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+        // --- DATA LOADING & POPULATION ---
         const proposalData = (function loadProposalData() {
             if (!window.location.hash) return null;
             try {
                 const encodedState = window.location.hash.substring(1);
                 if (!encodedState) return null;
-
                 const compressedString = atob(encodedState);
                 const compressed = new Uint8Array(compressedString.length);
                 for (let i = 0; i < compressedString.length; i++) {
@@ -372,7 +396,7 @@
                 return JSON.parse(jsonString);
             } catch (error) {
                 console.error("Failed to load proposal data:", error);
-                document.body.innerHTML = '<h1>Error: Could not load proposal data. The link may be invalid or corrupted.</h1>';
+                document.body.innerHTML = '<h1>Error: Could not load proposal data.</h1>';
                 return null;
             }
         })();
@@ -380,8 +404,7 @@
         function populateProposal(data) {
             if (!data) return;
             const container = document.getElementById('proposal-container');
-            if(!container) return;
-            
+            if (!container) return;
             let bodyHtml = container.innerHTML;
             for (const key in data) {
                 const regex = new RegExp(`{${key}}`, 'g');
@@ -390,7 +413,52 @@
             container.innerHTML = bodyHtml;
         }
 
+        // --- NEW INTERACTIVITY LOGIC ---
+        function addInteractivity(data) {
+            if (!data) return;
+
+            const supportOptions = document.querySelectorAll('.support-tier-option');
+            const grandTotalElem = document.getElementById('grand-total-price');
+            const supportDescElem = document.getElementById('support-package-description');
+            const supportQtyElem = document.getElementById('support-package-qty');
+            const supportUnitElem = document.getElementById('support-package-unit-price');
+            const supportTotalElem = document.getElementById('support-package-total-price');
+
+            const parsePrice = (priceString) => parseFloat(priceString.replace(/[£,]/g, ''));
+
+            const initialTotal = parsePrice(data.TotalPrice);
+            const initialSupport = parsePrice(data.TotalPrice4 || '£0.00');
+            const baseTotal = initialTotal - initialSupport;
+
+            const tierPrices = {
+                bronze: parsePrice(data.SupportTotalPrice1),
+                silver: parsePrice(data.SupportTotalPrice2),
+                gold: parsePrice(data.SupportTotalPrice3)
+            };
+
+            supportOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    supportOptions.forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+
+                    const tier = option.dataset.tier;
+                    const tierPrice = tierPrices[tier];
+                    const tierName = tier.charAt(0).toUpperCase() + tier.slice(1);
+
+                    const newGrandTotal = baseTotal + tierPrice;
+
+                    supportDescElem.textContent = `Annual ${tierName} Support Package`;
+                    supportQtyElem.textContent = '1';
+                    supportUnitElem.textContent = `£${tierPrice.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                    supportTotalElem.textContent = `£${tierPrice.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                    grandTotalElem.textContent = `£${newGrandTotal.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                });
+            });
+        }
+
+        // --- RUN EVERYTHING ---
         populateProposal(proposalData);
+        addInteractivity(proposalData);
     });
 </script>
 
