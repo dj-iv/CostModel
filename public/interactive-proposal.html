@@ -119,15 +119,15 @@
             margin-top: 0;
         }
         .support-tier-option {
-    cursor: pointer;
-}
-.support-tier-option:hover {
-    background-color: #f0f8ff;
-}
-.support-tier-option.selected {
-    background-color: #d4edda;
-    font-weight: bold;
-}
+            cursor: pointer;
+        }
+        .support-tier-option:hover {
+            background-color: #f0f8ff;
+        }
+        .support-tier-option.selected {
+            background-color: #d4edda;
+            font-weight: bold;
+        }
         @media print {
             body, .page { margin: 0; box-shadow: none; border: none; }
             h2 { page-break-before: always; }
@@ -221,21 +221,6 @@
         <img src="/CostModel/images/g41_diagrams.png" alt="G41 Installation Diagrams">
         <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>4</span></div>
     </div>
-    <div class="page">
-    <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
-    <div class="content-wrapper">
-        <h2>3. Proposed Solution</h2>
-        <h3>3.1 CEL-FI</h3>
-        <p>UCtel proposes to deploy solutions from Nextivity...</p>
-        
-        <div style="padding:10px 0;">
-            <iframe width="100%" height="315" src="https://www.youtube.com/embed/fGr_t_628-A" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        </div>
-        <h3>3.2 CEL-FI G41 System Architecture</h3>
-        <p>The CEL-FI solution needs to receive the best available donor signal...</p>
-    </div>
-    <div class="footer">...</div>
-</div>
 
     <div class="page">
         <div class="header"><img src="/CostModel/images/uctel_logo.png" alt="UCtel Logo"></div>
@@ -317,35 +302,35 @@
         <table class="pricing-table">
             <thead><tr><th>Description</th><th>Qty</th><th>Unit Price</th><th>Total Price</th></tr></thead>
           <tbody>
-    <tr><td>{Description1}</td><td>{Qty1}</td><td>{UnitPrice1}</td><td>{TotalPrice1}</td></tr>
-    <tr><td>{Description2}</td><td>{Qty2}</td><td>{UnitPrice2}</td><td>{TotalPrice2}</td></tr>
-    <tr><td>{Description3}</td><td>{Qty3}</td><td>{UnitPrice3}</td><td>{TotalPrice3}</td></tr>
-    <tr>
-        <td id="support-package-description">{Description4}</td>
-        <td id="support-package-qty">{Qty4}</td>
-        <td id="support-package-unit-price">{UnitPrice4}</td>
-        <td id="support-package-total-price">{TotalPrice4}</td>
-    </tr>
-    <tr class="total-row">
-        <td colspan="3" style="text-align:right;">Total Price:</td>
-        <td id="grand-total-price">{TotalPrice}</td>
-    </tr>
-</tbody>
+            <tr><td>{Description1}</td><td>{Qty1}</td><td>{UnitPrice1}</td><td>{TotalPrice1}</td></tr>
+            <tr><td>{Description2}</td><td>{Qty2}</td><td>{UnitPrice2}</td><td>{TotalPrice2}</td></tr>
+            <tr><td>{Description3}</td><td>{Qty3}</td><td>{UnitPrice3}</td><td>{TotalPrice3}</td></tr>
+            <tr>
+                <td id="support-package-description">{Description4}</td>
+                <td id="support-package-qty">{Qty4}</td>
+                <td id="support-package-unit-price">{UnitPrice4}</td>
+                <td id="support-package-total-price">{TotalPrice4}</td>
+            </tr>
+            <tr class="total-row">
+                <td colspan="3" style="text-align:right;">Total Price:</td>
+                <td id="grand-total-price">{TotalPrice}</td>
+            </tr>
+        </tbody>
         </table>
         <p>The following support options are available. Please see section 7 for more details.</p>
         <table class="pricing-table">
             <thead><tr><th>Support Option</th><th>Qty</th><th>Unit Price</th><th>Total Price</th></tr></thead>
            <tbody id="support-options-body">
-    <tr class="support-tier-option" data-tier="bronze">
-        <td>{Support1}</td><td>{SupportQty1}</td><td>{SupportUnitPrice1}</td><td>{SupportTotalPrice1}</td>
-    </tr>
-    <tr class="support-tier-option" data-tier="silver">
-        <td>{Support2}</td><td>{SupportQty2}</td><td>{SupportUnitPrice2}</td><td>{SupportTotalPrice2}</td>
-    </tr>
-    <tr class="support-tier-option" data-tier="gold">
-        <td>{Support3}</td><td>{SupportQty3}</td><td>{SupportUnitPrice3}</td><td>{SupportTotalPrice3}</td>
-    </tr>
-</tbody>
+            <tr class="support-tier-option" data-tier="bronze">
+                <td>{Support1}</td><td>{SupportQty1}</td><td>{SupportUnitPrice1}</td><td>{SupportTotalPrice1}</td>
+            </tr>
+            <tr class="support-tier-option" data-tier="silver">
+                <td>{Support2}</td><td>{SupportQty2}</td><td>{SupportUnitPrice2}</td><td>{SupportTotalPrice2}</td>
+            </tr>
+            <tr class="support-tier-option" data-tier="gold">
+                <td>{Support3}</td><td>{SupportQty3}</td><td>{SupportUnitPrice3}</td><td>{SupportTotalPrice3}</td>
+            </tr>
+        </tbody>
         </table>
         <p>All figures shown are exclusive of VAT.</p>
         <p><b>Terms:</b> Cel-Fi equipment to be paid on order. Other elements to be invoiced on completion and paid within 30 days.</p>
@@ -430,64 +415,57 @@
 
         // --- NEW INTERACTIVITY LOGIC ---
         function addInteractivity(data) {
-    if (!data) return;
+            if (!data) return;
 
-    const supportOptions = document.querySelectorAll('.support-tier-option');
-    const grandTotalElem = document.getElementById('grand-total-price');
-    const supportDescElem = document.getElementById('support-package-description');
-    const supportQtyElem = document.getElementById('support-package-qty');
-    const supportUnitElem = document.getElementById('support-package-unit-price');
-    const supportTotalElem = document.getElementById('support-package-total-price');
+            const supportOptions = document.querySelectorAll('.support-tier-option');
+            const grandTotalElem = document.getElementById('grand-total-price');
+            const supportDescElem = document.getElementById('support-package-description');
+            const supportQtyElem = document.getElementById('support-package-qty');
+            const supportUnitElem = document.getElementById('support-package-unit-price');
+            const supportTotalElem = document.getElementById('support-package-total-price');
 
-    const parsePrice = (priceString) => parseFloat(String(priceString).replace(/[£,]/g, ''));
+            const parsePrice = (priceString) => parseFloat(String(priceString).replace(/[£,]/g, ''));
 
-    const initialTotal = parsePrice(data.TotalPrice);
-    const initialSupport = parsePrice(data.TotalPrice4 || '£0.00');
-    const baseTotal = initialTotal - initialSupport;
+            const initialTotal = parsePrice(data.TotalPrice);
+            const initialSupport = parsePrice(data.TotalPrice4 || '£0.00');
+            const baseTotal = initialTotal - initialSupport;
 
-    const tierPrices = {
-        bronze: parsePrice(data.SupportTotalPrice1),
-        silver: parsePrice(data.SupportTotalPrice2),
-        gold: parsePrice(data.SupportTotalPrice3)
-    };
-    
-    // Store original "no support" text
-    const originalSupportDescription = data.Description4;
+            const tierPrices = {
+                bronze: parsePrice(data.SupportTotalPrice1),
+                silver: parsePrice(data.SupportTotalPrice2),
+                gold: parsePrice(data.SupportTotalPrice3)
+            };
+            
+            const originalSupportDescription = data.Description4;
 
-    supportOptions.forEach(option => {
-        option.addEventListener('click', () => {
-            const isAlreadySelected = option.classList.contains('selected');
+            supportOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    const isAlreadySelected = option.classList.contains('selected');
+                    supportOptions.forEach(opt => opt.classList.remove('selected'));
 
-            // First, clear all selections
-            supportOptions.forEach(opt => opt.classList.remove('selected'));
+                    if (isAlreadySelected) {
+                        supportDescElem.textContent = originalSupportDescription;
+                        supportQtyElem.textContent = data.Qty4;
+                        supportUnitElem.textContent = data.UnitPrice4;
+                        supportTotalElem.textContent = data.TotalPrice4;
+                        grandTotalElem.textContent = `£${baseTotal.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                    } else {
+                        option.classList.add('selected');
+                        const tier = option.dataset.tier;
+                        const tierPrice = tierPrices[tier];
+                        const tierName = tier.charAt(0).toUpperCase() + tier.slice(1);
+                        const newGrandTotal = baseTotal + tierPrice;
 
-            // --- THIS IS THE NEW LOGIC ---
-            if (isAlreadySelected) {
-                // If it was already selected, revert to the "no support" state
-                supportDescElem.textContent = originalSupportDescription;
-                supportQtyElem.textContent = data.Qty4;
-                supportUnitElem.textContent = data.UnitPrice4;
-                supportTotalElem.textContent = data.TotalPrice4;
-                grandTotalElem.textContent = `£${baseTotal.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-            } else {
-                // Otherwise, select the new option and update the totals
-                option.classList.add('selected');
-
-                const tier = option.dataset.tier;
-                const tierPrice = tierPrices[tier];
-                const tierName = tier.charAt(0).toUpperCase() + tier.slice(1);
-
-                const newGrandTotal = baseTotal + tierPrice;
-
-                supportDescElem.textContent = `Annual ${tierName} Support Package`;
-                supportQtyElem.textContent = '1';
-                supportUnitElem.textContent = `£${tierPrice.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-                supportTotalElem.textContent = `£${tierPrice.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-                grandTotalElem.textContent = `£${newGrandTotal.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-            }
-        });
-    });
-}
+                        supportDescElem.textContent = `Annual ${tierName} Support Package`;
+                        supportQtyElem.textContent = '1';
+                        supportUnitElem.textContent = `£${tierPrice.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                        supportTotalElem.textContent = `£${tierPrice.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                        grandTotalElem.textContent = `£${newGrandTotal.toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                    }
+                });
+            });
+        }
+        
         // --- RUN EVERYTHING ---
         populateProposal(proposalData);
         addInteractivity(proposalData);
