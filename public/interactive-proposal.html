@@ -361,6 +361,52 @@
         </p>
         <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>9</span></div>
     </div>
+    <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>9</span></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // This function reads the data from the URL link
+        function loadProposalData() {
+            if (!window.location.hash) return null;
+            try {
+                const encodedState = window.location.hash.substring(1);
+                if (!encodedState) return null;
+
+                const compressedString = atob(encodedState);
+                const compressed = new Uint8Array(compressedString.length);
+                for (let i = 0; i < compressedString.length; i++) {
+                    compressed[i] = compressedString.charCodeAt(i);
+                }
+                const jsonString = pako.inflate(compressed, { to: 'string' });
+                return JSON.parse(jsonString);
+            } catch (error) {
+                console.error("Failed to load proposal data:", error);
+                document.body.innerHTML = '<h1>Error: Could not load proposal data. The link may be invalid or corrupted.</h1>';
+                return null;
+            }
+        }
+
+        // This function finds and replaces all the placeholders like {Account}
+        function populateProposal(data) {
+            if (!data) return;
+            let bodyHtml = document.body.innerHTML;
+            for (const key in data) {
+                const regex = new RegExp(`{${key}}`, 'g');
+                bodyHtml = bodyHtml.replace(regex, data[key]);
+            }
+            document.body.innerHTML = bodyHtml;
+        }
+
+        // Run the functions when the page loads
+        const proposalData = loadProposalData();
+        populateProposal(proposalData);
+    });
+</script>
+
+</body>
+</html>
 </body>
 </html>
 
