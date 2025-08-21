@@ -646,6 +646,7 @@ async function generateDocument() {
     document.getElementById('support-preset-bronze').addEventListener('click', () => setSupportPreset('bronze'));
     document.getElementById('support-preset-silver').addEventListener('click', () => setSupportPreset('silver'));
     document.getElementById('support-preset-gold').addEventListener('click', () => setSupportPreset('gold'));
+    document.getElementById('generate-interactive-link-btn').addEventListener('click', generateInteractiveLink);
 
     const validatedFields = ['customer-name', 'survey-price', 'quote-number'];
     validatedFields.forEach(fieldId => {
@@ -1020,6 +1021,54 @@ async function generatePdf() {
     } finally {
         setTimeout(() => {
             button.innerHTML = originalText;
+        }, 3000);
+    }
+}
+    async function generateInteractiveLink() {
+    const button = document.getElementById('generate-interactive-link-btn');
+    const originalText = button.innerHTML;
+
+    try {
+        // Gather all calculator data into one object
+        const state = {
+            inputs: {
+                'customer-name': document.getElementById('customer-name').value,
+                'survey-price': document.getElementById('survey-price').value,
+                'quote-number': document.getElementById('quote-number').value,
+                'system-type': document.getElementById('system-type').value,
+            },
+            results: currentResults,
+            subTotals: subTotalsForProposal,
+            supportPrices: {
+                bronze: getSpecificSupportCost('bronze', 0, 0), // Simplified call for base prices
+                silver: getSpecificSupportCost('silver', 0, 0),
+                gold: getSpecificSupportCost('gold', 0, 0)
+            },
+            overriddenSupport: supportPriceOverrides
+        };
+
+        // Compress and encode the state into a URL-safe string
+        const jsonString = JSON.stringify(state);
+        const compressed = pako.deflate(jsonString);
+        let compressedString = '';
+        compressed.forEach((byte) => {
+            compressedString += String.fromCharCode(byte);
+        });
+        const encodedState = btoa(compressedString);
+        
+        // Create the final shareable URL pointing to the new interactive template
+        const shareUrl = `${window.location.origin}${window.location.pathname.replace('index.html', '')}interactive-proposal.html#${encodedState}`;
+
+        // Copy the URL to the clipboard
+        await navigator.clipboard.writeText(shareUrl);
+        button.innerHTML = 'Link Copied! ✅';
+        
+    } catch (error) {
+        console.error("Failed to generate interactive link:", error);
+        button.innerHTML = 'Failed! ❌';
+    } finally {
+        setTimeout(() => {
+            button.innerHTML = 'Interactive Proposal 🌐';
         }, 3000);
     }
 }
