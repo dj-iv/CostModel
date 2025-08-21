@@ -326,6 +326,7 @@ function updateDOM() {
     document.getElementById('solution-type-display').textContent = solutionName;
 
     document.getElementById('max-antennas-group').style.display = ['QUATRA', 'QUATRA_EVO'].includes(systemType) ? 'none' : 'flex';
+    document.getElementById('high-ceiling-checkbox-group').style.display = ['QUATRA', 'QUATRA_EVO'].includes(systemType) ? 'block' : 'none';
     const resultsHead = document.getElementById('results-thead'), resultsBody = document.getElementById('results-tbody');
     resultsBody.innerHTML = '';
     resultsHead.innerHTML = `<tr><th class="col-item">Item</th><th class="col-qty">Qty</th><th class="col-sell">Unit Sell</th><th class="col-total">Total Sell</th><th class="col-margin">Margin (£)</th></tr>`;
