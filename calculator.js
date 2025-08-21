@@ -368,9 +368,10 @@ function updateDOM() {
                 itemsInGroupDisplayed++;
 
                 const finalCost = priceInfo.cost;
-                const finalUnitSell = isSupport ? (finalCost * uplift) : (finalCost * (1 + priceInfo.margin) * uplift);
-                const finalTotalSell = finalUnitSell * quantity;
-                const trueLineMargin = finalTotalSell - (finalCost * quantity);
+               const baseTotalSell = (isSupport ? finalCost : (finalCost * (1 + priceInfo.margin))) * quantity;
+const finalTotalSell = baseTotalSell * uplift;
+const trueLineMargin = baseTotalSell - (finalCost * quantity);
+const finalUnitSell = finalTotalSell / quantity;
                 
                 // Add to sub-totals, ensuring they are numbers
                 subTotals[groupName].sell += parseFloat(finalTotalSell) || 0;
