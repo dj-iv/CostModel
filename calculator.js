@@ -1024,31 +1024,16 @@ async function generatePdf() {
         }, 3000);
     }
 }
-    async function generateInteractiveLink() {
+   async function generateInteractiveLink() {
     const button = document.getElementById('generate-interactive-link-btn');
     const originalText = button.innerHTML;
 
     try {
-        // Gather all calculator data into one object
-        const state = {
-            inputs: {
-                'customer-name': document.getElementById('customer-name').value,
-                'survey-price': document.getElementById('survey-price').value,
-                'quote-number': document.getElementById('quote-number').value,
-                'system-type': document.getElementById('system-type').value,
-            },
-            results: currentResults,
-            subTotals: subTotalsForProposal,
-            supportPrices: {
-                bronze: getSpecificSupportCost('bronze', 0, 0), // Simplified call for base prices
-                silver: getSpecificSupportCost('silver', 0, 0),
-                gold: getSpecificSupportCost('gold', 0, 0)
-            },
-            overriddenSupport: supportPriceOverrides
-        };
+        // Get the same data object used for DOCX and PDF proposals
+        const templateData = getTemplateData();
 
-        // Compress and encode the state into a URL-safe string
-        const jsonString = JSON.stringify(state);
+        // Compress and encode the data into a URL-safe string
+        const jsonString = JSON.stringify(templateData);
         const compressed = pako.deflate(jsonString);
         let compressedString = '';
         compressed.forEach((byte) => {
