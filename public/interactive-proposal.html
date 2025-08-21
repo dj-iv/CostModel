@@ -11,7 +11,6 @@
             background-color: #f4f4f4;
             margin: 0;
             padding: 0;
-            counter-reset: h2counter;
         }
         .page {
             position: relative;
@@ -57,19 +56,10 @@
             padding-bottom: 10px;
             margin-top: 40px;
             margin-bottom: 20px;
-            counter-reset: h3counter;
-        }
-        h2:before {
-            counter-increment: h2counter;
-            content: counter(h2counter) ". ";
         }
         h3 {
             font-size: 16pt;
             margin-top: 30px;
-        }
-        h3:before {
-            counter-increment: h3counter;
-            content: counter(h2counter) "." counter(h3counter) " ";
         }
         h4 { font-size: 12pt; margin-top: 20px;}
         p, li { margin-bottom: 1em; }
@@ -128,7 +118,6 @@
         .text-container h3 {
             margin-top: 0;
         }
-
         @media print {
             body, .page { margin: 0; box-shadow: none; border: none; }
             h2 { page-break-before: always; }
@@ -138,6 +127,8 @@
     </style>
 </head>
 <body>
+
+<div id="proposal-container">
     <div class="page cover-page">
         <img class="cover-logo" src="/CostModel/images/uctel_logo.png" alt="UCtel Logo">
         
@@ -361,14 +352,12 @@
         </p>
         <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>9</span></div>
     </div>
-    <div class="footer"><span>CEL-FI GO G41 solution proposal for {Account}</span><span>9</span></div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // This function reads the data from the URL link
-        function loadProposalData() {
+        const proposalData = (function loadProposalData() {
             if (!window.location.hash) return null;
             try {
                 const encodedState = window.location.hash.substring(1);
@@ -386,27 +375,24 @@
                 document.body.innerHTML = '<h1>Error: Could not load proposal data. The link may be invalid or corrupted.</h1>';
                 return null;
             }
-        }
+        })();
 
-        // This function finds and replaces all the placeholders like {Account}
         function populateProposal(data) {
             if (!data) return;
-            let bodyHtml = document.body.innerHTML;
+            const container = document.getElementById('proposal-container');
+            if(!container) return;
+            
+            let bodyHtml = container.innerHTML;
             for (const key in data) {
                 const regex = new RegExp(`{${key}}`, 'g');
                 bodyHtml = bodyHtml.replace(regex, data[key]);
             }
-            document.body.innerHTML = bodyHtml;
+            container.innerHTML = bodyHtml;
         }
 
-        // Run the functions when the page loads
-        const proposalData = loadProposalData();
         populateProposal(proposalData);
     });
 </script>
 
 </body>
 </html>
-</body>
-</html>
-
