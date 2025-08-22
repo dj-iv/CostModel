@@ -1024,34 +1024,35 @@ async function generatePdf() {
         }, 3000);
     }
 }
-  async function generateInteractiveLink() {
+async function generateInteractiveLink() {
     const button = document.getElementById('generate-interactive-link-btn');
     const originalText = button.innerHTML;
     button.innerHTML = 'Generating...';
     button.disabled = true;
 
     try {
-        // Get all the standard proposal data (pricing, names, etc.)
         const templateData = getTemplateData();
-
-        // Get the system type value (e.g., 'G41', 'QUATRA_EVO')
         const systemType = document.getElementById('system-type').value;
         
-        // Add the systemType to our data object so the template knows which content to show
         const finalData = {
             ...templateData,
             systemType: systemType
         };
 
-        // Compress and encode the data into a URL-safe string
         const jsonString = JSON.stringify(finalData);
-        const compressed = pako.deflate(jsonString, { to: 'string' });
-        const encodedState = btoa(compressed);
+
+        // --- THIS IS THE CORRECTED PART ---
+        // 1. Deflate to a Uint8Array (the default, most reliable format).
+        const compressed = pako.deflate(jsonString);
         
-        // Create the final shareable URL
+        // 2. Convert the Uint8Array to a binary string that btoa can safely encode.
+        const compressedString = String.fromCharCode.apply(null, compressed);
+        
+        const encodedState = btoa(compressedString);
+        // --- END OF CORRECTION ---
+
         const shareUrl = `${window.location.origin}${window.location.pathname.replace('index.html', '')}interactive-proposal.html#${encodedState}`;
 
-        // Copy the URL to the clipboard
         await navigator.clipboard.writeText(shareUrl);
         button.innerHTML = 'Link Copied! ✅';
         
