@@ -615,40 +615,67 @@ const finalUnitSell = finalTotalSell / quantity;
 async function generateDocument() {
     const button = document.getElementById('generate-document-btn');
     const originalText = button.innerHTML;
-    
-    if (!validateInputs(['customer-name', 'survey-price'])) {
-        return; // Stop if validation fails
-    }
+    if (!validateInputs(['customer-name', 'survey-price'])) return;
 
     button.innerHTML = 'Generating...';
     button.disabled = true;
 
     try {
         const systemType = document.getElementById('system-type').value;
-        const templateMap = {
-            'G41': 'CEL-FI-GO-G41-Proposal-Template.docx',
-            'G43': 'CEL-FI-GO-G43-Proposal-Template.docx',
-            'QUATRA': 'CEL-FI-QUATRA-4000e-Proposal-Template.docx',
-            'QUATRA_DAS': 'CEL-FI-QUATRA-4000e-Proposal-Template.docx',
-            'QUATRA_EVO': 'CEL-FI-QUATRA-EVO-Proposal-Template.docx',
-            'QUATRA_EVO_DAS': 'CEL-FI-QUATRA-EVO-Proposal-Template.docx'
-        };
-        const templateFilename = templateMap[systemType];
-        if (!templateFilename) {
-            throw new Error(`No template found for system type: ${systemType}`);
+        const baseSystemType = systemType.replace('_DAS', '');
+        const specifics = solutionSpecificData[baseSystemType];
+
+        if (!specifics) {
+            throw new Error(`No specific data found for system type: ${systemType}`);
         }
 
+        // Always use the universal template
+        const templateFilename = 'universal-proposal-template.docx';
         const response = await fetch(`templates/${templateFilename}`);
-        if (!response.ok) {
-            throw new Error(`Could not fetch template: ${response.statusText}`);
-        }
+        if (!response.ok) throw new Error(`Could not fetch template: ${response.statusText}`);
         const content = await response.arrayBuffer();
 
-        const zip = new PizZip(content);
-        const doc = new docxtemplater(zip);
+        const templateData = getTemplateData();
 
-        // This now uses the main helper function to get all the correct data and labels
-        doc.render(getTemplateData());
+        // Add dynamic text and flags
+        Object.assign(templateData, {
+            is_go_model: specifics.is_go_model || false,
+            is_quatra_model: specifics.is_quatra_model || false,
+            architecture_title: specifics.architecture_title,
+            architecture_description: specifics.architecture_description,
+            booster_title: specifics.booster_title,
+            booster_description: specifics.booster_description,
+            network_unit_description: specifics.network_unit_description,
+            coverage_unit_description: specifics.coverage_unit_description,
+            cabling_description: specifics.cabling_description,
+        });
+
+        // Load images
+        const imagePromises = {};
+        for (const key in specifics) {
+            if (key.endsWith('_image_path')) {
+                const imageName = key.replace('_path', '');
+                imagePromises[imageName] = loadImageAsBase64(specifics[key]);
+            }
+        }
+        const loadedImages = await Promise.all(Object.values(imagePromises));
+        const imageKeys = Object.keys(imagePromises);
+        for (let i = 0; i < imageKeys.length; i++) {
+            templateData[imageKeys[i]] = loadedImages[i];
+        }
+
+        const zip = new PizZip(content);
+        // IMPORTANT: Use the same ImageModule setup as the PDF function
+        const doc = new docxtemplater(zip, {
+            paragraphLoop: true,
+            linebreaks: true,
+            modules: [new ImageModule({
+                getImage: (tag) => atob(tag),
+                getSize: () => [450, 300],
+            })]
+        });
+        
+        doc.render(templateData);
 
         const out = doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
         
