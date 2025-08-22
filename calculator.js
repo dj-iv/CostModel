@@ -618,17 +618,18 @@ const finalUnitSell = finalTotalSell / quantity;
     
     return `UCtel_Proposal_${solutionName}_${networks}_Networks_for_${customerName}_${dateString}`;
 }
-    function buildSolutionComponentsXml(doc, specifics) {
-    const imageModule = doc.modules.find(m => m.constructor.name === 'ImageModule');
+   function buildSolutionComponentsXml(imageModule, specifics) {
+    // This helper ensures each image has a unique ID in the document
     let imageCounter = 1;
     const getImageTag = (imageKey, width = 450, height = 300) => {
         if (!imageModule || !specifics[imageKey]) return '';
         const newImage = { image: specifics[imageKey], id: `img-${imageCounter++}` };
-        imageModule.images.push(newImage);
+        imageModule.images.push(newImage); // Manually add image to the module's list
         const size = imageModule.getSize(newImage.image, newImage.id, [width, height]);
         return imageModule.render({ ...newImage, size });
     };
 
+    // Standard components for all solutions
     const donorAntennaXml = `
         <w:p><w:r><w:t>Donor Antenna</w:t></w:r></w:p>
         ${getImageTag('donor_image_path', 450, 450)}
@@ -697,20 +698,26 @@ async function generateDocument() {
             specifics[key.replace('_path','')] = loadedImages[i];
         });
 
+        // Create the ImageModule instance first
+        const imageModule = new ImageModule({
+            getImage: (tag) => tag,
+            getSize: (img, tag, size) => size,
+        });
+
         const zip = new PizZip(content);
+        // Pass the instance into the modules array
         const doc = new docxtemplater(zip, {
             paragraphLoop: true,
-            modules: [new ImageModule({
-                getImage: (tag) => tag,
-                getSize: (img, tag, size) => size,
-            })]
+            modules: [imageModule]
         });
         
-        templateData.solution_components = buildSolutionComponentsXml(doc, specifics);
+        // Pass the instance to the XML builder
+        templateData.solution_components = buildSolutionComponentsXml(imageModule, specifics);
         
+        // Handle the main architecture image
         const archImage = { image: specifics.architecture_image, id: 'arch-img' };
-        doc.modules.find(m => m.constructor.name === 'ImageModule').images.push(archImage);
-        templateData.architecture_image = doc.modules.find(m => m.constructor.name === 'ImageModule').render(archImage);
+        imageModule.images.push(archImage);
+        templateData.architecture_image = imageModule.render(archImage);
 
         doc.render(templateData);
 
