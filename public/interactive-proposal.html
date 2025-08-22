@@ -4,83 +4,74 @@
     <meta charset="UTF-8">
     <title>Proposal for {Account}</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            font-size: 11pt;
-            line-height: 1.4;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-            counter-reset: section;
-        }
-        .page {
-            position: relative;
-            width: 210mm;
-            min-height: 297mm;
-            padding: 20mm;
-            margin: 10mm auto;
-            border: 1px #D3D3D3 solid;
-            background: white;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-            box-sizing: border-box;
-        }
-        .header, .footer {
-            position: absolute;
-            width: calc(100% - 40mm);
-            font-size: 9pt;
-            color: #777;
-        }
-        .header { top: 10mm; right: 20mm; text-align: right; }
-        .header img { width: 100px; margin-bottom:0; }
-        .footer { bottom: 10mm; left: 20mm; display: flex; justify-content: space-between; }
-        h1, h2, h3, h4 { color: #386682; line-height: 1.2; font-weight: bold; }
-        h1 { font-size: 28pt; text-align: center; margin-top: 50px;}
-        h2 {
-            font-size: 20pt;
-            text-align: left;
-            border-bottom: 2px solid #386682;
-            padding-bottom: 10px;
-            margin-top: 40px;
-            margin-bottom: 20px;
-        }
-        h2:not(.no-number)::before {
-            counter-increment: section;
-            counter-reset: subsection;
-            content: counter(section) " ";
-            margin-right: 8px;
-        }
-        h3 { font-size: 16pt; margin-top: 30px; }
-        h3:not(.no-number)::before {
-            counter-increment: subsection;
-            content: counter(section) "." counter(subsection) " ";
-            margin-right: 8px;
-        }
-        h4 { font-size: 12pt; margin-top: 20px;}
-        p, li { margin-bottom: 1em; }
-        ul { padding-left: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 10pt; }
-        th, td { border: 1px solid #cccccc; padding: 8px; text-align: left; vertical-align: top; }
-        th { background-color: #386682; color: white; font-weight: bold; }
-        .pricing-table td:nth-child(2), .pricing-table td:nth-child(3), .pricing-table td:nth-child(4) { text-align: right; }
-        .total-row td { font-weight: bold; }
-        img { max-width: 100%; height: auto; display: block; margin: 20px auto; }
-        .cover-logo { width: 500px; margin: 40px auto 20px; }
-        .cover-title { text-align: center; font-family: Arial, sans-serif; font-size: 48pt; font-weight: bold; color: #386682; line-height: 1.5; margin-top: 20px; }
-        .toc { list-style-type: none; padding-left: 0; }
-        .toc li a { text-decoration: none; color: #333; display: flex; justify-content: space-between; }
-        .toc li a:hover { color: #386682; }
-        .toc li { margin-bottom: 10px; }
-        .toc-h2 { font-weight: bold; }
-        .toc-h3 { padding-left: 20px; }
-        .component-layout { display: flex; gap: 20px; align-items: center; margin-bottom: 30px; }
-        .component-layout.reverse { flex-direction: row-reverse; }
-        .image-container { flex: 1; }
-        .text-container { flex: 2; }
-        .text-container h3 { margin-top: 0; }
-        .support-tier-option { cursor: pointer; }
-        .support-tier-option:hover { background-color: #f0f8ff; }
-        .support-tier-option.selected { background-color: #d4edda; font-weight: bold; }
-    </style>
+    body {
+        font-family: Arial, sans-serif;
+        font-size: 11pt;
+        line-height: 1.4;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+    }
+    .page {
+        position: relative;
+        width: 210mm;
+        min-height: 297mm;
+        padding: 20mm;
+        margin: 10mm auto;
+        border: 1px #D3D3D3 solid;
+        background: white;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        box-sizing: border-box;
+    }
+    .header, .footer {
+        position: absolute;
+        width: calc(100% - 40mm);
+        font-size: 9pt;
+        color: #777;
+    }
+    .header { top: 10mm; right: 20mm; text-align: right; }
+    .header img { width: 100px; margin-bottom:0; }
+    .footer { bottom: 10mm; left: 20mm; display: flex; justify-content: space-between; }
+    h1, h2, h3, h4 { color: #386682; line-height: 1.2; font-weight: bold; }
+    h1 { font-size: 28pt; text-align: center; margin-top: 50px;}
+    h2 {
+        font-size: 20pt;
+        text-align: left;
+        border-bottom: 2px solid #386682;
+        padding-bottom: 10px;
+        margin-top: 40px;
+        margin-bottom: 20px;
+    }
+    h3 { font-size: 16pt; margin-top: 30px; }
+    h4 { font-size: 12pt; margin-top: 20px;}
+    p, li { margin-bottom: 1em; }
+    ul { padding-left: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 10pt; }
+    th, td { border: 1px solid #cccccc; padding: 8px; text-align: left; vertical-align: top; }
+    th { background-color: #386682; color: white; font-weight: bold; }
+    .pricing-table td:nth-child(2), .pricing-table td:nth-child(3), .pricing-table td:nth-child(4) { text-align: right; }
+    .total-row td { font-weight: bold; }
+    img { max-width: 100%; height: auto; display: block; margin: 20px auto; }
+    .cover-logo { width: 500px; margin: 40px auto 20px; }
+    .cover-title { text-align: center; font-family: Arial, sans-serif; font-size: 48pt; font-weight: bold; color: #386682; line-height: 1.5; margin-top: 20px; }
+    .toc { list-style-type: none; padding-left: 0; }
+    .toc li a { text-decoration: none; color: #333; display: flex; justify-content: space-between; }
+    .toc li a:hover { color: #386682; }
+    .toc li { margin-bottom: 10px; }
+    .toc-h2 { font-weight: bold; }
+    .toc-h3 { padding-left: 20px; }
+    .heading-number {
+        margin-right: 8px;
+    }
+    .component-layout { display: flex; gap: 20px; align-items: center; margin-bottom: 30px; }
+    .component-layout.reverse { flex-direction: row-reverse; }
+    .image-container { flex: 1; }
+    .text-container { flex: 2; }
+    .text-container h3 { margin-top: 0; }
+    .support-tier-option { cursor: pointer; }
+    .support-tier-option:hover { background-color: #f0f8ff; }
+    .support-tier-option.selected { background-color: #d4edda; font-weight: bold; }
+</style>
 </head>
 <body>
 
@@ -231,7 +222,6 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
 <script>
-    // --- CONSOLIDATED DATA FOR ALL SOLUTIONS (FULL CONTENT, NO H2 TAGS) ---
     const solutionSpecificData = {
         'G41': {
             architecture: `
@@ -391,16 +381,18 @@
             });
         })(proposalData);
 
-        // --- 5. ADD PAGE NUMBERS AND GENERATE TOC ---
+        // --- 5. ADD PAGE NUMBERS, HEADINGS, AND TOC (ROBUST VERSION) ---
         (function finalizeDocument() {
+            // Add page numbers
             const pages = document.querySelectorAll('.page:not(.cover-page)');
             pages.forEach((page, index) => {
                 const pageNumElem = page.querySelector('.footer .page-number');
                 if(pageNumElem) pageNumElem.textContent = index + 2;
             });
 
+            // Add heading numbers and generate ToC
             const tocList = document.getElementById('toc-list');
-            tocList.innerHTML = ''; // Clear any existing TOC
+            tocList.innerHTML = '';
             const headings = document.querySelectorAll('.page:not(.cover-page, .toc-page) h2:not(.no-number), .page:not(.cover-page, .toc-page) h3:not(.no-number)');
             
             let sectionCounter = 0;
@@ -409,30 +401,37 @@
             headings.forEach((heading) => {
                 const slug = 'section-' + heading.textContent.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-');
                 heading.id = slug;
+                
+                let displayNumber;
+                let numberSpan = document.createElement('span');
+                numberSpan.className = 'heading-number';
+
+                if (heading.tagName === 'H2') {
+                    sectionCounter++;
+                    subsectionCounter = 0;
+                    displayNumber = `${sectionCounter}`;
+                    numberSpan.textContent = `${displayNumber} `;
+                } else { // H3
+                    subsectionCounter++;
+                    displayNumber = `${sectionCounter}.${subsectionCounter}`;
+                    numberSpan.textContent = `${displayNumber} `;
+                }
+                
+                // Prepend the number span to the heading
+                heading.prepend(numberSpan);
+
+                // Create ToC entry
                 const li = document.createElement('li');
                 const a = document.createElement('a');
                 a.href = '#' + slug;
-
-                let displayNumber;
-                if (heading.tagName === 'H2') {
-                    sectionCounter++;
-                    subsectionCounter = 0; // Reset subsection on new main section
-                    displayNumber = `${sectionCounter}`;
-                    li.className = 'toc-h2';
-                } else {
-                    subsectionCounter++;
-                    displayNumber = `${sectionCounter}.${subsectionCounter}`;
-                    li.className = 'toc-h3';
-                }
-                
                 const pageNumber = heading.closest('.page')?.querySelector('.footer .page-number')?.textContent || '';
-                a.innerHTML = `<span>${displayNumber} ${heading.textContent}</span><span>${pageNumber}</span>`;
+                a.innerHTML = `<span>${displayNumber} ${heading.textContent.replace(numberSpan.textContent, '').trim()}</span><span>${pageNumber}</span>`;
+                li.className = heading.tagName === 'H2' ? 'toc-h2' : 'toc-h3';
                 li.appendChild(a);
                 tocList.appendChild(li);
             });
         })();
     });
 </script>
-
 </body>
 </html>
