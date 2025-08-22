@@ -638,13 +638,9 @@ async function generateDocument() {
         if (!response.ok) throw new Error(`Could not fetch template: ${response.statusText}`);
         const content = await response.arrayBuffer();
 
-        // Start with the basic data
         const templateData = getTemplateData();
-
-        // Add all text and boolean flags from our specifics object
         Object.assign(templateData, specifics);
         
-        // Create a list of all image paths that need to be loaded
         const imagePromises = [];
         const placeholderNames = [];
         for (const key in specifics) {
@@ -654,33 +650,30 @@ async function generateDocument() {
             }
         }
         
-        // Load all images in parallel
         const loadedImages = await Promise.all(imagePromises);
         
-        // Add the loaded image data (as base64 strings) to our template data
         placeholderNames.forEach((name, i) => {
             templateData[name] = loadedImages[i];
         });
 
         const zip = new PizZip(content);
+        // This is the simplified and corrected module setup
+        const imageModule = new ImageModule({
+            // This tells the module to get the image data from the placeholder tag value
+            getImage: function(tagValue) {
+                return atob(tagValue);
+            },
+            // This sets a default size for the images
+            getSize: function() {
+                return [450, 300];
+            }
+        });
+
         const doc = new docxtemplater(zip, {
             paragraphLoop: true,
-            // Use a simplified and more robust ImageModule configuration
-            modules: [new ImageModule({
-                // This tells the module where to find the image data.
-                // It will look for a placeholder like {architecture_image} and
-                // use the base64 string provided in templateData.architecture_image
-                getImage: function(tag) {
-                    return atob(tag);
-                },
-                // This sets a default size for the images
-                getSize: function() {
-                    return [450, 300];
-                },
-            })]
+            modules: [imageModule]
         });
         
-        // Render the document
         doc.render(templateData);
 
         const out = doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
