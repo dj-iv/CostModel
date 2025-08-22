@@ -657,13 +657,20 @@ async function generateDocument() {
         });
 
         const zip = new PizZip(content);
-        // This is the simplified and corrected module setup
+        
+        // This is the corrected ImageModule configuration
         const imageModule = new ImageModule({
-            // This tells the module to get the image data from the placeholder tag value
             getImage: function(tagValue) {
-                return atob(tagValue);
+                // This correctly converts the Base64 string from the template
+                // into the ArrayBuffer format that the module requires.
+                const binary_string = atob(tagValue);
+                const len = binary_string.length;
+                const bytes = new Uint8Array(len);
+                for (let i = 0; i < len; i++) {
+                    bytes[i] = binary_string.charCodeAt(i);
+                }
+                return bytes.buffer;
             },
-            // This sets a default size for the images
             getSize: function() {
                 return [450, 300];
             }
