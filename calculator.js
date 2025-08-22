@@ -638,42 +638,49 @@ async function generateDocument() {
         if (!response.ok) throw new Error(`Could not fetch template: ${response.statusText}`);
         const content = await response.arrayBuffer();
 
-        // Start with the basic data from the calculator
+        // Start with the basic data
         const templateData = getTemplateData();
 
         // Add all text and boolean flags from our specifics object
         Object.assign(templateData, specifics);
-
+        
         // Create a list of all image paths that need to be loaded
-        const imagePathsToLoad = {};
+        const imagePromises = [];
+        const placeholderNames = [];
         for (const key in specifics) {
             if (key.endsWith('_image_path')) {
-                // Create a new key for the placeholder (e.g., 'architecture_image_path' -> 'architecture_image')
-                const placeholderName = key.replace('_path', '');
-                imagePathsToLoad[placeholderName] = loadImageAsBase64(specifics[key]);
+                placeholderNames.push(key.replace('_path', ''));
+                imagePromises.push(loadImageAsBase64(specifics[key]));
             }
         }
-
+        
         // Load all images in parallel
-        const loadedImages = await Promise.all(Object.values(imagePathsToLoad));
-        const imageKeys = Object.keys(imagePathsToLoad);
-
-        // Add the loaded image data to our final template data object
-        imageKeys.forEach((key, i) => {
-            templateData[key] = loadedImages[i];
+        const loadedImages = await Promise.all(imagePromises);
+        
+        // Add the loaded image data (as base64 strings) to our template data
+        placeholderNames.forEach((name, i) => {
+            templateData[name] = loadedImages[i];
         });
 
         const zip = new PizZip(content);
         const doc = new docxtemplater(zip, {
             paragraphLoop: true,
+            // Use a simplified and more robust ImageModule configuration
             modules: [new ImageModule({
-                // This tells the module how to handle the image data
-                getImage: (tag) => atob(tag),
-                getSize: () => [450, 300], // default size
+                // This tells the module where to find the image data.
+                // It will look for a placeholder like {architecture_image} and
+                // use the base64 string provided in templateData.architecture_image
+                getImage: function(tag) {
+                    return atob(tag);
+                },
+                // This sets a default size for the images
+                getSize: function() {
+                    return [450, 300];
+                },
             })]
         });
-
-        // Render the document with all the data
+        
+        // Render the document
         doc.render(templateData);
 
         const out = doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
@@ -684,7 +691,7 @@ async function generateDocument() {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-
+        
         button.innerHTML = 'Downloaded! ✅';
 
     } catch (error) {
