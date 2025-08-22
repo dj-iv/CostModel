@@ -2103,12 +2103,6 @@ async function generatePdf() {
 }
 
 
-
-
-universal-...l-template
-DOCX
-
-
   
  async function generateShareLink() {
     const button = document.getElementById('generate-link-btn');
