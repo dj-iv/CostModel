@@ -64,7 +64,7 @@
         .total-row td { font-weight: bold; }
         img { max-width: 100%; height: auto; display: block; margin: 20px auto; }
         .cover-logo { width: 500px; margin: 40px auto 20px; }
-        .cover-title { text-align: center; font-size: 48pt; color: #386682; line-height: 1.5; margin-top: 20px; }
+        .cover-title { text-align: center; font-family: Arial, sans-serif; font-size: 48pt; font-weight: bold; color: #386682; line-height: 1.5; margin-top: 20px; }
         .toc { list-style-type: none; padding-left: 0; }
         .toc li a { text-decoration: none; color: #333; display: flex; justify-content: space-between; }
         .toc li a:hover { color: #386682; }
@@ -105,15 +105,9 @@
     <div class="page">
         <div class="header"><img src="images/uctel_logo.png" alt="UCtel Logo"></div>
         <h2>Introduction</h2>
-        <p>{Account} are looking to install a mobile boosting system to improve indoor mobile coverage. Coverage is required over {NumberOfNetworks} of the UK Mobile Network Operators (MNOs) – EE, O2, Vodafone and Three (3). Based on the information provided, UCtel proposes the use of the CEL-FI {Solution} solution. This document sets out the details of the proposed solution, UCtel’s approach and budgetary pricing.</p>
+        <p>{Account} are looking to install a mobile boosting system to improve indoor mobile coverage. Coverage is required over {NumberOfNetworks} of the UK Mobile Network Operators (MNOs). Based on the information provided, UCtel proposes the use of the CEL-FI {Solution} solution. This document sets out the details of the proposed solution, UCtel’s approach and budgetary pricing.</p>
         <h3 class="no-number">About UCtel</h3>
         <p>UCtel specialises in the design, installation and management of in-building mobile signal systems.</p>
-        <h4 class="no-number">Why UCtel:</h4>
-        <ul>
-            <li>We have been installing in building mobile signal systems since 2019 and have deployed over 300 systems in a wide range of buildings including private houses, offices, factories and hospitals</li>
-            <li>We only work with equipment that complies with Ofcom's UK Interface Requirement 2102</li>
-            <li>We provide a range of tailored support packages from break/fix maintenance to fully managed systems with onsite engineering support.</li>
-        </ul>
         <h3 class="no-number">Key Contacts</h3>
         <table>
             <tr><th>Name</th><th>Title</th><th>Contact Details</th></tr>
@@ -133,7 +127,7 @@
     <div class="page">
         <div class="header"><img src="images/uctel_logo.png" alt="UCtel Logo"></div>
         <div id="solution-components-section">
-            </div>
+             </div>
         <div class="footer"><span>CEL-FI {Solution} solution proposal for {Account}</span><span class="page-number"></span></div>
     </div>
 
@@ -144,31 +138,20 @@
         <p>In order to validate the assumptions in this proposal, a site survey is required. The survey will determine various factors including signal strength, equipment locations, and cable routes.</p>
         <h3>Report and Quotation</h3>
         <p>Following the survey, a report will be provided which will include the results of the signal survey as well as details of the solution and proposed equipment locations. A formal quotation will be provided for the installation of the solution.</p>
-        <h3>Project Coordination</h3>
-        <p>Once an order is received, UCtel will introduce a project coordinator to manage the installation, including scheduling, risk assessments, and ensuring smooth delivery.</p>
         <div class="footer"><span>CEL-FI {Solution} solution proposal for {Account}</span><span class="page-number"></span></div>
     </div>
     
     <div class="page">
         <div class="header"><img src="images/uctel_logo.png" alt="UCtel Logo"></div>
         <h2>Proposed Pricing</h2>
-        <p>The following table provides indicative figures for the proposed solution.</p>
         <table class="pricing-table">
           <thead><tr><th>Description</th><th>Qty</th><th>Unit Price</th><th>Total Price</th></tr></thead>
           <tbody>
             <tr><td>{Description1}</td><td>{Qty1}</td><td>{UnitPrice1}</td><td>{TotalPrice1}</td></tr>
             <tr><td>{Description2}</td><td>{Qty2}</td><td>{UnitPrice2}</td><td>{TotalPrice2}</td></tr>
             <tr><td>{Description3}</td><td>{Qty3}</td><td>{UnitPrice3}</td><td>{TotalPrice3}</td></tr>
-            <tr>
-                <td id="support-package-description">{Description4}</td>
-                <td id="support-package-qty">{Qty4}</td>
-                <td id="support-package-unit-price">{UnitPrice4}</td>
-                <td id="support-package-total-price">{TotalPrice4}</td>
-            </tr>
-            <tr class="total-row">
-                <td colspan="3" style="text-align:right;">Total Price:</td>
-                <td id="grand-total-price">{TotalPrice}</td>
-            </tr>
+            <tr id="support-row-initial"><td>{Description4}</td><td>{Qty4}</td><td>{UnitPrice4}</td><td>{TotalPrice4}</td></tr>
+            <tr class="total-row"><td colspan="3" style="text-align:right;">Total Price:</td><td id="grand-total-price">{TotalPrice}</td></tr>
         </tbody>
         </table>
         <p>The following support options are available. Please see section 7 for more details.</p>
@@ -215,9 +198,9 @@
                 <img src="images/g41_diagrams.png" alt="G41 Installation Diagrams">`,
             components: `
                 <h2>Solution Components</h2>
-                <div class="component-layout"><div class="image-container"><img src="images/donor_antenna.png"></div><div class="text-container"><h3>Donor Antenna</h3><p>One or more donor antennas will be installed on the roof to obtain the best signal for boosting.</p></div></div>
-                <div class="component-layout reverse"><div class="image-container"><img src="images/g41_boosters.png"></div><div class="text-container"><h3>G41 Booster</h3><p>CEL-FI Go G41 booster(s) will be installed in a suitable location and either wall or rack-mounted.</p></div></div>
-                <div class="component-layout"><div class="image-container"><img src="images/server_antennas.png"></div><div class="text-container"><h3>Server Antennas</h3><p>Depending on the environment the appropriate type of antenna will be installed.</p></div></div>`
+                <div class="component-layout"><div class="image-container"><img src="images/donor_antenna.png"></div><div class="text-container"><h3 class="no-number">Donor Antenna</h3><p>One or more donor antennas will be installed on the roof to obtain the best signal for boosting.</p></div></div>
+                <div class="component-layout reverse"><div class="image-container"><img src="images/g41_boosters.png"></div><div class="text-container"><h3 class="no-number">G41 Booster</h3><p>CEL-FI Go G41 booster(s) will be installed in a suitable location and either wall or rack-mounted.</p></div></div>
+                <div class="component-layout"><div class="image-container"><img src="images/server_antennas.png"></div><div class="text-container"><h3 class="no-number">Server Antennas</h3><p>Depending on the environment the appropriate type of antenna will be installed.</p></div></div>`
         },
         'G43': {
             architecture: `
@@ -229,9 +212,9 @@
                 <img src="images/g43_diagram.png" alt="G43 Installation Diagram">`,
             components: `
                 <h2>Solution Components</h2>
-                <div class="component-layout"><div class="image-container"><img src="images/donor_antenna.png"></div><div class="text-container"><h3>Donor Antenna</h3><p>One or more donor antennas will be installed on the roof to obtain the best signal for boosting.</p></div></div>
-                <div class="component-layout reverse"><div class="image-container"><img src="images/g43_booster.png"></div><div class="text-container"><h3>G43 Booster</h3><p>CEL-FI GO G43 booster(s) will be installed in a suitable location and either wall or rack-mounted.</p></div></div>
-                <div class="component-layout"><div class="image-container"><img src="images/server_antennas.png"></div><div class="text-container"><h3>Server Antennas</h3><p>Depending on the environment the appropriate type of antenna will be installed.</p></div></div>`
+                <div class="component-layout"><div class="image-container"><img src="images/donor_antenna.png"></div><div class="text-container"><h3 class="no-number">Donor Antenna</h3><p>One or more donor antennas will be installed on the roof to obtain the best signal for boosting.</p></div></div>
+                <div class="component-layout reverse"><div class="image-container"><img src="images/g43_booster.png"></div><div class="text-container"><h3 class="no-number">G43 Booster</h3><p>CEL-FI GO G43 booster(s) will be installed in a suitable location and either wall or rack-mounted.</p></div></div>
+                <div class="component-layout"><div class="image-container"><img src="images/server_antennas.png"></div><div class="text-container"><h3 class="no-number">Server Antennas</h3><p>Depending on the environment the appropriate type of antenna will be installed.</p></div></div>`
         },
         'QUATRA': {
             architecture: `
@@ -243,9 +226,9 @@
                 <img src="images/quatra_diagram.png" alt="QUATRA 4000e Architecture Diagram">`,
             components: `
                 <h2>Solution Components</h2>
-                <div class="component-layout"><div class="image-container"><img src="images/donor_antenna.png"></div><div class="text-container"><h3>Donor Antenna</h3><p>Donor antennas will be installed on the roof to obtain the best signal for boosting.</p></div></div>
-                <div class="component-layout reverse"><div class="image-container"><img src="images/network_unit.png"></div><div class="text-container"><h3>Network Unit</h3><p>CEL-FI QUATRA 4000e Network Units (NUs) will be installed in a suitable location and either wall or rack mounted.</p></div></div>
-                <div class="component-layout"><div class="image-container"><img src="images/coverage_unit.png"></div><div class="text-container"><h3>Coverage Unit</h3><p>Coverage Units are installed in each of the areas that require coverage, connected by CAT6 cables to the NU.</p></div></div>`
+                <div class="component-layout"><div class="image-container"><img src="images/donor_antenna.png"></div><div class="text-container"><h3 class="no-number">Donor Antenna</h3><p>Donor antennas will be installed on the roof to obtain the best signal for boosting.</p></div></div>
+                <div class="component-layout reverse"><div class="image-container"><img src="images/network_unit.png"></div><div class="text-container"><h3 class="no-number">Network Unit</h3><p>CEL-FI QUATRA 4000e Network Units (NUs) will be installed in a suitable location and either wall or rack mounted.</p></div></div>
+                <div class="component-layout"><div class="image-container"><img src="images/coverage_unit.png"></div><div class="text-container"><h3 class="no-number">Coverage Unit</h3><p>Coverage Units are installed in each of the areas that require coverage, connected by CAT6 cables to the NU.</p></div></div>`
         },
         'QUATRA_EVO': {
             architecture: `
@@ -257,13 +240,14 @@
                 <img src="images/evo_diagram.png" alt="QUATRA EVO Architecture Diagram">`,
             components: `
                 <h2>Solution Components</h2>
-                <div class="component-layout"><div class="image-container"><img src="images/donor_antenna.png"></div><div class="text-container"><h3>Donor Antenna</h3><p>Donor antennas will be installed on the roof to obtain the best signal for boosting.</p></div></div>
-                <div class="component-layout reverse"><div class="image-container"><img src="images/network_unit_evo.png"></div><div class="text-container"><h3>Network Unit</h3><p>CEL-FI QUATRA EVO Network Units (NUs) will be installed in a suitable location and either wall or rack mounted.</p></div></div>
-                <div class="component-layout"><div class="image-container"><img src="images/coverage_unit.png"></div><div class="text-container"><h3>Coverage Unit</h3><p>Coverage Units are installed in each of the areas that require coverage, connected by CAT6 cables to the NU.</p></div></div>`
+                <div class="component-layout"><div class="image-container"><img src="images/donor_antenna.png"></div><div class="text-container"><h3 class="no-number">Donor Antenna</h3><p>Donor antennas will be installed on the roof to obtain the best signal for boosting.</p></div></div>
+                <div class="component-layout reverse"><div class="image-container"><img src="images/network_unit_evo.png"></div><div class="text-container"><h3 class="no-number">Network Unit</h3><p>CEL-FI QUATRA EVO Network Units (NUs) will be installed in a suitable location and either wall or rack mounted.</p></div></div>
+                <div class="component-layout"><div class="image-container"><img src="images/coverage_unit.png"></div><div class="text-container"><h3 class="no-number">Coverage Unit</h3><p>Coverage Units are installed in each of the areas that require coverage, connected by CAT6 cables to the NU.</p></div></div>`
         }
     };
 
     document.addEventListener('DOMContentLoaded', () => {
+        // --- 1. LOAD AND DECODE DATA ---
         const proposalData = (function loadProposalData() {
             if (!window.location.hash) return null;
             try {
@@ -280,61 +264,83 @@
             }
         })();
 
-        function populatePlaceholders(data) {
-            if (!data) return;
+        if (!proposalData) return;
+
+        // --- 2. INJECT DYNAMIC SOLUTION-SPECIFIC HTML ---
+        (function populateDynamicContent(data) {
+            if (!data || !data.systemType) return;
+            const systemKey = data.systemType.replace('_DAS', '');
+            const content = solutionSpecificData[systemKey];
+            if (content) {
+                document.getElementById('solution-architecture-section').innerHTML = content.architecture;
+                document.getElementById('solution-components-section').innerHTML = content.components;
+            }
+        })(proposalData);
+
+        // --- 3. POPULATE ALL OTHER PLACEHOLDERS ---
+        (function populatePlaceholders(data) {
             let bodyHtml = document.getElementById('proposal-container').innerHTML;
             for (const key in data) {
                 const regex = new RegExp(`{${key}}`, 'g');
                 bodyHtml = bodyHtml.replace(regex, data[key]);
             }
             document.getElementById('proposal-container').innerHTML = bodyHtml;
-        }
-        
-        function populateDynamicContent(data) {
-            if (!data || !data.systemType) return;
-            
-            const systemKey = data.systemType.replace('_DAS', '');
-            const content = solutionSpecificData[systemKey];
-            
-            if (content) {
-                const archSection = document.getElementById('solution-architecture-section');
-                const compSection = document.getElementById('solution-components-section');
-                if(archSection) archSection.innerHTML = content.architecture;
-                if(compSection) compSection.innerHTML = content.components;
-            }
-        }
-        
-        function addInteractivity(data) {
-            if (!data) return;
+        })(proposalData);
+
+        // --- 4. ADD INTERACTIVITY FOR PRICING TABLE ---
+        (function addInteractivity(data) {
             const supportOptions = document.querySelectorAll('.support-tier-option');
             const grandTotalElem = document.getElementById('grand-total-price');
-            const supportDescElem = document.getElementById('support-package-description');
-            const supportQtyElem = document.getElementById('support-package-qty');
-            const supportUnitElem = document.getElementById('support-package-unit-price');
-            const supportTotalElem = document.getElementById('support-package-total-price');
-            if(!grandTotalElem) return;
+            const supportRow = document.getElementById('support-row-initial');
+            if(!grandTotalElem || !supportRow) return;
+
+            const initialData = {
+                desc: supportRow.cells[0].textContent,
+                qty: supportRow.cells[1].textContent,
+                unit: supportRow.cells[2].textContent,
+                total: supportRow.cells[3].textContent
+            };
 
             const parsePrice = (priceString) => parseFloat(String(priceString).replace(/[£,]/g, ''));
-            const baseTotal = parsePrice(data.TotalPrice) - parsePrice(data.TotalPrice4 || '£0.00');
+            const baseTotal = parsePrice(data.TotalPrice) - parsePrice(initialData.total || '£0.00');
             const tierPrices = { bronze: parsePrice(data.SupportTotalPrice1), silver: parsePrice(data.SupportTotalPrice2), gold: parsePrice(data.SupportTotalPrice3) };
             
             supportOptions.forEach(option => {
                 option.addEventListener('click', () => {
-                    const tier = option.dataset.tier;
-                    const newGrandTotal = baseTotal + tierPrices[tier];
-                    supportDescElem.textContent = `Annual ${tier.charAt(0).toUpperCase() + tier.slice(1)} Support Package`;
-                    supportUnitElem.textContent = `£${tierPrices[tier].toLocaleString('en-GB', {minimumFractionDigits: 2})}`;
-                    supportTotalElem.textContent = `£${tierPrices[tier].toLocaleString('en-GB', {minimumFractionDigits: 2})}`;
-                    grandTotalElem.textContent = `£${newGrandTotal.toLocaleString('en-GB', {minimumFractionDigits: 2})}`;
-                    supportOptions.forEach(opt => opt.classList.remove('selected'));
-                    option.classList.add('selected');
+                    const isAlreadySelected = option.classList.contains('selected');
+
+                    if (isAlreadySelected) {
+                        option.classList.remove('selected');
+                        supportRow.cells[0].textContent = initialData.desc;
+                        supportRow.cells[1].textContent = initialData.qty;
+                        supportRow.cells[2].textContent = initialData.unit;
+                        supportRow.cells[3].textContent = initialData.total;
+                        grandTotalElem.textContent = `£${(baseTotal + parsePrice(initialData.total || '£0.00')).toLocaleString('en-GB', {minimumFractionDigits: 2})}`;
+                    } else {
+                        supportOptions.forEach(opt => opt.classList.remove('selected'));
+                        option.classList.add('selected');
+                        const tier = option.dataset.tier;
+                        const tierPrice = tierPrices[tier];
+                        const newGrandTotal = baseTotal + tierPrice;
+                        supportRow.cells[0].textContent = `Annual ${tier.charAt(0).toUpperCase() + tier.slice(1)} Support Package`;
+                        supportRow.cells[1].textContent = '1';
+                        supportRow.cells[2].textContent = `£${tierPrice.toLocaleString('en-GB', {minimumFractionDigits: 2})}`;
+                        supportRow.cells[3].textContent = `£${tierPrice.toLocaleString('en-GB', {minimumFractionDigits: 2})}`;
+                        grandTotalElem.textContent = `£${newGrandTotal.toLocaleString('en-GB', {minimumFractionDigits: 2})}`;
+                    }
                 });
             });
-        }
+        })(proposalData);
 
-        function generateDynamicTOC() {
+        // --- 5. ADD PAGE NUMBERS AND GENERATE TOC ---
+        (function finalizeDocument() {
+            const pages = document.querySelectorAll('.page:not(.cover-page)');
+            pages.forEach((page, index) => {
+                const pageNumElem = page.querySelector('.footer .page-number');
+                if(pageNumElem) pageNumElem.textContent = index + 2;
+            });
+
             const tocList = document.getElementById('toc-list');
-            if (!tocList) return;
             const headings = document.querySelectorAll('.page:not(.cover-page, .toc-page) h2:not(.no-number), .page:not(.cover-page, .toc-page) h3:not(.no-number)');
             let h2Counter = 0, h3Counter = 0;
             
@@ -352,24 +358,7 @@
                 li.appendChild(a);
                 tocList.appendChild(li);
             });
-        }
-        
-        function addPageNumbers() {
-            const pages = document.querySelectorAll('.page:not(.cover-page)');
-            pages.forEach((page, index) => {
-                const pageNumElem = page.querySelector('.footer .page-number');
-                if(pageNumElem) pageNumElem.textContent = index + 2;
-            });
-        }
-
-        // --- RUN ALL INITIALIZATION LOGIC ---
-        if (proposalData) {
-            populateDynamicContent(proposalData); // Must run first to build the page structure
-            populatePlaceholders(proposalData);     // Then fill in the placeholders
-            addInteractivity(proposalData);         // Then add interactivity
-            addPageNumbers();                       // Add page numbers
-            generateDynamicTOC();                   // Finally, generate TOC from the final content
-        }
+        })();
     });
 </script>
 </body>
