@@ -703,7 +703,7 @@ async function generateDocument() {
             getImage: (tag) => tag,
             getSize: (img, tag, size) => size,
         });
-
+imageModule.images = [];
         const zip = new PizZip(content);
         // Pass the instance into the modules array
         const doc = new docxtemplater(zip, {
