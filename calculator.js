@@ -653,24 +653,24 @@ async function generateDocument() {
         const loadedImages = await Promise.all(imagePromises);
         
         placeholderNames.forEach((name, i) => {
+            // The template tag {%donor_image} will be replaced by this Base64 data
             templateData[name] = loadedImages[i];
         });
 
         const zip = new PizZip(content);
-        
-        // This is the corrected ImageModule configuration
+
+        // This is the simplified and corrected module setup.
+        // It no longer needs the complex 'getImage' function.
         const imageModule = new ImageModule({
+            // All images will be centered.
+            centered: true,
+            // This tells the module how to handle the data. It will look up the tag
+            // (e.g., 'donor_image') in your data, find the base64 string,
+            // and handle it automatically.
             getImage: function(tagValue) {
-                // This correctly converts the Base64 string from the template
-                // into the ArrayBuffer format that the module requires.
-                const binary_string = atob(tagValue);
-                const len = binary_string.length;
-                const bytes = new Uint8Array(len);
-                for (let i = 0; i < len; i++) {
-                    bytes[i] = binary_string.charCodeAt(i);
-                }
-                return bytes.buffer;
+                return atob(tagValue);
             },
+             // This sets the size for the images.
             getSize: function() {
                 return [450, 300];
             }
