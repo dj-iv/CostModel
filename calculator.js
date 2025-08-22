@@ -1,11 +1,3 @@
-solutionSpecificData.G41.donor_image_path = 'images/donor_antenna.png';
-solutionSpecificData.G41.server_antennas_image_path = 'images/server_antennas.png';
-solutionSpecificData.G43.donor_image_path = 'images/donor_antenna.png';
-solutionSpecificData.G43.server_antennas_image_path = 'images/server_antennas.png';
-solutionSpecificData.QUATRA.donor_image_path = 'images/donor_antenna.png';
-solutionSpecificData.QUATRA.server_antennas_image_path = 'images/server_antennas.png';
-solutionSpecificData.QUATRA_EVO.donor_image_path = 'images/donor_antenna.png';
-solutionSpecificData.QUATRA_EVO.server_antennas_image_path = 'images/server_antennas.png';
 const solutionSpecificData = {
     'G41': {
         is_go_model: true,
@@ -15,7 +7,9 @@ const solutionSpecificData = {
         booster_title: "G41 Booster",
         booster_description: "CEL-FI Go G41 booster(s) will be installed in a suitable location and either wall or rack-mounted. Typical locations are comms rooms or riser cupboards. Power will be required for the booster(s) and management router if remote management is required.",
         booster_image_path: 'images/g41_boosters.png',
-        cabling_go_image_path: 'images/cabling.png'
+        cabling_go_image_path: 'images/cabling.png',
+        donor_image_path: 'images/donor_antenna.png',
+        server_antennas_image_path: 'images/server_antennas.png'
     },
     'G43': {
         is_go_model: true,
@@ -25,7 +19,9 @@ const solutionSpecificData = {
         booster_title: "G43 Booster",
         booster_description: "CEL-FI GO G43 booster(s) will be installed in a suitable location and either wall or rack-mounted. Typical locations are comms rooms or riser cupboards. Power will be required for the booster(s) and management router if remote management is required.",
         booster_image_path: 'images/g43_booster.png',
-        cabling_go_image_path: 'images/cabling.png'
+        cabling_go_image_path: 'images/cabling.png',
+        donor_image_path: 'images/donor_antenna.png',
+        server_antennas_image_path: 'images/server_antennas.png'
     },
     'QUATRA': {
         is_quatra_model: true,
@@ -37,7 +33,9 @@ const solutionSpecificData = {
         coverage_unit_description: "Coverage Units are installed on the wall or ceiling in each of the areas that require coverage. Two CAT6 cables connect each CU to the NU providing power over PoE. A server antenna or segments of passive DAS (coax based distributed antenna system) will be connected to each CU to distribute the signal across the required area.",
         coverage_unit_image_path: 'images/coverage_unit.png',
         cabling_quatra_image_path: 'images/cabling_quatra.png',
-        cabling_description: "Structured cabling will be used to connect active components together and coaxial cabling to connect antennas. Structured cabling carries digital signal and if necessary is amplified with range extenders. Coaxial cable carries analog signal and is low-loss to ensure the maximum signal is delivered to antennas. Some installations involve fibre optic cable to maximise the distance between NU and CU, but will require a dedicated power at the other end."
+        cabling_description: "Structured cabling will be used to connect active components together and coaxial cabling to connect antennas. Structured cabling carries digital signal and if necessary is amplified with range extenders. Coaxial cable carries analog signal and is low-loss to ensure the maximum signal is delivered to antennas. Some installations involve fibre optic cable to maximise the distance between NU and CU, but will require a dedicated power at the other end.",
+        donor_image_path: 'images/donor_antenna.png',
+        server_antennas_image_path: 'images/server_antennas.png'
     },
     'QUATRA_EVO': {
         is_quatra_model: true,
@@ -49,10 +47,10 @@ const solutionSpecificData = {
         coverage_unit_description: "Coverage Units are installed on the wall or ceiling in each of the areas that require coverage. Two CAT6 cables connect each CU to the NU providing power over PoE. A server antenna or segments of passive DAS (coax based distributed antenna system) will be connected to each CU to distribute the signal across the required area.",
         coverage_unit_image_path: 'images/coverage_unit.png',
         cabling_quatra_image_path: 'images/cabling_quatra.png',
-        cabling_description: "Structured cabling will be used to connect active components together and coaxial cabling to connect antennas. Structured cabling carries digital signal and if necessary is amplified with range extenders. Coaxial cable carries analog signal and is low-loss to ensure the maximum signal is delivered to antennas. Some installations involve fibre optic cable to maximise the distance between NU and CU, but will require a dedicated power at the other end."
+        cabling_description: "Structured cabling will be used to connect active components together and coaxial cabling to connect antennas. Structured cabling carries digital signal and if necessary is amplified with range extenders. Coaxial cable carries analog signal and is low-loss to ensure the maximum signal is delivered to antennas. Some installations involve fibre optic cable to maximise the distance between NU and CU, but will require a dedicated power at the other end.",
+        donor_image_path: 'images/donor_antenna.png',
+        server_antennas_image_path: 'images/server_antennas.png'
     }
-    // Note: The descriptions for QUATRA_DAS and QUATRA_EVO_DAS will be the same as their non-DAS counterparts.
-    // The code will handle this automatically.
 };
 
 document.addEventListener('DOMContentLoaded', () => {
