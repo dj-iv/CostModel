@@ -1,3 +1,11 @@
+solutionSpecificData.G41.donor_image_path = 'images/donor_antenna.png';
+solutionSpecificData.G41.server_antennas_image_path = 'images/server_antennas.png';
+solutionSpecificData.G43.donor_image_path = 'images/donor_antenna.png';
+solutionSpecificData.G43.server_antennas_image_path = 'images/server_antennas.png';
+solutionSpecificData.QUATRA.donor_image_path = 'images/donor_antenna.png';
+solutionSpecificData.QUATRA.server_antennas_image_path = 'images/server_antennas.png';
+solutionSpecificData.QUATRA_EVO.donor_image_path = 'images/donor_antenna.png';
+solutionSpecificData.QUATRA_EVO.server_antennas_image_path = 'images/server_antennas.png';
 const solutionSpecificData = {
     'G41': {
         is_go_model: true,
@@ -612,6 +620,50 @@ const finalUnitSell = finalTotalSell / quantity;
     
     return `UCtel_Proposal_${solutionName}_${networks}_Networks_for_${customerName}_${dateString}`;
 }
+    function buildSolutionComponentsXml(doc, specifics) {
+    const imageModule = doc.modules.find(m => m.constructor.name === 'ImageModule');
+    let imageCounter = 1;
+    const getImageTag = (imageKey, width = 450, height = 300) => {
+        if (!imageModule || !specifics[imageKey]) return '';
+        const newImage = { image: specifics[imageKey], id: `img-${imageCounter++}` };
+        imageModule.images.push(newImage);
+        const size = imageModule.getSize(newImage.image, newImage.id, [width, height]);
+        return imageModule.render({ ...newImage, size });
+    };
+
+    const donorAntennaXml = `
+        <w:p><w:r><w:t>Donor Antenna</w:t></w:r></w:p>
+        ${getImageTag('donor_image_path', 450, 450)}
+        <w:p><w:r><w:t>One or more donor antennas will be installed on the roof (or other suitable location) to obtain the best signal for boosting. The type of donor antenna will be selected during the site survey. The image shows an example of a roof installation. Low loss coaxial cables will be run from the donor antennas to the boosters.</w:t></w:r></w:p>`;
+
+    const serverAntennaXml = `
+        <w:p><w:r><w:t>Server antennas</w:t></w:r></w:p>
+        ${getImageTag('server_antennas_image_path')}
+        <w:p><w:r><w:t>Depending on the environment the appropriate type of antenna will be installed. There are a range of ceiling and panel omni antennas available and the most appropriate antenna will be recommended following the survey.</w:t></w:r></w:p>`;
+    
+    let componentsXml = '';
+    if (specifics.is_go_model) {
+        componentsXml = `
+            <w:p><w:r><w:t>${specifics.booster_title}</w:t></w:r></w:p>
+            ${getImageTag('booster_image_path', 450, 450)}
+            <w:p><w:r><w:t>${specifics.booster_description}</w:t></w:r></w:p>`;
+    } else if (specifics.is_quatra_model) {
+        componentsXml = `
+            <w:p><w:r><w:t>Network Unit</w:t></w:r></w:p>
+            ${getImageTag('network_unit_image_path', 450, 450)}
+            <w:p><w:r><w:t>${specifics.network_unit_description}</w:t></w:r></w:p>
+            <w:p><w:r><w:t>Coverage Unit</w:t></w:r></w:p>
+            ${getImageTag('coverage_unit_image_path')}
+            <w:p><w:r><w:t>${specifics.coverage_unit_description}</w:t></w:r></w:p>`;
+    }
+
+    const cablingXml = `
+        <w:p><w:r><w:t>Cabling</w:t></w:r></w:p>
+        ${specifics.is_go_model ? getImageTag('cabling_go_image_path') : getImageTag('cabling_quatra_image_path')}
+        <w:p><w:r><w:t>${specifics.is_go_model ? 'Coaxial cable carries the analogue signal and is low-loss to ensure the maximum signal is delivered to antennas.' : specifics.cabling_description}</w:t></w:r></w:p>`;
+        
+    return donorAntennaXml + componentsXml + serverAntennaXml + cablingXml;
+}
 async function generateDocument() {
     const button = document.getElementById('generate-document-btn');
     const originalText = button.innerHTML;
@@ -624,61 +676,47 @@ async function generateDocument() {
         const systemType = document.getElementById('system-type').value;
         const baseSystemType = systemType.replace('_DAS', '');
         const specifics = solutionSpecificData[baseSystemType];
+        if (!specifics) throw new Error(`No specific data found for system type: ${systemType}`);
 
-        if (!specifics) {
-            throw new Error(`No specific data found for system type: ${systemType}`);
-        }
-
-        // Always use the universal template
         const templateFilename = 'universal-proposal-template.docx';
         const response = await fetch(`templates/${templateFilename}`);
         if (!response.ok) throw new Error(`Could not fetch template: ${response.statusText}`);
         const content = await response.arrayBuffer();
 
         const templateData = getTemplateData();
+        
+        templateData.architecture_title = specifics.architecture_title;
+        templateData.architecture_description = specifics.architecture_description;
 
-        // Add dynamic text and flags
-        Object.assign(templateData, {
-            is_go_model: specifics.is_go_model || false,
-            is_quatra_model: specifics.is_quatra_model || false,
-            architecture_title: specifics.architecture_title,
-            architecture_description: specifics.architecture_description,
-            booster_title: specifics.booster_title,
-            booster_description: specifics.booster_description,
-            network_unit_description: specifics.network_unit_description,
-            coverage_unit_description: specifics.coverage_unit_description,
-            cabling_description: specifics.cabling_description,
-        });
-
-        // Load images
-        const imagePromises = {};
+        const imagePaths = {};
         for (const key in specifics) {
             if (key.endsWith('_image_path')) {
-                const imageName = key.replace('_path', '');
-                imagePromises[imageName] = loadImageAsBase64(specifics[key]);
+                imagePaths[key] = loadImageAsBase64(specifics[key]);
             }
         }
-        const loadedImages = await Promise.all(Object.values(imagePromises));
-        const imageKeys = Object.keys(imagePromises);
-        for (let i = 0; i < imageKeys.length; i++) {
-            templateData[imageKeys[i]] = loadedImages[i];
-        }
+        const loadedImages = await Promise.all(Object.values(imagePaths));
+        Object.keys(imagePaths).forEach((key, i) => {
+            specifics[key.replace('_path','')] = loadedImages[i];
+        });
 
         const zip = new PizZip(content);
-        // IMPORTANT: Use the same ImageModule setup as the PDF function
         const doc = new docxtemplater(zip, {
             paragraphLoop: true,
-            linebreaks: true,
             modules: [new ImageModule({
-                getImage: (tag) => atob(tag),
-                getSize: () => [450, 300],
+                getImage: (tag) => tag,
+                getSize: (img, tag, size) => size,
             })]
         });
         
+        templateData.solution_components = buildSolutionComponentsXml(doc, specifics);
+        
+        const archImage = { image: specifics.architecture_image, id: 'arch-img' };
+        doc.modules.find(m => m.constructor.name === 'ImageModule').images.push(archImage);
+        templateData.architecture_image = doc.modules.find(m => m.constructor.name === 'ImageModule').render(archImage);
+
         doc.render(templateData);
 
         const out = doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
-        
         const filename = generateFilename() + '.docx';
         const link = document.createElement('a');
         link.href = URL.createObjectURL(out);
