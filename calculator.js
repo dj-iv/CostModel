@@ -653,26 +653,29 @@ async function generateDocument() {
         const loadedImages = await Promise.all(imagePromises);
         
         placeholderNames.forEach((name, i) => {
-            // The template tag {%donor_image} will be replaced by this Base64 data
             templateData[name] = loadedImages[i];
         });
 
         const zip = new PizZip(content);
-
+        
+        // This is the final, correct ImageModule configuration
         const imageModule = new ImageModule({
-    getImage: function(tagValue) {
-        const binary_string = atob(tagValue);
-        const len = binary_string.length;
-        const bytes = new Uint8Array(len);
-        for (let i = 0; i < len; i++) {
-            bytes[i] = binary_string.charCodeAt(i);
-        }
-        return bytes.buffer;
-    },
-    getSize: function() {
-        return [450, 300];
-    }
-});
+            getImage: function(tagValue) {
+                // This correctly converts the Base64 data into the 
+                // ArrayBuffer format that the image module requires.
+                const binary_string = atob(tagValue);
+                const len = binary_string.length;
+                const bytes = new Uint8Array(len);
+                for (let i = 0; i < len; i++) {
+                    bytes[i] = binary_string.charCodeAt(i);
+                }
+                return bytes.buffer;
+            },
+            getSize: function() {
+                // You can customize image sizes here if needed in the future
+                return [450, 300];
+            }
+        });
 
         const doc = new docxtemplater(zip, {
             paragraphLoop: true,
