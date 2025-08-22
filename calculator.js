@@ -1,3 +1,51 @@
+const solutionSpecificData = {
+    'G41': {
+        is_go_model: true,
+        architecture_title: "CEL-FI G41 System Architecture",
+        architecture_description: "The CEL-FI solution needs to receive the best available donor signal from outside and transport the signal through low loss cable to the network repeaters that then distribute the signal through indoor antennas. A system comprises:\n• Donor antenna installed where the best donor signal can be obtained\n• Low loss cables\n• Repeaters to receive donor signal and boost it\n• Internal antennas to broadcast the boosted signal",
+        architecture_image_path: 'images/g41_diagrams.png',
+        booster_title: "G41 Booster",
+        booster_description: "CEL-FI Go G41 booster(s) will be installed in a suitable location and either wall or rack-mounted. Typical locations are comms rooms or riser cupboards. Power will be required for the booster(s) and management router if remote management is required.",
+        booster_image_path: 'images/g41_boosters.png',
+        cabling_go_image_path: 'images/cabling.png'
+    },
+    'G43': {
+        is_go_model: true,
+        architecture_title: "CEL-FI G43 System Architecture",
+        architecture_description: "The CEL-FI solution needs to receive the best available donor signal from outside and transport the signal through low loss cable to the network repeaters that then distribute the signal through indoor antennas. A system comprises:\n• Donor antenna installed where the best donor signal can be obtained\n• Low loss cables\n• Repeaters to receive donor signal and boost it\n• Internal antennas to broadcast the boosted signal",
+        architecture_image_path: 'images/g43_diagram.png',
+        booster_title: "G43 Booster",
+        booster_description: "CEL-FI GO G43 booster(s) will be installed in a suitable location and either wall or rack-mounted. Typical locations are comms rooms or riser cupboards. Power will be required for the booster(s) and management router if remote management is required.",
+        booster_image_path: 'images/g43_booster.png',
+        cabling_go_image_path: 'images/cabling.png'
+    },
+    'QUATRA': {
+        is_quatra_model: true,
+        architecture_title: "CEL-FI QUATRA 4000e",
+        architecture_description: "CEL-FI QUATRA is a distributed antenna system (DAS) hybrid solution that combines the strength of passive and active DAS technologies to deliver high-quality mobile signal in buildings. CEL-FI QUATRA delivers a mobile signal that is up to 1000 times stronger than a pure analogue solution. Utilising CAT 5e/6 cabling for RF and power over ethernet, with no signal attenuation up to the transmitters within the perimeter of the building. The CEL-FI QUATRA solution consists of a donor antenna which is installed on the roof or outdoors where mobile signal is strongest, a network unit (NU) which amplifies and digitises the mobile signal and a network of coverage units (CU’s) which are connected to segments of passive DAS to distribute the signal around the building. The QUATRA 4000e boosts up to 4 network operators in a single system and complies with recent changes to Ofcom’s regulations in this regard.",
+        architecture_image_path: 'images/quatra_diagram.png',
+        network_unit_description: "CEL-FI QUATRA 4000e Network Units (NUs) will be installed in a suitable location and either wall or rack mounted. Typical locations are comms rooms or riser cupboard. Power will be required for the NU. An NU can support up to 6 CUs. A fibre hub can be added to expand the capacity to 12 CUs.",
+        network_unit_image_path: 'images/network_unit.png',
+        coverage_unit_description: "Coverage Units are installed on the wall or ceiling in each of the areas that require coverage. Two CAT6 cables connect each CU to the NU providing power over PoE. A server antenna or segments of passive DAS (coax based distributed antenna system) will be connected to each CU to distribute the signal across the required area.",
+        coverage_unit_image_path: 'images/coverage_unit.png',
+        cabling_quatra_image_path: 'images/cabling_quatra.png',
+        cabling_description: "Structured cabling will be used to connect active components together and coaxial cabling to connect antennas. Structured cabling carries digital signal and if necessary is amplified with range extenders. Coaxial cable carries analog signal and is low-loss to ensure the maximum signal is delivered to antennas. Some installations involve fibre optic cable to maximise the distance between NU and CU, but will require a dedicated power at the other end."
+    },
+    'QUATRA_EVO': {
+        is_quatra_model: true,
+        architecture_title: "CEL-FI QUATRA EVO",
+        architecture_description: "CEL-FI QUATRA is a distributed antenna system (DAS) hybrid solution that combines the strength of passive and active DAS technologies to deliver high-quality mobile signal in buildings. CEL-FI QUATRA delivers a mobile signal that is up to 1000 times stronger than a pure analogue solution. Utilising CAT 5e/6 cabling for RF and power over ethernet, with no signal attenuation up to the transmitters within the perimeter of the building. The CEL-FI QUATRA solution consists of a donor antenna which is installed on the roof or outdoors where mobile signal is strongest, a network unit (NU) which amplifies and digitises the mobile signal and a network of coverage units (CU’s) which are connected to segments of passive DAS to distribute the signal around the building. The QUATRA EVO can boost two network operators in a single system and complies with recent changes to Ofcom’s regulations in this regard.",
+        architecture_image_path: 'images/evo_diagram.png',
+        network_unit_description: "CEL-FI QUATRA EVO Network Units (NUs) will be installed in a suitable location and either wall or rack mounted. Typical locations are comms rooms or riser cupboard. Power will be required for the NU. An NU can support up to 6 CUs. A fibre hub can be added to expand the capacity to 12 CUs.",
+        network_unit_image_path: 'images/network_unit_evo.png',
+        coverage_unit_description: "Coverage Units are installed on the wall or ceiling in each of the areas that require coverage. Two CAT6 cables connect each CU to the NU providing power over PoE. A server antenna or segments of passive DAS (coax based distributed antenna system) will be connected to each CU to distribute the signal across the required area.",
+        coverage_unit_image_path: 'images/coverage_unit.png',
+        cabling_quatra_image_path: 'images/cabling_quatra.png',
+        cabling_description: "Structured cabling will be used to connect active components together and coaxial cabling to connect antennas. Structured cabling carries digital signal and if necessary is amplified with range extenders. Coaxial cable carries analog signal and is low-loss to ensure the maximum signal is delivered to antennas. Some installations involve fibre optic cable to maximise the distance between NU and CU, but will require a dedicated power at the other end."
+    }
+    // Note: The descriptions for QUATRA_DAS and QUATRA_EVO_DAS will be the same as their non-DAS counterparts.
+    // The code will handle this automatically.
+};
 document.addEventListener('DOMContentLoaded', () => {
     // --- MAKE.COM WEBHOOK ---
     const MAKE_WEBHOOK_URL = 'https://hook.eu1.make.com/chemsqrmifjs5lwbrquhh1bha0vo96k2';
@@ -891,6 +939,25 @@ function getTemplateData() {
         SupportTotalPrice3: `£${getSpecificSupportCost('gold', totalHardwareUnits, totalHardwareSellPrice).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
     };
 }
+// Helper function to load image data
+function loadImageAsBase64(url) {
+    return new Promise((resolve, reject) => {
+        fetch(url)
+            .then(response => {
+                if (!response.ok) throw new Error(`Network response was not ok for ${url}`);
+                return response.blob();
+            })
+            .then(blob => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result.split(',')[1]); // Get Base64
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            })
+            .catch(reject);
+    });
+}
+
+
 async function generatePdf() {
     const button = document.getElementById('generate-pdf-btn');
     const originalText = button.innerHTML;
@@ -900,50 +967,77 @@ async function generatePdf() {
     button.disabled = true;
 
     try {
-        // 1. Get the correct DOCX template
         const systemType = document.getElementById('system-type').value;
-        const docxTemplateMap = {
-            'G41': 'CEL-FI-GO-G41-Proposal-Template.docx',
-            'G43': 'CEL-FI-GO-G43-Proposal-Template.docx',
-            'QUATRA': 'CEL-FI-QUATRA-4000e-Proposal-Template.docx',
-            'QUATRA_DAS': 'CEL-FI-QUATRA-4000e-Proposal-Template.docx',
-            'QUATRA_EVO': 'CEL-FI-QUATRA-EVO-Proposal-Template.docx',
-            'QUATRA_EVO_DAS': 'CEL-FI-QUATRA-EVO-Proposal-Template.docx'
-        };
-        const templateFilename = docxTemplateMap[systemType];
-        if (!templateFilename) throw new Error(`No template found for system type: ${systemType}`);
+        // Handle DAS variations by mapping them to their base type
+        const baseSystemType = systemType.replace('_DAS', '');
+        const specifics = solutionSpecificData[baseSystemType];
 
-        // 2. Fetch the template and populate it with data
+        if (!specifics) {
+            throw new Error(`No specific data found for system type: ${systemType}`);
+        }
+
+        // Always use the universal template
+        const templateFilename = 'universal-proposal-template.docx';
         const response = await fetch(`templates/${templateFilename}`);
         if (!response.ok) throw new Error(`Could not fetch template: ${response.statusText}`);
         const content = await response.arrayBuffer();
-        const zip = new PizZip(content);
-        const doc = new docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
-        doc.render(getTemplateData());
 
-        // 3. Generate the DOCX file in memory as a "blob"
-        const blob = doc.getZip().generate({
-            type: "blob",
-            mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        // Get standard pricing data etc.
+        const templateData = getTemplateData();
+
+        // Add the dynamic text and boolean flags to the data object
+        Object.assign(templateData, {
+            is_go_model: specifics.is_go_model || false,
+            is_quatra_model: specifics.is_quatra_model || false,
+            architecture_title: specifics.architecture_title,
+            architecture_description: specifics.architecture_description,
+            booster_title: specifics.booster_title,
+            booster_description: specifics.booster_description,
+            network_unit_description: specifics.network_unit_description,
+            coverage_unit_description: specifics.coverage_unit_description,
+            cabling_description: specifics.cabling_description,
         });
+
+        // Load all necessary images in parallel
+        const imagePromises = {};
+        for (const key in specifics) {
+            if (key.endsWith('_image_path')) {
+                const imageName = key.replace('_path', '');
+                imagePromises[imageName] = loadImageAsBase64(specifics[key]);
+            }
+        }
+        
+        const loadedImages = await Promise.all(Object.values(imagePromises));
+        const imageKeys = Object.keys(imagePromises);
+
+        for (let i = 0; i < imageKeys.length; i++) {
+            templateData[imageKeys[i]] = loadedImages[i];
+        }
+
+        const zip = new PizZip(content);
+        const doc = new docxtemplater(zip, {
+            paragraphLoop: true,
+            linebreaks: true,
+            modules: [new ImageModule({
+                // This tells the module how to process the image data
+                getImage: (tag) => atob(tag),
+                getSize: () => [450, 300], // default size
+            })]
+        });
+        
+        doc.render(templateData);
+
+        const blob = doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
         const docxFilename = generateFilename() + '.docx';
 
-        // 4. Send the file to your Make.com webhook
         button.innerHTML = 'Converting...';
         const formData = new FormData();
         formData.append('file', blob, docxFilename);
-
-        const makeResponse = await fetch(PDF_MAKE_WEBHOOK_URL, {
-            method: 'POST',
-            body: formData
-        });
-
+        const makeResponse = await fetch(PDF_MAKE_WEBHOOK_URL, { method: 'POST', body: formData });
         if (!makeResponse.ok) throw new Error(`Make.com webhook failed: ${makeResponse.statusText}`);
 
-        // 5. Receive the PDF file directly and trigger the download
         const pdfBlob = await makeResponse.blob();
         const downloadUrl = window.URL.createObjectURL(pdfBlob);
-
         const link = document.createElement('a');
         link.href = downloadUrl;
         link.setAttribute('download', generateFilename() + '.pdf');
@@ -960,11 +1054,21 @@ async function generatePdf() {
         button.innerHTML = 'Failed! ❌';
     } finally {
         setTimeout(() => {
-            button.innerHTML = originalText;
+            button.innerHTML = 'Proposal PDF 📄';
             button.disabled = false;
         }, 3000);
     }
 }
+
+
+
+
+
+
+universal-...l-template
+DOCX
+
+
   
  async function generateShareLink() {
     const button = document.getElementById('generate-link-btn');
