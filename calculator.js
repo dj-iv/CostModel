@@ -939,25 +939,6 @@ function getTemplateData() {
         SupportTotalPrice3: `£${getSpecificSupportCost('gold', totalHardwareUnits, totalHardwareSellPrice).toLocaleString('en-GB', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`,
     };
 }
-// Helper function to load image data
-function loadImageAsBase64(url) {
-    return new Promise((resolve, reject) => {
-        fetch(url)
-            .then(response => {
-                if (!response.ok) throw new Error(`Network response was not ok for ${url}`);
-                return response.blob();
-            })
-            .then(blob => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result.split(',')[1]); // Get Base64
-                reader.onerror = reject;
-                reader.readAsDataURL(blob);
-            })
-            .catch(reject);
-    });
-}
-
-
 async function generatePdf() {
     const button = document.getElementById('generate-pdf-btn');
     const originalText = button.innerHTML;
@@ -967,77 +948,50 @@ async function generatePdf() {
     button.disabled = true;
 
     try {
+        // 1. Get the correct DOCX template
         const systemType = document.getElementById('system-type').value;
-        // Handle DAS variations by mapping them to their base type
-        const baseSystemType = systemType.replace('_DAS', '');
-        const specifics = solutionSpecificData[baseSystemType];
+        const docxTemplateMap = {
+            'G41': 'CEL-FI-GO-G41-Proposal-Template.docx',
+            'G43': 'CEL-FI-GO-G43-Proposal-Template.docx',
+            'QUATRA': 'CEL-FI-QUATRA-4000e-Proposal-Template.docx',
+            'QUATRA_DAS': 'CEL-FI-QUATRA-4000e-Proposal-Template.docx',
+            'QUATRA_EVO': 'CEL-FI-QUATRA-EVO-Proposal-Template.docx',
+            'QUATRA_EVO_DAS': 'CEL-FI-QUATRA-EVO-Proposal-Template.docx'
+        };
+        const templateFilename = docxTemplateMap[systemType];
+        if (!templateFilename) throw new Error(`No template found for system type: ${systemType}`);
 
-        if (!specifics) {
-            throw new Error(`No specific data found for system type: ${systemType}`);
-        }
-
-        // Always use the universal template
-        const templateFilename = 'universal-proposal-template.docx';
+        // 2. Fetch the template and populate it with data
         const response = await fetch(`templates/${templateFilename}`);
         if (!response.ok) throw new Error(`Could not fetch template: ${response.statusText}`);
         const content = await response.arrayBuffer();
-
-        // Get standard pricing data etc.
-        const templateData = getTemplateData();
-
-        // Add the dynamic text and boolean flags to the data object
-        Object.assign(templateData, {
-            is_go_model: specifics.is_go_model || false,
-            is_quatra_model: specifics.is_quatra_model || false,
-            architecture_title: specifics.architecture_title,
-            architecture_description: specifics.architecture_description,
-            booster_title: specifics.booster_title,
-            booster_description: specifics.booster_description,
-            network_unit_description: specifics.network_unit_description,
-            coverage_unit_description: specifics.coverage_unit_description,
-            cabling_description: specifics.cabling_description,
-        });
-
-        // Load all necessary images in parallel
-        const imagePromises = {};
-        for (const key in specifics) {
-            if (key.endsWith('_image_path')) {
-                const imageName = key.replace('_path', '');
-                imagePromises[imageName] = loadImageAsBase64(specifics[key]);
-            }
-        }
-        
-        const loadedImages = await Promise.all(Object.values(imagePromises));
-        const imageKeys = Object.keys(imagePromises);
-
-        for (let i = 0; i < imageKeys.length; i++) {
-            templateData[imageKeys[i]] = loadedImages[i];
-        }
-
         const zip = new PizZip(content);
-        const doc = new docxtemplater(zip, {
-            paragraphLoop: true,
-            linebreaks: true,
-            modules: [new ImageModule({
-                // This tells the module how to process the image data
-                getImage: (tag) => atob(tag),
-                getSize: () => [450, 300], // default size
-            })]
-        });
-        
-        doc.render(templateData);
+        const doc = new docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+        doc.render(getTemplateData());
 
-        const blob = doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+        // 3. Generate the DOCX file in memory as a "blob"
+        const blob = doc.getZip().generate({
+            type: "blob",
+            mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        });
         const docxFilename = generateFilename() + '.docx';
 
+        // 4. Send the file to your Make.com webhook
         button.innerHTML = 'Converting...';
         const formData = new FormData();
         formData.append('file', blob, docxFilename);
-        const makeResponse = await fetch(PDF_MAKE_WEBHOOK_URL, { method: 'POST', body: formData });
+
+        const makeResponse = await fetch(PDF_MAKE_WEBHOOK_URL, {
+            method: 'POST',
+            body: formData
+        });
+
         if (!makeResponse.ok) throw new Error(`Make.com webhook failed: ${makeResponse.statusText}`);
 
+        // 5. Receive the PDF file directly and trigger the download
         const pdfBlob = await makeResponse.blob();
         const downloadUrl = window.URL.createObjectURL(pdfBlob);
+
         const link = document.createElement('a');
         link.href = downloadUrl;
         link.setAttribute('download', generateFilename() + '.pdf');
@@ -1054,13 +1008,11 @@ async function generatePdf() {
         button.innerHTML = 'Failed! ❌';
     } finally {
         setTimeout(() => {
-            button.innerHTML = 'Proposal PDF 📄';
+            button.innerHTML = originalText;
             button.disabled = false;
         }, 3000);
     }
 }
-
-
 
 
 
