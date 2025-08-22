@@ -231,6 +231,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
 <script>
+    // --- CONSOLIDATED DATA FOR ALL SOLUTIONS (FULL CONTENT, NO H2 TAGS) ---
     const solutionSpecificData = {
         'G41': {
             architecture: `
@@ -242,10 +243,10 @@
                 <ul><li>Donor antenna installed where the best donor signal can be obtained</li><li>Low loss cables</li><li>Repeaters to receive donor signal and boost it</li><li>Internal antennas to broadcast the boosted signal</li></ul>
                 <img src="images/g41_diagrams.png" alt="G41 Installation Diagrams">`,
             components: `
-                <div class="component-layout"><div class="image-container"><img src="images/donor_antenna.png"></div><div class="text-container"><h3>Donor Antenna</h3><p>One or more donor antennas will be installed on the roof (or other suitable location) to obtain the best signal for boosting. The type of donor antenna will be selected during the site survey. The image shows an example of a roof installation. Low loss coaxial cables will be run from the donor antennas to the boosters.</p></div></div>
-                <div class="component-layout reverse"><div class="image-container"><img src="images/g41_boosters.png"></div><div class="text-container"><h3>G41 Booster</h3><p>CEL-FI Go G41 booster(s) will be installed in a suitable location and either wall or rack-mounted. Typical locations are comms rooms or riser cupboards. Power will be required for the booster(s) and management router if remote management is required.</p></div></div>
-                <div class="component-layout"><div class="image-container"><img src="images/server_antennas.png"></div><div class="text-container"><h3>Server Antennas</h3><p>Depending on the environment the appropriate type of antenna will be installed. There are a range of ceiling and panel omni antennas available and the most appropriate antenna will be recommended following the survey.</p></div></div>
-                <div class="component-layout reverse"><div class="image-container"><img src="images/cabling.png"></div><div class="text-container"><h3>Cabling</h3><p>Coaxial cable carries the analogue signal and is low-loss to ensure the maximum signal is delivered to antennas.</p></div></div>
+                <div class="component-layout"><div class="image-container"><img src="images/donor_antenna.png" alt="Donor Antenna"></div><div class="text-container"><h3>Donor Antenna</h3><p>One or more donor antennas will be installed on the roof (or other suitable location) to obtain the best signal for boosting. The type of donor antenna will be selected during the site survey. The image shows an example of a roof installation. Low loss coaxial cables will be run from the donor antennas to the boosters.</p></div></div>
+                <div class="component-layout reverse"><div class="image-container"><img src="images/g41_boosters.png" alt="G41 Boosters"></div><div class="text-container"><h3>G41 Booster</h3><p>CEL-FI Go G41 booster(s) will be installed in a suitable location and either wall or rack-mounted. Typical locations are comms rooms or riser cupboards. Power will be required for the booster(s) and management router if remote management is required.</p></div></div>
+                <div class="component-layout"><div class="image-container"><img src="images/server_antennas.png" alt="Server Antennas"></div><div class="text-container"><h3>Server Antennas</h3><p>Depending on the environment the appropriate type of antenna will be installed. There are a range of ceiling and panel omni antennas available and the most appropriate antenna will be recommended following the survey.</p></div></div>
+                <div class="component-layout reverse"><div class="image-container"><img src="images/cabling.png" alt="Cabling"></div><div class="text-container"><h3>Cabling</h3><p>Coaxial cable carries the analogue signal and is low-loss to ensure the maximum signal is delivered to antennas.</p></div></div>
                 <h3>5G Ready DAS</h3><p>All our DAS components, Donor Antennas, Server Antennas and Splitters support 5G in the 3500MHz - 3700MHz range (Band 78). Current Ofcom regulations do not allow these frequencies to be boosted, but the DAS elements will be capable of supporting this when it is available.</p>`
         },
         'G43': {
@@ -258,10 +259,10 @@
                 <ul><li>Donor antenna installed where the best donor signal can be obtained</li><li>Low loss cables</li><li>Repeaters to receive donor signal and boost it</li><li>Internal antennas to broadcast the boosted signal</li></ul>
                 <img src="images/g43_diagram.png" alt="G43 Installation Diagram">`,
             components: `
-                <div class="component-layout"><div class="image-container"><img src="images/donor_antenna.png"></div><div class="text-container"><h3>Donor Antenna</h3><p>One or more donor antennas will be installed on the roof (or other suitable location) to obtain the best signal for boosting. The type of donor antenna will be selected during the site survey. The image shows an example of a roof installation. Low loss coaxial cables will be run from the donor antennas to the boosters.</p></div></div>
-                <div class="component-layout reverse"><div class="image-container"><img src="images/g43_booster.png"></div><div class="text-container"><h3>G43 Booster</h3><p>CEL-FI GO G43 booster(s) will be installed in a suitable location and either wall or rack-mounted. Typical locations are comms rooms or riser cupboards. Power will be required for the booster(s) and management router if remote management is required.</p></div></div>
-                <div class="component-layout"><div class="image-container"><img src="images/server_antennas.png"></div><div class="text-container"><h3>Server Antennas</h3><p>Depending on the environment the appropriate type of antenna will be installed. There are a range of ceiling and panel omni antennas available and the most appropriate antenna will be recommended following the survey.</p></div></div>
-                <div class="component-layout reverse"><div class="image-container"><img src="images/cabling.png"></div><div class="text-container"><h3>Cabling</h3><p>Coaxial cable carries the analogue signal and is low-loss to ensure the maximum signal is delivered to antennas.</p></div></div>
+                <div class="component-layout"><div class="image-container"><img src="images/donor_antenna.png" alt="Donor Antenna"></div><div class="text-container"><h3>Donor Antenna</h3><p>One or more donor antennas will be installed on the roof (or other suitable location) to obtain the best signal for boosting. The type of donor antenna will be selected during the site survey. The image shows an example of a roof installation. Low loss coaxial cables will be run from the donor antennas to the boosters.</p></div></div>
+                <div class="component-layout reverse"><div class="image-container"><img src="images/g43_booster.png" alt="G43 Booster"></div><div class="text-container"><h3>G43 Booster</h3><p>CEL-FI GO G43 booster(s) will be installed in a suitable location and either wall or rack-mounted. Typical locations are comms rooms or riser cupboards. Power will be required for the booster(s) and management router if remote management is required.</p></div></div>
+                <div class="component-layout"><div class="image-container"><img src="images/server_antennas.png" alt="Server Antennas"></div><div class="text-container"><h3>Server Antennas</h3><p>Depending on the environment the appropriate type of antenna will be installed. There are a range of ceiling and panel omni antennas available and the most appropriate antenna will be recommended following the survey.</p></div></div>
+                <div class="component-layout reverse"><div class="image-container"><img src="images/cabling.png" alt="Cabling"></div><div class="text-container"><h3>Cabling</h3><p>Coaxial cable carries the analogue signal and is low-loss to ensure the maximum signal is delivered to antennas.</p></div></div>
                 <h3>5G Ready DAS</h3><p>All our DAS components, Donor Antennas, Server Antennas and Splitters support 5G in the 3500MHz - 3700MHz range (Band 78). Current Ofcom regulations do not allow these frequencies to be boosted, but the DAS elements will be capable of supporting this when it is available.</p>`
         },
         'QUATRA': {
@@ -273,11 +274,11 @@
                 <p>CEL-FI QUATRA is a distributed antenna system (DAS) hybrid solution that combines the strength of passive and active DAS technologies to deliver high-quality mobile signal in buildings. The QUATRA 4000e boosts up to 4 network operators in a single system and complies with recent changes to Ofcom’s regulations in this regard.</p>
                 <img src="images/quatra_diagram.png" alt="QUATRA 4000e Architecture Diagram">`,
             components: `
-                <div class="component-layout"><div class="image-container"><img src="images/donor_antenna.png"></div><div class="text-container"><h3>Donor Antenna</h3><p>Donor antennas will be installed on the roof (or other suitable location) to obtain the best signal for boosting. The type of donor antenna will be selected during the site survey. The image shows an example of a roof installation. Low loss coaxial cables will be run from the donor antennas to the QUATRA Network Unit.</p></div></div>
-                <div class="component-layout reverse"><div class="image-container"><img src="images/network_unit.png"></div><div class="text-container"><h3>Network Unit</h3><p>CEL-FI QUATRA 4000e Network Units (NUs) will be installed in a suitable location and either wall or rack mounted. Typical locations are comms rooms or riser cupboard. Power will be required for the NU. An NU can support up to 6 CUs. A fibre hub can be added to expand the capacity to 12 CUs.</p></div></div>
-                <div class="component-layout"><div class="image-container"><img src="images/coverage_unit.png"></div><div class="text-container"><h3>Coverage Unit</h3><p>Coverage Units are installed on the wall or ceiling in each of the areas that require coverage. Two CAT6 cables connect each CU to the NU providing power over PoE. A server antenna or segments of passive DAS (coax based distributed antenna system) will be connected to each CU to distribute the signal across the required area.</p></div></div>
-                <div class="component-layout reverse"><div class="image-container"><img src="images/server_antennas.png"></div><div class="text-container"><h3>Server Antennas</h3><p>Depending on the environment the appropriate type of antenna will be installed. There are a range of ceiling and panel omni antennas available and the most appropriate antenna will be recommended following the survey.</p></div></div>
-                <div class="component-layout"><div class="image-container"><img src="images/cabling_quatra.png"></div><div class="text-container"><h3>Cabling</h3><p>Structured cabling will be used to connect active components together and coaxial cabling to connect antennas. Some installations involve fibre optic cable to maximise the distance between NU and CU, but will require a dedicated power at the other end.</p></div></div>
+                <div class="component-layout"><div class="image-container"><img src="images/donor_antenna.png" alt="Donor Antenna"></div><div class="text-container"><h3>Donor Antenna</h3><p>Donor antennas will be installed on the roof (or other suitable location) to obtain the best signal for boosting. The type of donor antenna will be selected during the site survey. The image shows an example of a roof installation. Low loss coaxial cables will be run from the donor antennas to the QUATRA Network Unit.</p></div></div>
+                <div class="component-layout reverse"><div class="image-container"><img src="images/network_unit.png" alt="Network Unit"></div><div class="text-container"><h3>Network Unit</h3><p>CEL-FI QUATRA 4000e Network Units (NUs) will be installed in a suitable location and either wall or rack mounted. Typical locations are comms rooms or riser cupboard. Power will be required for the NU. An NU can support up to 6 CUs. A fibre hub can be added to expand the capacity to 12 CUs.</p></div></div>
+                <div class="component-layout"><div class="image-container"><img src="images/coverage_unit.png" alt="Coverage Unit"></div><div class="text-container"><h3>Coverage Unit</h3><p>Coverage Units are installed on the wall or ceiling in each of the areas that require coverage. Two CAT6 cables connect each CU to the NU providing power over PoE. A server antenna or segments of passive DAS will be connected to each CU to distribute the signal across the required area.</p></div></div>
+                <div class="component-layout reverse"><div class="image-container"><img src="images/server_antennas.png" alt="Server Antennas"></div><div class="text-container"><h3>Server Antennas</h3><p>Depending on the environment the appropriate type of antenna will be installed. There are a range of ceiling and panel omni antennas available and the most appropriate antenna will be recommended following the survey.</p></div></div>
+                <div class="component-layout"><div class="image-container"><img src="images/cabling_quatra.png" alt="Quatra Cabling"></div><div class="text-container"><h3>Cabling</h3><p>Structured cabling will be used to connect active components together and coaxial cabling to connect antennas. Some installations involve fibre optic cable to maximise the distance between NU and CU, but will require a dedicated power at the other end.</p></div></div>
                 <h3>5G Ready DAS</h3><p>All our DAS components, Donor Antennas, Server Antennas and Splitters support 5G in the 3500MHz - 3700MHz range (Band 78). Current Ofcom regulations do not allow these frequencies to be boosted, but the DAS elements will be capable of supporting this when it is available.</p>`
         },
         'QUATRA_EVO': {
@@ -289,16 +290,17 @@
                 <p>CEL-FI QUATRA is a distributed antenna system (DAS) hybrid solution that combines the strength of passive and active DAS technologies to deliver high-quality mobile signal in buildings. The QUATRA EVO can boost two network operators in a single system and complies with recent changes to Ofcom’s regulations in this regard.</p>
                 <img src="images/evo_diagram.png" alt="QUATRA EVO Architecture Diagram">`,
             components: `
-                <div class="component-layout"><div class="image-container"><img src="images/donor_antenna.png"></div><div class="text-container"><h3>Donor Antenna</h3><p>Donor antennas will be installed on the roof (or other suitable location) to obtain the best signal for boosting. The type of donor antenna will be selected during the site survey. The image shows an example of a roof installation. Low loss coaxial cables will be run from the donor antennas to the QUATRA Network Unit.</p></div></div>
-                <div class="component-layout reverse"><div class="image-container"><img src="images/network_unit_evo.png"></div><div class="text-container"><h3>Network Unit</h3><p>CEL-FI QUATRA EVO Network Units (NUs) will be installed in a suitable location and either wall or rack mounted. Typical locations are comms rooms or riser cupboard. Power will be required for the NU. An NU can support up to 6 CUs. A fibre hub can be added to expand the capacity to 12 CUs.</p></div></div>
-                <div class="component-layout"><div class="image-container"><img src="images/coverage_unit.png"></div><div class="text-container"><h3>Coverage Unit</h3><p>Coverage Units are installed on the wall or ceiling in each of the areas that require coverage. Two CAT6 cables connect each CU to the NU providing power over PoE. A server antenna or segments of passive DAS (coax based distributed antenna system) will be connected to each CU to distribute the signal across the required area.</p></div></div>
-                <div class="component-layout reverse"><div class="image-container"><img src="images/server_antennas.png"></div><div class="text-container"><h3>Server Antennas</h3><p>Depending on the environment the appropriate type of antenna will be installed. There are a range of ceiling and panel omni antennas available and the most appropriate antenna will be recommended following the survey.</p></div></div>
-                <div class="component-layout"><div class="image-container"><img src="images/cabling_quatra.png"></div><div class="text-container"><h3>Cabling</h3><p>Structured cabling will be used to connect active components together and coaxial cabling to connect antennas. Some installations involve fibre optic cable to maximise the distance between NU and CU, but will require a dedicated power at the other end.</p></div></div>
+                <div class="component-layout"><div class="image-container"><img src="images/donor_antenna.png" alt="Donor Antenna"></div><div class="text-container"><h3>Donor Antenna</h3><p>Donor antennas will be installed on the roof (or other suitable location) to obtain the best signal for boosting. The type of donor antenna will be selected during the site survey. The image shows an example of a roof installation. Low loss coaxial cables will be run from the donor antennas to the QUATRA Network Unit.</p></div></div>
+                <div class="component-layout reverse"><div class="image-container"><img src="images/network_unit_evo.png" alt="EVO Network Unit"></div><div class="text-container"><h3>Network Unit</h3><p>CEL-FI QUATRA EVO Network Units (NUs) will be installed in a suitable location and either wall or rack mounted. Typical locations are comms rooms or riser cupboard. Power will be required for the NU. An NU can support up to 6 CUs. A fibre hub can be added to expand the capacity to 12 CUs.</p></div></div>
+                <div class="component-layout"><div class="image-container"><img src="images/coverage_unit.png" alt="Coverage Unit"></div><div class="text-container"><h3>Coverage Unit</h3><p>Coverage Units are installed on the wall or ceiling in each of the areas that require coverage. Two CAT6 cables connect each CU to the NU providing power over PoE. A server antenna or segments of passive DAS will be connected to each CU to distribute the signal across the required area.</p></div></div>
+                <div class="component-layout reverse"><div class="image-container"><img src="images/server_antennas.png" alt="Server Antennas"></div><div class="text-container"><h3>Server Antennas</h3><p>Depending on the environment the appropriate type of antenna will be installed. There are a range of ceiling and panel omni antennas available and the most appropriate antenna will be recommended following the survey.</p></div></div>
+                <div class="component-layout"><div class="image-container"><img src="images/cabling_quatra.png" alt="Quatra Cabling"></div><div class="text-container"><h3>Cabling</h3><p>Structured cabling will be used to connect active components together and coaxial cabling to connect antennas. Some installations involve fibre optic cable to maximise the distance between NU and CU, but will require a dedicated power at the other end.</p></div></div>
                 <h3>5G Ready DAS</h3><p>All our DAS components, Donor Antennas, Server Antennas and Splitters support 5G in the 3500MHz - 3700MHz range (Band 78). Current Ofcom regulations do not allow these frequencies to be boosted, but the DAS elements will be capable of supporting this when it is available.</p>`
         }
     };
 
     document.addEventListener('DOMContentLoaded', () => {
+        // --- 1. LOAD AND DECODE DATA ---
         const proposalData = (function loadProposalData() {
             if (!window.location.hash) return null;
             try {
@@ -319,20 +321,22 @@
             document.body.innerHTML = '<h1>No proposal data found. Please generate a link from the calculator.</h1>';
             return;
         };
-
+        
+        // --- 2. POPULATE GENERAL PLACEHOLDERS (SAFE METHOD) ---
         (function populatePlaceholders(data) {
             const container = document.getElementById('proposal-container');
-            const walker = document.createTreeWalker(container, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, null, false);
+            const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null, false);
             let node;
             while (node = walker.nextNode()) {
-                if (node.nodeType === Node.TEXT_NODE) {
-                    for (const key in data) {
-                        node.nodeValue = node.nodeValue.replace(new RegExp(`{${key}}`, 'g'), data[key]);
-                    }
+                let text = node.nodeValue;
+                for (const key in data) {
+                    text = text.replace(new RegExp(`{${key}}`, 'g'), data[key]);
                 }
+                node.nodeValue = text;
             }
         })(proposalData);
 
+        // --- 3. INJECT DYNAMIC SOLUTION-SPECIFIC HTML ---
         (function populateDynamicContent(data) {
             if (!data || !data.systemType) return;
             const systemKey = data.systemType.replace('_DAS', '');
@@ -343,6 +347,7 @@
             }
         })(proposalData);
 
+        // --- 4. ADD INTERACTIVITY FOR PRICING TABLE ---
         (function addInteractivity(data) {
             const supportOptions = document.querySelectorAll('.support-tier-option');
             const grandTotalElem = document.getElementById('grand-total-price');
@@ -386,6 +391,7 @@
             });
         })(proposalData);
 
+        // --- 5. ADD PAGE NUMBERS AND GENERATE TOC ---
         (function finalizeDocument() {
             const pages = document.querySelectorAll('.page:not(.cover-page)');
             pages.forEach((page, index) => {
@@ -394,30 +400,39 @@
             });
 
             const tocList = document.getElementById('toc-list');
-            tocList.innerHTML = '';
+            tocList.innerHTML = ''; // Clear any existing TOC
             const headings = document.querySelectorAll('.page:not(.cover-page, .toc-page) h2:not(.no-number), .page:not(.cover-page, .toc-page) h3:not(.no-number)');
             
+            let sectionCounter = 0;
+            let subsectionCounter = 0;
+
             headings.forEach((heading) => {
-                const slug = 'section-' + heading.textContent.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                const slug = 'section-' + heading.textContent.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-');
                 heading.id = slug;
                 const li = document.createElement('li');
                 const a = document.createElement('a');
                 a.href = '#' + slug;
 
-                const fullHeadingText = window.getComputedStyle(heading, '::before').content.replace(/"/g, '') + heading.textContent;
-                
-                const pageNumber = heading.closest('.page')?.querySelector('.footer .page-number')?.textContent || '';
-                a.innerHTML = `<span>${fullHeadingText}</span><span>${pageNumber}</span>`;
-                
+                let displayNumber;
                 if (heading.tagName === 'H2') {
+                    sectionCounter++;
+                    subsectionCounter = 0; // Reset subsection on new main section
+                    displayNumber = `${sectionCounter}`;
                     li.className = 'toc-h2';
                 } else {
-                     li.className = 'toc-h3';
+                    subsectionCounter++;
+                    displayNumber = `${sectionCounter}.${subsectionCounter}`;
+                    li.className = 'toc-h3';
                 }
+                
+                const pageNumber = heading.closest('.page')?.querySelector('.footer .page-number')?.textContent || '';
+                a.innerHTML = `<span>${displayNumber} ${heading.textContent}</span><span>${pageNumber}</span>`;
+                li.appendChild(a);
                 tocList.appendChild(li);
             });
         })();
     });
 </script>
+
 </body>
 </html>
