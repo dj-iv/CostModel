@@ -659,22 +659,20 @@ async function generateDocument() {
 
         const zip = new PizZip(content);
 
-        // This is the simplified and corrected module setup.
-        // It no longer needs the complex 'getImage' function.
         const imageModule = new ImageModule({
-            // All images will be centered.
-            centered: true,
-            // This tells the module how to handle the data. It will look up the tag
-            // (e.g., 'donor_image') in your data, find the base64 string,
-            // and handle it automatically.
-            getImage: function(tagValue) {
-                return atob(tagValue);
-            },
-             // This sets the size for the images.
-            getSize: function() {
-                return [450, 300];
-            }
-        });
+    getImage: function(tagValue) {
+        const binary_string = atob(tagValue);
+        const len = binary_string.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+            bytes[i] = binary_string.charCodeAt(i);
+        }
+        return bytes.buffer;
+    },
+    getSize: function() {
+        return [450, 300];
+    }
+});
 
         const doc = new docxtemplater(zip, {
             paragraphLoop: true,
