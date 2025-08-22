@@ -1024,24 +1024,31 @@ async function generatePdf() {
         }, 3000);
     }
 }
-   async function generateInteractiveLink() {
+  async function generateInteractiveLink() {
     const button = document.getElementById('generate-interactive-link-btn');
     const originalText = button.innerHTML;
+    button.innerHTML = 'Generating...';
+    button.disabled = true;
 
     try {
-        // Get the same data object used for DOCX and PDF proposals
+        // Get all the standard proposal data (pricing, names, etc.)
         const templateData = getTemplateData();
 
-        // Compress and encode the data into a URL-safe string
-        const jsonString = JSON.stringify(templateData);
-        const compressed = pako.deflate(jsonString);
-        let compressedString = '';
-        compressed.forEach((byte) => {
-            compressedString += String.fromCharCode(byte);
-        });
-        const encodedState = btoa(compressedString);
+        // Get the system type value (e.g., 'G41', 'QUATRA_EVO')
+        const systemType = document.getElementById('system-type').value;
         
-        // Create the final shareable URL pointing to the new interactive template
+        // Add the systemType to our data object so the template knows which content to show
+        const finalData = {
+            ...templateData,
+            systemType: systemType
+        };
+
+        // Compress and encode the data into a URL-safe string
+        const jsonString = JSON.stringify(finalData);
+        const compressed = pako.deflate(jsonString, { to: 'string' });
+        const encodedState = btoa(compressed);
+        
+        // Create the final shareable URL
         const shareUrl = `${window.location.origin}${window.location.pathname.replace('index.html', '')}interactive-proposal.html#${encodedState}`;
 
         // Copy the URL to the clipboard
@@ -1054,6 +1061,7 @@ async function generatePdf() {
     } finally {
         setTimeout(() => {
             button.innerHTML = 'Interactive Proposal 🌐';
+            button.disabled = false;
         }, 3000);
     }
 }
