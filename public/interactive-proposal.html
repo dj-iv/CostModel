@@ -198,6 +198,27 @@ ul li::marker {
         color: #888;
         margin-bottom: 10px;
     }
+        /* --- NEW: Benefits List Styling --- */
+.benefits-list {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 30px;
+}
+.benefits-list li {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1.5em;
+    text-align: left; /* Overrides justify for better list readability */
+    hyphens: none;
+}
+.benefits-list i {
+    font-size: 1.5em;
+    margin-right: 15px;
+    color: var(--color-secondary-teal);
+    width: 30px; /* Ensures consistent alignment */
+    text-align: center;
+    margin-top: 4px;
+}
 
     /* --- Table of Contents (TOC) Styling --- */
     .toc { list-style-type: none; padding-left: 0; border-left: 3px solid var(--color-neutral-beige); padding-left: 20px; }
@@ -395,6 +416,12 @@ ul li::marker {
             <p>All passive components in our Distributed Antenna System (DAS)—including donor antennas, server antennas, cabling, and splitters—are specified to support frequencies up to 4.0GHz. This ensures they are fully compatible with the 3.5GHz to 3.7GHz range (Band n78) allocated for 5G services in the UK.</p>
             <p>While current Ofcom regulations do not yet permit the boosting of these 5G frequencies, your infrastructure will be ready from day one. When the regulations are updated, the core DAS network we install will not need to be replaced, saving you significant future expense and disruption.</p>
         </div>
+        <h3>Key Benefits at a Glance</h3>
+<ul class="benefits-list">
+    <li><i class="fa-solid fa-shield-halved"></i> <strong>Investment Protection:</strong> Your in-building mobile infrastructure is future-proofed, ready for the next generation of mobile technology.</li>
+    <li><i class="fa-solid fa-piggy-bank"></i> <strong>Significant Cost Savings:</strong> Avoid the high cost and disruption of a "rip-and-replace" upgrade when 5G boosting is enabled.</li>
+    <li><i class="fa-solid fa-puzzle-piece"></i> <strong>Seamless Transition:</strong> Be ready to take immediate advantage of 5G's speed and capacity as soon as it's available for boosting, with no additional hardware installation required.</li>
+</ul>
         <div class="footer"><span>CEL-FI {Solution} solution proposal for {Account}</span><span class="page-number"></span></div>
     </div>
    
