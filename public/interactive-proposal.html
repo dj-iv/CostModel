@@ -233,6 +233,11 @@ p a:hover {
     }   
 /* --- FINAL PRINT STYLES --- */
 
+    @page {
+        /* REDUCED top margin, kept others for a professional look */
+        margin: 10mm 20mm 20mm 20mm; 
+    }
+
     @media print {
         body {
             background-color: #fff;
@@ -243,31 +248,27 @@ p a:hover {
             display: block;
         }
 
-        /* UPDATED: Use Flexbox to force a clean vertical stack */
         .page {
             box-shadow: none;
             border: none;
             margin: 0;
-            padding: 15mm 20mm;
+            padding: 10mm 20mm; /* REDUCED top padding */
             width: auto;
-            min-height: 277mm; 
+            min-height: 257mm; /* A4 height (297mm) minus top/bottom margins (40mm) */
             
             display: flex;
             flex-direction: column;
         }
         
-        /* Ensure the header is part of the normal layout flow */
         .header {
             position: static;
             flex-shrink: 0;
         }
 
-        /* Control the space between the header and the main title */
         h2 {
             margin-top: 1.5em !important;
-        } /* << This closing brace was missing */
+        }
 
-        /* Hide the footer as requested */
         .footer {
             display: none !important;
         }
