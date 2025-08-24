@@ -243,32 +243,34 @@ p a:hover {
             display: block;
         }
 
-        /* UPDATED: Removed incorrect min-height */
+        /* UPDATED: Use Flexbox to force a clean vertical stack */
         .page {
             box-shadow: none;
             border: none;
             margin: 0;
-            padding: 0mm 20mm;
+            padding: 15mm 20mm;
             width: auto;
+            min-height: 277mm; 
             
             display: flex;
             flex-direction: column;
         }
         
-        /* UPDATED: Explicitly reset inherited position values */
+        /* Ensure the header is part of the normal layout flow */
         .header {
             position: static;
             flex-shrink: 0;
-            top: auto;  /* Add this line */
-            right: auto; /* Add this line */
         }
 
         /* Control the space between the header and the main title */
         h2 {
             margin-top: 1.5em !important;
-       .footer {
-    display: none !important;
-}
+        } /* << This closing brace was missing */
+
+        /* Hide the footer as requested */
+        .footer {
+            display: none !important;
+        }
         
         /* Standard Page Break Rules */
         .page:not(:first-child) {
