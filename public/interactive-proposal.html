@@ -231,70 +231,53 @@ p a:hover {
         flex-direction: column;
         align-items: center;
     }   
-/* --- FINAL PRINT STYLES --- */
-
-    /* Define the physical page margins */
-    @page {
-        margin: 15mm 20mm 20mm 20mm; 
-    }
-
+/* --- PRINT STYLES --- */
     @media print {
+        /* Remove the soft background color for a clean white print */
         body {
             background-color: #fff;
-            margin: 0; 
         }
 
+        /* Reset the main container's flex layout for print */
         #proposal-container {
             display: block;
         }
 
-        /* The page is a simple container */
+        /* Remove shadows, borders, and screen margins from the pages */
         .page {
             box-shadow: none;
             border: none;
             margin: 0;
-            padding: 0;
-            width: 100%;
-        }
-        
-        /* Header and footer are part of the normal document flow */
-        .header, .footer {
-            position: static;
-        }
-        
-        /* Reduce the large space at the top of the page */
-        .page > h2 {
-            margin-top: 1.5em !important;
+            min-height: initial; 
         }
 
-        /* Give the footer a large top margin to create a clean break */
-        .footer {
-            margin-top: 4em;
-        }
-        
-        /* Add space after tables for better readability */
-        table {
-            margin-bottom: 1.5em;
-        }
-
-        /* --- Standard Page Break Rules --- */
+        /* The most important part: control the page breaks */
         .page:not(:first-child) {
-            page-break-before: always;
+            page-break-before: always; /* Start every new page on a new sheet */
         }
         
-        .survey-cta, .component-layout {
+        /* NEW: Prevent key elements from being split across pages */
+        .survey-cta, .component-layout, table {
             page-break-inside: avoid;
         }
         
+        /* NEW: Prevent headings from being left alone at the bottom of a page */
         h2, h3, h4 {
             page-break-after: avoid;
         }
 
-        /* --- Hide Web-Only Elements --- */
+        /* UPDATED: Change footer positioning for print */
+        .footer {
+            position: static; /* Position normally instead of absolute */
+            margin-top: 20mm; /* Add space above the footer */
+        }
+
+        /* Hide elements that are not useful in a PDF, like the video player */
         iframe {
             display: none;
         }
         
+        /* Ensure links are readable in print */
         a {
             color: var(--color-secondary-teal) !important;
             text-decoration: none;
