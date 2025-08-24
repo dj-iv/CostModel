@@ -231,7 +231,7 @@ p a:hover {
         flex-direction: column;
         align-items: center;
     }   
-        /* --- PRINT STYLES --- */
+       /* --- PRINT STYLES --- */
     @media print {
         /* Remove the soft background color for a clean white print */
         body {
@@ -248,13 +248,28 @@ p a:hover {
             box-shadow: none;
             border: none;
             margin: 0;
-            /* Ensure pages don't get cut off */
             min-height: initial; 
         }
 
         /* The most important part: control the page breaks */
         .page:not(:first-child) {
             page-break-before: always; /* Start every new page on a new sheet */
+        }
+        
+        /* NEW: Prevent key elements from being split across pages */
+        .survey-cta, .component-layout, table {
+            page-break-inside: avoid;
+        }
+        
+        /* NEW: Prevent headings from being left alone at the bottom of a page */
+        h2, h3, h4 {
+            page-break-after: avoid;
+        }
+
+        /* UPDATED: Change footer positioning for print */
+        .footer {
+            position: static; /* Position normally instead of absolute */
+            margin-top: 20mm; /* Add space above the footer */
         }
 
         /* Hide elements that are not useful in a PDF, like the video player */
