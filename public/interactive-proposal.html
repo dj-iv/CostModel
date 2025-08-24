@@ -231,57 +231,66 @@ p a:hover {
         flex-direction: column;
         align-items: center;
     }   
-/* --- PRINT STYLES --- */
+/* --- FINAL PRINT STYLES --- */
+
     @media print {
-        /* Remove the soft background color for a clean white print */
         body {
             background-color: #fff;
+            margin: 0; 
         }
 
-        /* Reset the main container's flex layout for print */
         #proposal-container {
             display: block;
         }
 
-        /* Remove shadows, borders, and screen margins from the pages */
+        /* UPDATED: Use Flexbox to force a clean vertical stack */
         .page {
             box-shadow: none;
             border: none;
             margin: 0;
-            min-height: initial; 
-            padding-top: 10mm;
-        }
-        .header {
-    position: static;
-}
-
-        /* The most important part: control the page breaks */
-        .page:not(:first-child) {
-            page-break-before: always; /* Start every new page on a new sheet */
+            padding: 15mm 20mm; /* Set vertical and horizontal padding */
+            width: auto;
+            min-height: 277mm; /* A4 height minus top/bottom padding */
+            
+            display: flex;
+            flex-direction: column;
         }
         
-        /* NEW: Prevent key elements from being split across pages */
+        /* Ensure the header is part of the normal layout flow */
+        .header {
+            position: static;
+            flex-shrink: 0; /* Prevent header from shrinking */
+        }
+
+        /* Control the space between the header and the main title */
+        h2 {
+            margin-top: 1.5em !important;
+        }
+
+        /* Push the footer to the bottom */
+        .footer {
+            position: static;
+            margin-top: auto; /* This works with the new flex layout */
+            flex-shrink: 0; /* Prevent footer from shrinking */
+        }
+        
+        /* Standard Page Break Rules */
+        .page:not(:first-child) {
+            page-break-before: always;
+        }
+        
         .survey-cta, .component-layout, table {
             page-break-inside: avoid;
         }
         
-        /* NEW: Prevent headings from being left alone at the bottom of a page */
         h2, h3, h4 {
             page-break-after: avoid;
         }
 
-        /* UPDATED: Change footer positioning for print */
-        .footer {
-            position: static; /* Position normally instead of absolute */
-            margin-top: 20mm; /* Add space above the footer */
-        }
-
-        /* Hide elements that are not useful in a PDF, like the video player */
         iframe {
             display: none;
         }
         
-        /* Ensure links are readable in print */
         a {
             color: var(--color-secondary-teal) !important;
             text-decoration: none;
