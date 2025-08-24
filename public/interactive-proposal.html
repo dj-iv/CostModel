@@ -235,7 +235,7 @@ p a:hover {
 
     /* Define the physical page margins */
     @page {
-        margin: 20mm; 
+        margin: 15mm; /* REDUCED from 20mm */
     }
 
     @media print {
@@ -254,12 +254,12 @@ p a:hover {
             box-shadow: none;
             border: none;
             margin: 0;
-            padding-top: 25mm;    /* Space for the header */
-            padding-bottom: 25mm; /* Space for the footer */
+            padding-top: 15mm;    /* REDUCED from 25mm */
+            padding-bottom: 15mm; /* REDUCED from 25mm */
             width: 100%;
         }
         
-        /* THE CRUCIAL FIX: Remove the extra top margin from the first element on the page */
+        /* The crucial fix: Remove extra top margin from the first element */
         .page > h2, .page > h3, .page > .component-layout:first-child, .page > p:first-child, .page > div:first-child {
             margin-top: 0 !important;
         }
@@ -270,7 +270,7 @@ p a:hover {
             top: 0;
             left: 0;
             right: 0;
-            height: 20mm;
+            height: 15mm; /* REDUCED from 20mm */
         }
 
         /* Lock the footer to the bottom */
@@ -279,7 +279,7 @@ p a:hover {
             bottom: 0;
             left: 0;
             right: 0;
-            height: 20mm;
+            height: 15mm; /* REDUCED from 20mm */
         }
 
         /* --- Standard rules from before --- */
