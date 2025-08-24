@@ -50,16 +50,35 @@ p a:hover {
         box-sizing: border-box;
     }
 
-    /* --- Header & Footer --- */
-    .header, .footer {
-        position: absolute;
-        width: calc(100% - 40mm);
-        font-size: 9pt;
-        color: #888;
-    }
-    .header { top: 15mm; right: 20mm; text-align: right; }
-    .header img { width: 100px; margin-bottom: 0; }
-    .footer { bottom: 10mm; left: 20mm; display: flex; justify-content: space-between; }
+/* --- Header & Footer --- */
+
+/* Shared Styles */
+.header, .footer {
+    position: absolute;
+    width: calc(100% - 40mm);
+    font-size: 9pt;
+    color: #888;
+}
+
+/* Header-Specific Position */
+.header {
+    top: 15mm;
+    right: 20mm;
+    text-align: right;
+}
+
+.header img {
+    width: 100px;
+    margin-bottom: 0;
+}
+
+/* Footer-Specific Position */
+.footer {
+    bottom: 10mm; /* This locks it to the bottom */
+    left: 20mm;
+    display: flex;
+    justify-content: space-between;
+}
 
     /* --- Typography & Headings --- */
     h1, h2, h3, h4 {
