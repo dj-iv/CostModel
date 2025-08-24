@@ -235,7 +235,8 @@ p a:hover {
 
     /* Define the physical page margins */
     @page {
-        margin: 15mm; /* REDUCED from 20mm */
+        /* Keep original side/bottom margins, only reduce the top */
+        margin: 15mm 20mm 20mm 20mm; 
     }
 
     @media print {
@@ -254,12 +255,17 @@ p a:hover {
             box-shadow: none;
             border: none;
             margin: 0;
-            padding-top: 15mm;    /* REDUCED from 25mm */
-            padding-bottom: 15mm; /* REDUCED from 25mm */
+            padding-top: 15mm;    /* Keep header space tight */
+            padding-bottom: 25mm; /* RESTORED: Keep original footer space */
             width: 100%;
         }
+
+        /* NEW: Force the browser not to create a blank page after the cover */
+        .cover-page {
+            page-break-after: avoid !important;
+        }
         
-        /* The crucial fix: Remove extra top margin from the first element */
+        /* Remove the extra top margin from the first element on the page */
         .page > h2, .page > h3, .page > .component-layout:first-child, .page > p:first-child, .page > div:first-child {
             margin-top: 0 !important;
         }
@@ -270,7 +276,7 @@ p a:hover {
             top: 0;
             left: 0;
             right: 0;
-            height: 15mm; /* REDUCED from 20mm */
+            height: 5mm; /* Keep header space tight */
         }
 
         /* Lock the footer to the bottom */
@@ -279,7 +285,7 @@ p a:hover {
             bottom: 0;
             left: 0;
             right: 0;
-            height: 15mm; /* REDUCED from 20mm */
+            height: 5mm; /* RESTORED: Keep original footer height */
         }
 
         /* --- Standard rules from before --- */
