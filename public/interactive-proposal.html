@@ -248,32 +248,38 @@ p a:hover {
             display: block;
         }
 
-        /* NEW: Make each page a positioning container */
+        /* The page is a container for the fixed header/footer */
         .page {
-            position: relative; /* This is crucial for positioning the header/footer */
+            position: relative; 
             box-shadow: none;
             border: none;
             margin: 0;
-            padding: 25mm 0; /* Add top/bottom padding for header/footer space */
+            padding-top: 25mm;    /* Space for the header */
+            padding-bottom: 25mm; /* Space for the footer */
             width: 100%;
         }
         
-        /* NEW: Lock the header to the top of the page */
+        /* THE CRUCIAL FIX: Remove the extra top margin from the first element on the page */
+        .page > h2, .page > h3, .page > .component-layout:first-child, .page > p:first-child, .page > div:first-child {
+            margin-top: 0 !important;
+        }
+
+        /* Lock the header to the top */
         .header {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            height: 20mm; /* Give the header a fixed height */
+            height: 20mm;
         }
 
-        /* NEW: Lock the footer to the bottom of the page */
+        /* Lock the footer to the bottom */
         .footer {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 20mm; /* Give the footer a fixed height */
+            height: 20mm;
         }
 
         /* --- Standard rules from before --- */
