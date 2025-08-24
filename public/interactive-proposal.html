@@ -231,6 +231,43 @@ p a:hover {
         flex-direction: column;
         align-items: center;
     }   
+        /* --- PRINT STYLES --- */
+    @media print {
+        /* Remove the soft background color for a clean white print */
+        body {
+            background-color: #fff;
+        }
+
+        /* Reset the main container's flex layout for print */
+        #proposal-container {
+            display: block;
+        }
+
+        /* Remove shadows, borders, and screen margins from the pages */
+        .page {
+            box-shadow: none;
+            border: none;
+            margin: 0;
+            /* Ensure pages don't get cut off */
+            min-height: initial; 
+        }
+
+        /* The most important part: control the page breaks */
+        .page:not(:first-child) {
+            page-break-before: always; /* Start every new page on a new sheet */
+        }
+
+        /* Hide elements that are not useful in a PDF, like the video player */
+        iframe {
+            display: none;
+        }
+        
+        /* Ensure links are readable in print */
+        a {
+            color: var(--color-secondary-teal) !important;
+            text-decoration: none;
+        }
+    }
 </style>
 </head>
 <body>
