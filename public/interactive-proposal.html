@@ -231,38 +231,42 @@ p a:hover {
         flex-direction: column;
         align-items: center;
     }   
-     /* --- PRINT STYLES --- */
+    /* --- PRINT STYLES --- */
     @media print {
         /* Remove the soft background color for a clean white print */
         body {
             background-color: #fff;
+            margin: 0; /* Ensure no default body margin */
         }
 
-        /* Reset the main container's flex layout for print */
+        /* Reset the main container's layout */
         #proposal-container {
             display: block;
         }
 
-        /* UPDATED: Turn each page into a full-height flex container */
+        /* UPDATED: Force each page to exact A4 dimensions */
         .page {
             box-shadow: none;
             border: none;
             margin: 0;
-            width: 100%; /* Use full available width */
-            height: 100vh; /* Fill the full height of the print page */
-            display: flex; /* Apply flexbox */
+            padding: 20mm; /* Keep the original page padding */
+            width: 210mm; /* A4 paper width */
+            height: 297mm; /* A4 paper height */
+            box-sizing: border-box; /* IMPORTANT: Include padding within the height/width */
+            
+            display: flex; /* Use flexbox for layout */
             flex-direction: column; /* Stack content vertically */
-            justify-content: flex-start; /* Align content to the top */
         }
         
-        /* NEW: Reset header positioning for print */
+        /* Reset header positioning for print */
         .header {
             position: static;
+            flex-shrink: 0; /* Prevent the header from shrinking */
         }
 
         /* The most important part: control the page breaks */
         .page:not(:first-child) {
-            page-break-before: always; /* Start every new page on a new sheet */
+            page-break-before: always;
         }
         
         /* Prevent key elements from being split across pages */
@@ -275,14 +279,15 @@ p a:hover {
             page-break-after: avoid;
         }
 
-        /* Push the footer to the bottom of the flex container */
+        /* Push the footer to the bottom of the A4 container */
         .footer {
             position: static; 
-            margin-top: auto; /* This is the key change */
-            padding-top: 2em; /* Add some space above the footer */
+            margin-top: auto; /* Push to the bottom */
+            padding-top: 1em; /* Add some space above */
+            flex-shrink: 0; /* Prevent the footer from shrinking */
         }
 
-        /* Hide elements that are not useful in a PDF, like the video player */
+        /* Hide elements that are not useful in a PDF */
         iframe {
             display: none;
         }
