@@ -21,16 +21,17 @@
 
     /* --- General Body and Page Setup --- */
     body {
-         display: flex;
+    display: flex;
     flex-direction: column;
-        font-family: 'Lato', Arial, sans-serif;
-        font-size: 11pt;
-        line-height: 1.6;
-        background-color: var(--color-light-background);
-        margin: 0;
-        padding: 0;
-        color: var(--color-text-dark); /* Applied globally */
-    }
+    align-items: center;   /* This is the missing line */
+    font-family: 'Lato', Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.6;
+    background-color: var(--color-light-background);
+    margin: 0;
+    padding: 0;
+    color: var(--color-text-dark);
+}
 
     .page {
         position: relative;
