@@ -235,8 +235,8 @@ p a:hover {
 
     /* Define the physical page margins */
     @page {
-        /* UPDATED: Reduced side margins, kept top/bottom spacing */
-        margin: 15mm 15mm 20mm 15mm; 
+        /* UPDATED: Restored original 20mm side margins */
+        margin: 15mm 20mm 20mm 20mm; 
     }
 
     @media print {
@@ -258,11 +258,10 @@ p a:hover {
             padding-top: 15mm;    
             padding-bottom: 25mm; 
             width: 100%;
-            /* NEW page break logic */
             page-break-after: always;
         }
 
-        /* NEW: Prevent a blank page at the very end of the document */
+        /* Prevent a blank page at the very end of the document */
         .page:last-of-type {
             page-break-after: avoid;
         }
@@ -290,7 +289,7 @@ p a:hover {
             height: 20mm; 
         }
         
-        /* NEW: Add space after tables */
+        /* Add space after tables */
         table {
             margin-bottom: 1.5em;
         }
