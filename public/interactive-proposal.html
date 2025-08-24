@@ -38,17 +38,7 @@ p a:hover {
     text-decoration: underline;
 }
 
-    .page {
-        position: relative;
-        width: 210mm;
-        min-height: 297mm;
-        padding: 20mm;
-        margin: 20mm auto;
-        border: 1px solid #e0e0e0;
-        background: var(--color-text-light);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        box-sizing: border-box;
-    }
+    
 
     /* --- Header & Footer --- */
     .header, .footer {
@@ -233,11 +223,6 @@ p a:hover {
     }   
 /* --- FINAL PRINT STYLES --- */
 
-    @page {
-        /* UPDATED: Sets all margins in one place. 10mm top/bottom, 15mm sides. */
-        margin: 10mm 15mm; 
-    }
-
     @media print {
         body {
             background-color: #fff;
@@ -251,10 +236,10 @@ p a:hover {
         .page {
             box-shadow: none;
             border: none;
-            margin: 0;
-            padding: 0; /* UPDATED: Removed padding to prevent "double margins" */
+            margin: 0;  /* Ensure no outer margin */
+            padding: 0; /* Ensure no inner padding */
             width: 100%;
-            min-height: 277mm; /* A4 height (297mm) minus top/bottom margins (20mm) */
+            min-height: 1%; /* Allow content to dictate height */
             
             display: flex;
             flex-direction: column;
@@ -263,6 +248,12 @@ p a:hover {
         .header {
             position: static;
             flex-shrink: 0;
+            padding: 0 10mm; /* Add side padding for header content */
+        }
+
+        /* All main content needs some side padding now */
+        h2, h3, h4, p, ul, table, .survey-cta, .component-layout {
+            padding: 0 10mm;
         }
 
         h2 {
