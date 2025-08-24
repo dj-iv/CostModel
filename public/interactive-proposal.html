@@ -231,7 +231,7 @@ p a:hover {
         flex-direction: column;
         align-items: center;
     }   
- /* --- PRINT STYLES --- */
+/* --- FINAL PRINT STYLES --- */
 
     /* Define the physical page margins */
     @page {
@@ -248,28 +248,32 @@ p a:hover {
             display: block;
         }
 
-        /* The page is now a simple container */
+        /* NEW: Make each page a positioning container */
         .page {
+            position: relative; /* This is crucial for positioning the header/footer */
             box-shadow: none;
             border: none;
             margin: 0;
-            padding: 0;
+            padding: 25mm 0; /* Add top/bottom padding for header/footer space */
             width: 100%;
         }
         
-        /* Put header and footer back into the normal document flow */
-        .header, .footer {
-            position: static;
-        }
-        
-        /* REDUCE the large space at the top of the page */
-        h2 {
-            margin-top: 1.5em;
+        /* NEW: Lock the header to the top of the page */
+        .header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 20mm; /* Give the header a fixed height */
         }
 
-        /* Give the footer a large top margin to create a clean break on short pages */
+        /* NEW: Lock the footer to the bottom of the page */
         .footer {
-            margin-top: 4em;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 20mm; /* Give the footer a fixed height */
         }
 
         /* --- Standard rules from before --- */
