@@ -235,8 +235,8 @@ p a:hover {
 
     /* Define the physical page margins */
     @page {
-        /* Keep original side/bottom margins, only reduce the top */
-        margin: 15mm 20mm 20mm 20mm; 
+        /* UPDATED: Reduced side margins, kept top/bottom spacing */
+        margin: 15mm 15mm 20mm 15mm; 
     }
 
     @media print {
@@ -255,14 +255,16 @@ p a:hover {
             box-shadow: none;
             border: none;
             margin: 0;
-            padding-top: 15mm;    /* Keep header space tight */
-            padding-bottom: 25mm; /* RESTORED: Keep original footer space */
+            padding-top: 15mm;    
+            padding-bottom: 25mm; 
             width: 100%;
+            /* NEW page break logic */
+            page-break-after: always;
         }
 
-        /* NEW: Force the browser not to create a blank page after the cover */
-        .cover-page {
-            page-break-after: avoid !important;
+        /* NEW: Prevent a blank page at the very end of the document */
+        .page:last-of-type {
+            page-break-after: avoid;
         }
         
         /* Remove the extra top margin from the first element on the page */
@@ -276,7 +278,7 @@ p a:hover {
             top: 0;
             left: 0;
             right: 0;
-            height: 15mm; /* Keep header space tight */
+            height: 15mm; 
         }
 
         /* Lock the footer to the bottom */
@@ -285,15 +287,16 @@ p a:hover {
             bottom: 0;
             left: 0;
             right: 0;
-            height: 20mm; /* RESTORED: Keep original footer height */
-        }
-
-        /* --- Standard rules from before --- */
-        .page:not(:first-child) {
-            page-break-before: always;
+            height: 20mm; 
         }
         
-        .survey-cta, .component-layout, table {
+        /* NEW: Add space after tables */
+        table {
+            margin-bottom: 1.5em;
+        }
+        
+        /* --- Standard rules from before --- */
+        .survey-cta, .component-layout {
             page-break-inside: avoid;
         }
         
