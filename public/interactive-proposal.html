@@ -231,14 +231,13 @@ p a:hover {
         flex-direction: column;
         align-items: center;
     }   
-  /* --- PRINT STYLES --- */
+ /* --- PRINT STYLES --- */
 
-    /* Step 1: Define the physical page margins */
+    /* Define the physical page margins */
     @page {
-        margin: 20mm; /* Sets a 2cm margin on the top, bottom, left, and right of the paper */
+        margin: 20mm; 
     }
 
-    /* Step 2: Style the content to fit within those margins */
     @media print {
         body {
             background-color: #fff;
@@ -249,24 +248,31 @@ p a:hover {
             display: block;
         }
 
-        /* UPDATED: Page now fills the area INSIDE the @page margins */
+        /* The page is now a simple container */
         .page {
             box-shadow: none;
             border: none;
             margin: 0;
-            padding: 0; /* Remove internal padding, as @page handles it */
+            padding: 0;
             width: 100%;
-            height: 100%; /* Fill the printable area */
-            
-            display: flex;
-            flex-direction: column;
         }
         
-        .header {
+        /* Put header and footer back into the normal document flow */
+        .header, .footer {
             position: static;
-            flex-shrink: 0;
+        }
+        
+        /* REDUCE the large space at the top of the page */
+        h2 {
+            margin-top: 1.5em;
         }
 
+        /* Give the footer a large top margin to create a clean break on short pages */
+        .footer {
+            margin-top: 4em;
+        }
+
+        /* --- Standard rules from before --- */
         .page:not(:first-child) {
             page-break-before: always;
         }
@@ -277,13 +283,6 @@ p a:hover {
         
         h2, h3, h4 {
             page-break-after: avoid;
-        }
-
-        .footer {
-            position: static; 
-            margin-top: auto;
-            padding-top: 1em;
-            flex-shrink: 0;
         }
 
         iframe {
