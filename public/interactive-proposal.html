@@ -568,6 +568,27 @@ ul li::marker {
             document.body.innerHTML = '<h1>No proposal data found. Please generate a link from the calculator.</h1>';
             return;
         };
+        // Function to format the date as DDMonYYYY
+function getFormattedDate() {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const date = new Date();
+    const day = date.getDate();
+    const month = months[date.getMonth()];
+    const year = date.getFullYear();
+    return `${day}${month}${year}`;
+}
+
+// 1. Get the necessary data from the proposalData object
+const solution = proposalData.Solution.replace(/ /g, '_'); // Replace spaces with underscores
+const networks = proposalData.NumberOfNetworks;
+const account = proposalData.Account.replace(/ /g, '_'); // Replace spaces with underscores
+const dateStr = getFormattedDate();
+
+// 2. Build the new filename string
+const newFilename = `UCtel_Proposal_${solution}_${networks}_Networks_for_${account}_${dateStr}`;
+
+// 3. Set the document title
+document.title = newFilename;
         
         // --- 2. POPULATE GENERAL PLACEHOLDERS (SAFE METHOD) ---
         (function populatePlaceholders(data) {
