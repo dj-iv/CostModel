@@ -231,7 +231,7 @@ p a:hover {
         flex-direction: column;
         align-items: center;
     }   
-       /* --- PRINT STYLES --- */
+      /* --- PRINT STYLES --- */
     @media print {
         /* Remove the soft background color for a clean white print */
         body {
@@ -243,12 +243,16 @@ p a:hover {
             display: block;
         }
 
-        /* Remove shadows, borders, and screen margins from the pages */
+        /* UPDATED: Turn each page into a full-height flex container */
         .page {
             box-shadow: none;
             border: none;
             margin: 0;
-            min-height: initial; 
+            width: 100%; /* Use full available width */
+            height: 100vh; /* Fill the full height of the print page */
+            display: flex; /* Apply flexbox */
+            flex-direction: column; /* Stack content vertically */
+            justify-content: flex-start; /* Align content to the top */
         }
 
         /* The most important part: control the page breaks */
@@ -256,20 +260,21 @@ p a:hover {
             page-break-before: always; /* Start every new page on a new sheet */
         }
         
-        /* NEW: Prevent key elements from being split across pages */
+        /* Prevent key elements from being split across pages */
         .survey-cta, .component-layout, table {
             page-break-inside: avoid;
         }
         
-        /* NEW: Prevent headings from being left alone at the bottom of a page */
+        /* Prevent headings from being left alone at the bottom of a page */
         h2, h3, h4 {
             page-break-after: avoid;
         }
 
-        /* UPDATED: Change footer positioning for print */
+        /* UPDATED: Push the footer to the bottom of the flex container */
         .footer {
-            position: static; /* Position normally instead of absolute */
-            margin-top: 20mm; /* Add space above the footer */
+            position: static; 
+            margin-top: auto; /* This is the key change */
+            padding-top: 2em; /* Add some space above the footer */
         }
 
         /* Hide elements that are not useful in a PDF, like the video player */
