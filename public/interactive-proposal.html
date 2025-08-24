@@ -29,6 +29,14 @@ body {
     padding: 0;
     color: var(--color-text-dark);
 }
+        p a {
+    color: var(--color-secondary-teal);
+    font-weight: bold;
+    text-decoration: none;
+}
+p a:hover {
+    text-decoration: underline;
+}
 
     .page {
         position: relative;
@@ -322,7 +330,7 @@ body {
             <tr class="total-row"><td colspan="3" style="text-align:right;">Total Price:</td><td id="grand-total-price">{TotalPrice}</td></tr>
         </tbody>
         </table>
-        <p>The following support options are available. Please see section 7 for more details.</p>
+        <p>The following support options are available. Please see the <a href="#section-cel-fi-support-services">CEL-FI Support Services</a> section for more details.</p>
         <table class="pricing-table">
            <thead><tr><th>Support Option</th><th>Qty</th><th>Unit Price</th><th>Total Price</th></tr></thead>
            <tbody id="support-options-body">
