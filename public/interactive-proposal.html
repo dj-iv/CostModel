@@ -243,23 +243,24 @@ p a:hover {
             display: block;
         }
 
-        /* UPDATED: Use Flexbox to force a clean vertical stack */
+        /* UPDATED: Removed incorrect min-height */
         .page {
             box-shadow: none;
             border: none;
             margin: 0;
-            padding: 0mm 20mm; /* Set vertical and horizontal padding */
+            padding: 0mm 20mm;
             width: auto;
-            min-height: 300mm; /* A4 height minus top/bottom padding */
             
             display: flex;
             flex-direction: column;
         }
         
-        /* Ensure the header is part of the normal layout flow */
+        /* UPDATED: Explicitly reset inherited position values */
         .header {
             position: static;
-            flex-shrink: 0; /* Prevent header from shrinking */
+            flex-shrink: 0;
+            top: auto;  /* Add this line */
+            right: auto; /* Add this line */
         }
 
         /* Control the space between the header and the main title */
@@ -270,8 +271,8 @@ p a:hover {
         /* Push the footer to the bottom */
         .footer {
             position: static;
-            margin-top: auto; /* This works with the new flex layout */
-            flex-shrink: 0; /* Prevent footer from shrinking */
+            margin-top: auto;
+            flex-shrink: 0;
         }
         
         /* Standard Page Break Rules */
