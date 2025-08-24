@@ -231,7 +231,7 @@ p a:hover {
         flex-direction: column;
         align-items: center;
     }   
-      /* --- PRINT STYLES --- */
+     /* --- PRINT STYLES --- */
     @media print {
         /* Remove the soft background color for a clean white print */
         body {
@@ -254,6 +254,11 @@ p a:hover {
             flex-direction: column; /* Stack content vertically */
             justify-content: flex-start; /* Align content to the top */
         }
+        
+        /* NEW: Reset header positioning for print */
+        .header {
+            position: static;
+        }
 
         /* The most important part: control the page breaks */
         .page:not(:first-child) {
@@ -270,7 +275,7 @@ p a:hover {
             page-break-after: avoid;
         }
 
-        /* UPDATED: Push the footer to the bottom of the flex container */
+        /* Push the footer to the bottom of the flex container */
         .footer {
             position: static; 
             margin-top: auto; /* This is the key change */
