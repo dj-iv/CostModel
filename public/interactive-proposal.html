@@ -234,8 +234,8 @@ p a:hover {
 /* --- FINAL PRINT STYLES --- */
 
     @page {
-        /* REDUCED top margin, kept others for a professional look */
-        margin: 10mm 20mm 20mm 20mm; 
+        /* UPDATED: Sets all margins in one place. 10mm top/bottom, 15mm sides. */
+        margin: 10mm 15mm; 
     }
 
     @media print {
@@ -252,9 +252,9 @@ p a:hover {
             box-shadow: none;
             border: none;
             margin: 0;
-            padding: 10mm 20mm; /* REDUCED top padding */
-            width: auto;
-            min-height: 257mm; /* A4 height (297mm) minus top/bottom margins (40mm) */
+            padding: 0; /* UPDATED: Removed padding to prevent "double margins" */
+            width: 100%;
+            min-height: 277mm; /* A4 height (297mm) minus top/bottom margins (20mm) */
             
             display: flex;
             flex-direction: column;
