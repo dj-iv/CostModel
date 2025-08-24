@@ -82,9 +82,22 @@ p a:hover {
     h3 { font-size: 16pt; margin-top: 35px; margin-bottom: 15px; font-weight: 600; color: var(--color-primary-blue); }
     h4 { font-size: 12pt; margin-top: 25px; margin-bottom: 10px; font-weight: 600; text-transform: uppercase; color: #555; }
 
-    p, li { margin-bottom: 1.2em; }
-    ul { padding-left: 25px; }
-    ul li::marker { color: var(--color-secondary-teal); font-weight: bold; }
+ p, li {
+    margin-bottom: 1.2em;
+    text-align: justify; /* Aligns text to both sides */
+    hyphens: auto;      /* Enables automatic hyphenation */
+    widows: 2;          /* Prevents single lines at the top of a page */
+    orphans: 2;         /* Prevents single lines at the bottom of a page */
+}
+
+ul {
+    padding-left: 25px;
+}
+
+ul li::marker {
+    color: var(--color-secondary-teal);
+    font-weight: bold;
+}
 
     /* --- Modern Table Styling --- */
     table {
