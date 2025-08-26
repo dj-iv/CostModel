@@ -1,0 +1,24 @@
+{
+  "name": "testcostmodel",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dj-iv/TestCostModel.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dj-iv/TestCostModel/issues"
+  },
+  "homepage": "https://github.com/dj-iv/TestCostModel#readme",
+  "dependencies": {
+    "chrome-aws-lambda": "^10.1.0",
+    "puppeteer-core": "^24.17.0"
+  }
+}
