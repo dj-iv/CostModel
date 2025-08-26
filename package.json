@@ -6,8 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "devDependencies": {
+"dependencies": {
   "@sparticuz/chromium": "^123.0.1",
   "puppeteer-core": "^22.10.0"
-}
+},
+"devDependencies": {}
 }
