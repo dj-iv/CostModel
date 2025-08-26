@@ -1,4 +1,16 @@
-"dependencies": {
-  "@sparticuz/chromium": "111.0.0",
-  "puppeteer-core": "19.7.2"
+{
+  "name": "your-project-name",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",   <-- Make sure there is a comma here!
+  "dependencies": {
+    "@sparticuz/chromium": "111.0.0",
+    "puppeteer-core": "19.7.2"
+  }
 }
