@@ -11,31 +11,25 @@ module.exports = async (req, res) => {
   }
 
   try {
-    console.log("PDF generation function started."); // <-- New log
-
     const proposalData = req.body;
-    let baseHtml = '';
 
-    // --- Start of updated file reading logic ---
-    // Vercel copies the 'public' directory to the root of the deployment.
     const templatePath = path.join(process.cwd(), 'public', 'interactive-proposal.html');
-    console.log("Attempting to read template from path:", templatePath); // <-- New log
+    let baseHtml = '';
 
     if (fs.existsSync(templatePath)) {
         baseHtml = fs.readFileSync(templatePath, 'utf8');
-        console.log("Successfully read template file. Length:", baseHtml.length); // <-- New log
     } else {
-        // This makes the error loud and clear if the file is missing.
-        console.error("CRITICAL: Template file not found at path:", templatePath);
         throw new Error("HTML template file not found on the server.");
     }
 
-    if (!baseHtml) {
-        throw new Error("HTML template is empty after being read from the file.");
-    }
-    // --- End of updated file reading logic ---
+    // --- START: New logic to add a base URL ---
+    // Get the Vercel URL from environment variables
+    const siteUrl = `https://${process.env.VERCEL_URL}`;
+    // Inject a <base> tag into the HTML head to resolve relative image paths
+    const finalHtml = baseHtml.replace('<head>', `<head><base href="${siteUrl}">`);
+    // --- END: New logic ---
 
-    const populatedHtml = baseHtml.replace(/\{(\w+)\}/g, (match, key) => {
+    const populatedHtml = finalHtml.replace(/\{(\w+)\}/g, (match, key) => {
       return proposalData.hasOwnProperty(key) ? proposalData[key] : match;
     });
 
@@ -47,6 +41,7 @@ module.exports = async (req, res) => {
     });
 
     const page = await browser.newPage();
+    // Use the final, populated HTML
     await page.setContent(populatedHtml, { waitUntil: 'networkidle0' });
 
     const pdfBuffer = await page.pdf({
@@ -57,7 +52,6 @@ module.exports = async (req, res) => {
 
     await browser.close();
 
-    console.log("PDF generated successfully. Sending response."); // <-- New log
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="proposal.pdf"`);
     return res.status(200).send(pdfBuffer);
