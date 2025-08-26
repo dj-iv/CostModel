@@ -1,6 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+    /* Default screen styles: hide the print version */
+.show-on-print {
+    display: none;
+}
+
+/* Print styles (used by the PDF generator) */
+@media print {
+    /* Hide the screen version */
+    .show-on-screen {
+        display: none !important;
+    }
+    /* Show the print version */
+    .show-on-print {
+        display: block;
+    }
+}
     <meta charset="UTF-8">
     <title>Proposal for {Account}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -556,7 +573,7 @@ const solutionSpecificData = {
         architecture: `
             <h3 class="no-number">CEL-FI</h3>
             <p>UCtel proposes to deploy solutions from Nextivity. Nextivity manufactures the CEL-FI suite of cellular coverage solutions which are designed to optimise mobile signal coverage within buildings and vehicles. CEL-FI is unconditionally network safe, as it prevents interference with mobile operator networks and in the UK CEL-FI products are licence-exempt and fully comply with Ofcom’s UK Interface requirement 2102 (IR2102).</p>
-            <div style="padding:20px 0;"><iframe width="100%" height="315" src="https://www.youtube.com/embed/x_kXPIDpMcE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+           <div class="show-on-screen" style="padding:20px 0;">     <iframe width="100%" height="315" src="https://www.youtube.com/embed/x_kXPIDpMcE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe> </div>  <div class="show-on-print">     <p style="text-align: center; font-style: italic;">A video demonstration is available in the online version of this proposal.</p>     <a href="https://www.youtube.com/watch?v=x_kXPIDpMcE" target="_blank">         <img src="https://img.youtube.com/vi/x_kXPIDpMcE/0.jpg" alt="YouTube Video Thumbnail" style="border: 1px solid #ccc; width: 100%;">     </a> </div>
             <h3>CEL-FI G41 System Architecture</h3>
             <p>The CEL-FI solution needs to receive the best available donor signal from outside and transport the signal through low loss cable to the network repeaters that then distribute the signal through indoor antennas. A system comprises:</p>
             <ul><li>Donor antenna installed where the best donor signal can be obtained</li><li>Low loss cables</li><li>Repeaters to receive donor signal and boost it</li><li>Internal antennas to broadcast the boosted signal</li></ul>
@@ -571,7 +588,7 @@ const solutionSpecificData = {
         architecture: `
             <h3 class="no-number">CEL-FI</h3>
             <p>UCtel proposes to deploy solutions from Nextivity. Nextivity manufactures the CEL-FI suite of cellular coverage solutions which are designed to optimise mobile signal coverage within buildings and vehicles. CEL-FI is unconditionally network safe, as it prevents interference with mobile operator networks and in the UK CEL-FI products are licence-exempt and fully comply with Ofcom’s UK Interface requirement 2102 (IR2102).</p>
-            <div style="padding:20px 0;"><iframe width="100%" height="315" src="https://www.youtube.com/embed/x_kXPIDpMcE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+           <div class="show-on-screen" style="padding:20px 0;">     <iframe width="100%" height="315" src="https://www.youtube.com/embed/x_kXPIDpMcE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe> </div>  <div class="show-on-print">     <p style="text-align: center; font-style: italic;">A video demonstration is available in the online version of this proposal.</p>     <a href="https://www.youtube.com/watch?v=x_kXPIDpMcE" target="_blank">         <img src="https://img.youtube.com/vi/x_kXPIDpMcE/0.jpg" alt="YouTube Video Thumbnail" style="border: 1px solid #ccc; width: 100%;">     </a> </div>
             <h3>CEL-FI G43 System Architecture</h3>
             <p>The CEL-FI solution needs to receive the best available donor signal from outside and transport the signal through low loss cable to the network repeaters that then distribute the signal through indoor antennas. A system comprises:</p>
             <ul><li>Donor antenna installed where the best donor signal can be obtained</li><li>Low loss cables</li><li>Repeaters to receive donor signal and boost it</li><li>Internal antennas to broadcast the boosted signal</li></ul>
@@ -586,7 +603,7 @@ const solutionSpecificData = {
         architecture: `
             <h3 class="no-number">CEL-FI</h3>
             <p>UCtel proposes to deploy solutions from Nextivity. Nextivity manufactures the CEL-FI suite of cellular coverage solutions which are designed to optimise mobile signal coverage within buildings and vehicles. CEL-FI is unconditionally network safe, as it prevents interference with mobile operator networks and in the UK, CEL-FI products are licence-exempt and fully comply with Ofcom’s UK Interface requirement 2102 (IR2102).</p>
-            <div style="padding:20px 0;"><iframe width="100%" height="315" src="https://www.youtube.com/embed/x_kXPIDpMcE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+           <div class="show-on-screen" style="padding:20px 0;">     <iframe width="100%" height="315" src="https://www.youtube.com/embed/x_kXPIDpMcE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe> </div>  <div class="show-on-print">     <p style="text-align: center; font-style: italic;">A video demonstration is available in the online version of this proposal.</p>     <a href="https://www.youtube.com/watch?v=x_kXPIDpMcE" target="_blank">         <img src="https://img.youtube.com/vi/x_kXPIDpMcE/0.jpg" alt="YouTube Video Thumbnail" style="border: 1px solid #ccc; width: 100%;">     </a> </div>
             <h3>CEL-FI QUATRA 4000e</h3>
             <p>CEL-FI QUATRA is a distributed antenna system (DAS) hybrid solution that combines the strength of passive and active DAS technologies to deliver high-quality mobile signal in buildings. The QUATRA 4000e boosts up to 4 network operators in a single system and complies with recent changes to Ofcom’s regulations in this regard.</p>
             <img src="images/quatra_diagram.png" alt="QUATRA 4000e Architecture Diagram">`,
@@ -601,7 +618,7 @@ const solutionSpecificData = {
         architecture: `
             <h3 class="no-number">CEL-FI</h3>
             <p>UCtel proposes to deploy solutions from Nextivity. Nextivity manufactures the CEL-FI suite of cellular coverage solutions which are designed to optimise mobile signal coverage within buildings and vehicles. CEL-FI is unconditionally network safe, as it prevents interference with mobile operator networks and in the UK, CEL-FI products are licence-exempt and fully comply with Ofcom’s UK Interface requirement 2102 (IR2102).</p>
-            <div style="padding:20px 0;"><iframe width="100%" height="315" src="https://www.youtube.com/embed/x_kXPIDpMcE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+           <div class="show-on-screen" style="padding:20px 0;">     <iframe width="100%" height="315" src="https://www.youtube.com/embed/x_kXPIDpMcE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe> </div>  <div class="show-on-print">     <p style="text-align: center; font-style: italic;">A video demonstration is available in the online version of this proposal.</p>     <a href="https://www.youtube.com/watch?v=x_kXPIDpMcE" target="_blank">         <img src="https://img.youtube.com/vi/x_kXPIDpMcE/0.jpg" alt="YouTube Video Thumbnail" style="border: 1px solid #ccc; width: 100%;">     </a> </div>
             <h3>CEL-FI QUATRA EVO</h3>
             <p>CEL-FI QUATRA is a distributed antenna system (DAS) hybrid solution that combines the strength of passive and active DAS technologies to deliver high-quality mobile signal in buildings. The QUATRA EVO can boost two network operators in a single system and complies with recent changes to Ofcom’s regulations in this regard.</p>
             <img src="images/evo_diagram.png" alt="QUATRA EVO Architecture Diagram">`,
