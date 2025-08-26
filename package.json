@@ -1,14 +1,11 @@
 {
-  "name": "your-project-name",
+  "name": "cost-model",
   "version": "1.0.0",
-  "description": "",
+  "description": "Cost model and proposal generator",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",   <-- Make sure there is a comma here!
   "dependencies": {
     "@sparticuz/chromium": "111.0.0",
     "puppeteer-core": "19.7.2"
