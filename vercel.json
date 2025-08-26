@@ -1,6 +1,8 @@
 {
   "functions": {
-    "api/**/*.js": {
+    "api/generate-pdf.js": {
+      "memory": 3008,
+      "maxDuration": 60,
       "runtime": "nodejs18.x"
     }
   }
