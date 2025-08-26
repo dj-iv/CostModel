@@ -349,22 +349,6 @@ ul li::marker {
             text-decoration: none;
         }
     }
-                /* Default screen styles: hide the print version */
-.show-on-print {
-    display: none;
-}
-
-/* Print styles (used by the PDF generator) */
-@media print {
-    /* Hide the screen version */
-    .show-on-screen {
-        display: none !important;
-    }
-    /* Show the print version */
-    .show-on-print {
-        display: block;
-    }
-}
 </style>
 </head>
 <body>
@@ -536,33 +520,78 @@ ul li::marker {
         </p>
         <div class="footer"><span>CEL-FI {Solution} solution proposal for {Account}</span><span class="page-number"></span></div>
     </div>
-     <div class="page" style="border: none; box-shadow: none; min-height: auto;">
-        <style>
-            #download-pdf-btn {
-                display: block;
-                width: 220px;
-                margin: 50px auto;
-                padding: 15px;
-                font-size: 16px;
-                font-weight: bold;
-                color: white;
-                background-color: #d9534f; /* PDF Red */
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                text-align: center;
-                transition: background-color 0.2s;
-            }
-            #download-pdf-btn:hover {
-                background-color: #c9302c;
-            }
-            #download-pdf-btn:disabled {
-                background-color: #cccccc;
-                cursor: not-allowed;
-            }
-        </style>
-        <button id="download-pdf-btn">Download as PDF 📄</button>
+    <div class="page">
+        <div class="header"><img src="images/uctel_logo.png" alt="UCtel Logo"></div>
+        <h2><i class="fa-solid fa-cloud-arrow-down"></i> Download a Copy</h2>
+        <p>
+            You can download a PDF copy of this proposal for your records by clicking the button below. The generated file will be a high-quality, print-ready version of this interactive document.
+        </p>
+        
+        <div id="download-section" style="text-align: center; margin-top: 40px;">
+            <button id="download-pdf-button" style="padding: 15px 30px; font-size: 18px; font-family: 'Montserrat', sans-serif; cursor: pointer; background-color: var(--color-primary-blue); color: white; border: none; border-radius: 5px;">
+                Download Proposal as PDF
+            </button>
+        </div>
+
+        <div class="footer"><span>CEL-FI {Solution} solution proposal for {Account}</span><span class="page-number"></span></div>
     </div>
+
+    <script>
+        const downloadButton = document.getElementById('download-pdf-button');
+        
+        if (downloadButton) {
+            downloadButton.addEventListener('click', async () => {
+                
+                // Provide instant feedback to the user
+                downloadButton.disabled = true;
+                downloadButton.textContent = 'Generating PDF, please wait...';
+
+                // Temporarily hide the button itself so it's not in the PDF
+                const downloadSection = document.getElementById('download-section');
+                downloadSection.style.display = 'none';
+
+                try {
+                    // 1. Capture the entire current HTML of the proposal
+                    const fullHtml = document.documentElement.outerHTML;
+
+                    // 2. Send this HTML to your existing Vercel function
+                    const response = await fetch('/api/generate-pdf', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/html' },
+                        body: fullHtml
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('PDF generation service failed.');
+                    }
+
+                    // 3. Receive the PDF back and trigger the download
+                    const pdfBlob = await response.blob();
+                    const downloadUrl = window.URL.createObjectURL(pdfBlob);
+                    const link = document.createElement('a');
+                    
+                    link.href = downloadUrl;
+                    // The document title is already set by your other script, so we can use it!
+                    link.setAttribute('download', `${document.title}.pdf`);
+                    document.body.appendChild(link);
+                    link.click();
+                    
+                    link.remove();
+                    window.URL.revokeObjectURL(downloadUrl);
+
+                } catch (error) {
+                    console.error('Failed to download PDF:', error);
+                    alert('Sorry, the PDF could not be generated at this time. Please try again later.');
+                } finally {
+                    // Always restore the button's state
+                    downloadSection.style.display = 'block';
+                    downloadButton.disabled = false;
+                    downloadButton.textContent = 'Download Proposal as PDF';
+                }
+            });
+        }
+  </script>
+
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
@@ -572,7 +601,7 @@ const solutionSpecificData = {
         architecture: `
             <h3 class="no-number">CEL-FI</h3>
             <p>UCtel proposes to deploy solutions from Nextivity. Nextivity manufactures the CEL-FI suite of cellular coverage solutions which are designed to optimise mobile signal coverage within buildings and vehicles. CEL-FI is unconditionally network safe, as it prevents interference with mobile operator networks and in the UK CEL-FI products are licence-exempt and fully comply with Ofcom’s UK Interface requirement 2102 (IR2102).</p>
-           <div class="show-on-screen" style="padding:20px 0;">     <iframe width="100%" height="315" src="https://www.youtube.com/embed/x_kXPIDpMcE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe> </div>  <div class="show-on-print">     <p style="text-align: center; font-style: italic;">A video demonstration is available in the online version of this proposal.</p>     <a href="https://www.youtube.com/watch?v=x_kXPIDpMcE" target="_blank">         <img src="https://img.youtube.com/vi/x_kXPIDpMcE/0.jpg" alt="YouTube Video Thumbnail" style="border: 1px solid #ccc; width: 100%;">     </a> </div>
+            <div style="padding:20px 0;"><iframe width="100%" height="315" src="https://www.youtube.com/embed/x_kXPIDpMcE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
             <h3>CEL-FI G41 System Architecture</h3>
             <p>The CEL-FI solution needs to receive the best available donor signal from outside and transport the signal through low loss cable to the network repeaters that then distribute the signal through indoor antennas. A system comprises:</p>
             <ul><li>Donor antenna installed where the best donor signal can be obtained</li><li>Low loss cables</li><li>Repeaters to receive donor signal and boost it</li><li>Internal antennas to broadcast the boosted signal</li></ul>
@@ -587,7 +616,7 @@ const solutionSpecificData = {
         architecture: `
             <h3 class="no-number">CEL-FI</h3>
             <p>UCtel proposes to deploy solutions from Nextivity. Nextivity manufactures the CEL-FI suite of cellular coverage solutions which are designed to optimise mobile signal coverage within buildings and vehicles. CEL-FI is unconditionally network safe, as it prevents interference with mobile operator networks and in the UK CEL-FI products are licence-exempt and fully comply with Ofcom’s UK Interface requirement 2102 (IR2102).</p>
-           <div class="show-on-screen" style="padding:20px 0;">     <iframe width="100%" height="315" src="https://www.youtube.com/embed/x_kXPIDpMcE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe> </div>  <div class="show-on-print">     <p style="text-align: center; font-style: italic;">A video demonstration is available in the online version of this proposal.</p>     <a href="https://www.youtube.com/watch?v=x_kXPIDpMcE" target="_blank">         <img src="https://img.youtube.com/vi/x_kXPIDpMcE/0.jpg" alt="YouTube Video Thumbnail" style="border: 1px solid #ccc; width: 100%;">     </a> </div>
+            <div style="padding:20px 0;"><iframe width="100%" height="315" src="https://www.youtube.com/embed/x_kXPIDpMcE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
             <h3>CEL-FI G43 System Architecture</h3>
             <p>The CEL-FI solution needs to receive the best available donor signal from outside and transport the signal through low loss cable to the network repeaters that then distribute the signal through indoor antennas. A system comprises:</p>
             <ul><li>Donor antenna installed where the best donor signal can be obtained</li><li>Low loss cables</li><li>Repeaters to receive donor signal and boost it</li><li>Internal antennas to broadcast the boosted signal</li></ul>
@@ -602,7 +631,7 @@ const solutionSpecificData = {
         architecture: `
             <h3 class="no-number">CEL-FI</h3>
             <p>UCtel proposes to deploy solutions from Nextivity. Nextivity manufactures the CEL-FI suite of cellular coverage solutions which are designed to optimise mobile signal coverage within buildings and vehicles. CEL-FI is unconditionally network safe, as it prevents interference with mobile operator networks and in the UK, CEL-FI products are licence-exempt and fully comply with Ofcom’s UK Interface requirement 2102 (IR2102).</p>
-           <div class="show-on-screen" style="padding:20px 0;">     <iframe width="100%" height="315" src="https://www.youtube.com/embed/x_kXPIDpMcE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe> </div>  <div class="show-on-print">     <p style="text-align: center; font-style: italic;">A video demonstration is available in the online version of this proposal.</p>     <a href="https://www.youtube.com/watch?v=x_kXPIDpMcE" target="_blank">         <img src="https://img.youtube.com/vi/x_kXPIDpMcE/0.jpg" alt="YouTube Video Thumbnail" style="border: 1px solid #ccc; width: 100%;">     </a> </div>
+            <div style="padding:20px 0;"><iframe width="100%" height="315" src="https://www.youtube.com/embed/x_kXPIDpMcE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
             <h3>CEL-FI QUATRA 4000e</h3>
             <p>CEL-FI QUATRA is a distributed antenna system (DAS) hybrid solution that combines the strength of passive and active DAS technologies to deliver high-quality mobile signal in buildings. The QUATRA 4000e boosts up to 4 network operators in a single system and complies with recent changes to Ofcom’s regulations in this regard.</p>
             <img src="images/quatra_diagram.png" alt="QUATRA 4000e Architecture Diagram">`,
@@ -617,7 +646,7 @@ const solutionSpecificData = {
         architecture: `
             <h3 class="no-number">CEL-FI</h3>
             <p>UCtel proposes to deploy solutions from Nextivity. Nextivity manufactures the CEL-FI suite of cellular coverage solutions which are designed to optimise mobile signal coverage within buildings and vehicles. CEL-FI is unconditionally network safe, as it prevents interference with mobile operator networks and in the UK, CEL-FI products are licence-exempt and fully comply with Ofcom’s UK Interface requirement 2102 (IR2102).</p>
-           <div class="show-on-screen" style="padding:20px 0;">     <iframe width="100%" height="315" src="https://www.youtube.com/embed/x_kXPIDpMcE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe> </div>  <div class="show-on-print">     <p style="text-align: center; font-style: italic;">A video demonstration is available in the online version of this proposal.</p>     <a href="https://www.youtube.com/watch?v=x_kXPIDpMcE" target="_blank">         <img src="https://img.youtube.com/vi/x_kXPIDpMcE/0.jpg" alt="YouTube Video Thumbnail" style="border: 1px solid #ccc; width: 100%;">     </a> </div>
+            <div style="padding:20px 0;"><iframe width="100%" height="315" src="https://www.youtube.com/embed/x_kXPIDpMcE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
             <h3>CEL-FI QUATRA EVO</h3>
             <p>CEL-FI QUATRA is a distributed antenna system (DAS) hybrid solution that combines the strength of passive and active DAS technologies to deliver high-quality mobile signal in buildings. The QUATRA EVO can boost two network operators in a single system and complies with recent changes to Ofcom’s regulations in this regard.</p>
             <img src="images/evo_diagram.png" alt="QUATRA EVO Architecture Diagram">`,
@@ -794,152 +823,6 @@ document.title = newFilename;
             });
         })();
     });
-    async function generatePdf() {
-    const downloadBtn = document.getElementById('download-pdf-btn');
-    const originalText = downloadBtn.innerHTML;
-    
-    downloadBtn.disabled = true;
-    downloadBtn.innerHTML = 'Generating...';
-
-    try {
-        // 1. Send the proposal data to our new API endpoint
-        const response = await fetch('/api/generate-pdf', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(proposalData),
-        });
-
-        if (!response.ok) {
-            throw new Error(`Server responded with status: ${response.status}`);
-        }
-
-        // 2. Receive the generated PDF file as a blob
-        const pdfBlob = await response.blob();
-
-        // 3. Create a temporary link and trigger the download
-        const url = window.URL.createObjectURL(pdfBlob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', generateFilename()); // Use the same filename helper
-        document.body.appendChild(link);
-        link.click();
-
-        // Clean up the temporary link
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-
-    } catch (error) {
-        console.error("Error fetching PDF:", error);
-        alert("An error occurred while generating the PDF. Please try again.");
-    } finally {
-        // 4. Restore the button
-        downloadBtn.disabled = false;
-        downloadBtn.innerHTML = originalText;
-    }
-}
-    window.onload = function() {
-            let proposalData = {}; // This will store the data from the URL
-
-            /**
-             * Decodes data from the URL hash and populates all placeholders.
-             */
-            function initializeProposal() {
-                try {
-                    const encodedState = window.location.hash.substring(1);
-                    if (!encodedState) {
-                        console.error("No data found in URL hash.");
-                        return;
-                    }
-                    
-                    const compressedString = atob(encodedState);
-                    const compressed = new Uint8Array(compressedString.length);
-                    for (let i = 0; i < compressedString.length; i++) {
-                        compressed[i] = compressedString.charCodeAt(i);
-                    }
-                    const jsonString = pako.inflate(compressed, { to: 'string' });
-                    proposalData = JSON.parse(jsonString);
-
-                    // Replace all placeholders like {Account} with the actual data
-                    const bodyHtml = document.body.innerHTML;
-                    const populatedHtml = bodyHtml.replace(/\{(\w+)\}/g, (match, key) => {
-                        return proposalData.hasOwnProperty(key) ? proposalData[key] : match;
-                    });
-                    document.body.innerHTML = populatedHtml;
-
-                } catch (error) {
-                    console.error("Failed to load proposal data from URL:", error);
-                    alert("Could not load proposal data. The link may be invalid.");
-                }
-            }
-            
-            /**
-             * Generates a dynamic filename for the PDF.
-             */
-            function generateFilename() {
-                const customerName = (proposalData.Account || 'Customer').substring(0, 50);
-                const solutionName = (proposalData.Solution || 'Solution').replace(/\s+/g, '-');
-                const now = new Date();
-                const day = String(now.getDate()).padStart(2, '0');
-                const month = now.toLocaleString('en-GB', { month: 'short' });
-                const year = now.getFullYear();
-                return `UCtel-Proposal-${solutionName}-for-${customerName}-${day}${month}${year}.pdf`;
-            }
-
-            /**
-             * Handles the PDF generation by calling our serverless API.
-             */
-            async function generatePdf() {
-                const downloadBtn = document.getElementById('download-pdf-btn');
-                const originalText = downloadBtn.innerHTML;
-                
-                downloadBtn.disabled = true;
-                downloadBtn.innerHTML = 'Generating...';
-
-                try {
-                    // Send the proposal data to our new serverless function
-                    const response = await fetch('/api/generate-pdf', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(proposalData),
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(`Server responded with status: ${response.status}`);
-                    }
-
-                    // Receive the generated PDF file as a 'blob'
-                    const pdfBlob = await response.blob();
-
-                    // Create a temporary link to trigger the browser's download prompt
-                    const url = window.URL.createObjectURL(pdfBlob);
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.setAttribute('download', generateFilename());
-                    document.body.appendChild(link);
-                    link.click();
-
-                    // Clean up the temporary link
-                    document.body.removeChild(link);
-                    window.URL.revokeObjectURL(url);
-
-                } catch (error) {
-                    console.error("Error fetching PDF:", error);
-                    alert("An error occurred while generating the PDF. Please try again.");
-                } finally {
-                    // Always restore the button to its original state
-                    downloadBtn.disabled = false;
-                    downloadBtn.innerHTML = originalText;
-                }
-            }
-            
-            // Run the initialization function to populate the page
-            initializeProposal();
-            
-            // Attach the event listener to our new button
-            document.getElementById('download-pdf-btn').addEventListener('click', generatePdf);
-        };
 </script>
-    </body>
+</body>
 </html>
